@@ -1,0 +1,84 @@
+// StudyHub 초기 ERD - 개선 버전(v2)
+
+Table users {
+  id int [pk, increment]
+  email varchar [unique, not null]
+  password varchar(60) [not null, note: 'bcrypt 대응']
+  name varchar [not null]
+  education_status varchar [note: '재학, 졸업, 중퇴, 휴학 등']
+  university varchar
+  major varchar
+  role enum('USER', 'ADMIN') [default: 'USER']
+  created_at timestamp [default: `current_timestamp`]
+}
+
+Table studies {
+  id int [pk, increment]
+  title varchar [not null]
+  description text
+  leader_id int [not null]
+  recruitment_limit int
+  requirement text
+  deadline date
+  created_at timestamp [default: `current_timestamp`]
+}
+
+Table study_applications {
+  id int [pk, increment]
+  user_id int [not null]
+  study_id int [not null]
+  status varchar [default: 'PENDING', note: 'PENDING, APPROVED, REJECTED']
+  applied_at timestamp [default: `current_timestamp`]
+
+  indexes {
+    (user_id, study_id) [unique]
+  }
+}
+
+Table posts {
+  id int [pk, increment]
+  title varchar [not null]
+  content text
+  user_id int [not null]
+  category varchar [note: 'FREE, QNA, REVIEW, INTERVIEW']
+  created_at timestamp [default: `current_timestamp`]
+}
+
+Table comments {
+  id int [pk, increment]
+  post_id int [not null]
+  user_id int [not null]
+  content text
+  parent_id int [note: 'null if root comment']
+  created_at timestamp [default: `current_timestamp`]
+}
+
+Table reports {
+  id int [pk, increment]
+  target_user_id int [not null]
+  post_id int [note: 'nullable if only user report']
+  reason text
+  is_resolved boolean [default: false]
+  reported_at timestamp [default: `current_timestamp`]
+}
+
+Table files {
+  id int [pk, increment]
+  user_id int
+  study_id int
+  type varchar [note: 'THUMBNAIL, RESUME']
+  url varchar [not null]
+  uploaded_at timestamp [default: `current_timestamp`]
+}
+
+Ref: studies.leader_id > users.id
+Ref: study_applications.user_id > users.id
+Ref: study_applications.study_id > studies.id
+Ref: posts.user_id > users.id
+Ref: comments.post_id > posts.id
+Ref: comments.user_id > users.id
+Ref: comments.parent_id > comments.id [delete: cascade]
+Ref: reports.target_user_id > users.id
+Ref: reports.post_id > posts.id
+Ref: files.user_id > users.id
+Ref: files.study_id > studies.id

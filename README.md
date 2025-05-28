@@ -60,6 +60,6 @@ Spring Boot 기반 MVC 패턴으로 제작되었으며, 회원 관리, 스터디
 - [https://studyhub.dev](https://studyhub.dev) (추후 연결)
 
 ## 👤 개발자
-- 강인석 ([GitHub](https://github.com/DLST316))
+- DLST316 ([GitHub](https://github.com/DLST316))
 
 ---
