@@ -1,3 +1,8 @@
+![Java](https://img.shields.io/badge/Java-17-blue)
+![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.5-brightgreen)
+![MySQL](https://img.shields.io/badge/DB-MySQL-yellow)
+![Thymeleaf](https://img.shields.io/badge/View-Thymeleaf-lightgrey)
+
 # 🧠 StudyHub (스터디/취준생 커뮤니티)
 
 스터디 모집과 취업 준비생을 위한 커뮤니티 플랫폼입니다.  
