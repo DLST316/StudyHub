@@ -61,4 +61,31 @@ public class UserController {
         }
         return "redirect:/login";
     }
+    @PostMapping("/join")
+    public String processJoin(@Valid @ModelAttribute("userJoinForm") UserJoinForm form,
+                              BindingResult result, Model model) {
+        if (result.hasErrors()) {
+            return "user/join";
+        }
+
+        // 이메일 중복 검사
+        if (userService.findByEmail(form.getEmail()).isPresent()) {
+            result.rejectValue("email", "duplicate", "이미 사용 중인 이메일입니다.");
+            return "user/join";
+        }
+
+        // 유저 생성 및 저장
+        User user = User.builder()
+                .name(form.getName())
+                .email(form.getEmail())
+                .password(passwordEncoder.encode(form.getPassword()))
+                .university(form.getUniversity())
+                .major(form.getMajor())
+                .role("USER")
+                .educationStatus(form.getEducationStatus()) // ENUM
+                .build();
+
+        userService.save(user);
+        return "redirect:/login";
+    }
 }
