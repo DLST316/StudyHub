@@ -18,7 +18,7 @@ Spring Boot 기반 MVC 패턴으로 제작되었으며, 회원 관리, 스터디
 | 목적    | 스터디 모집 및 취준생 커뮤니티 서비스                                                    |
 | 대상    | 백엔드 개발 취업용 포트폴리오                                                         |
 | 기술 스택 | Java 17, Spring Boot 3.5, Spring Security, JPA, MySQL, Thymeleaf, Gradle |
-| 배포 환경 | AWS EC2 (Docker)                                                         |
+| 배포 환경 | AWS EC2 (추후 Docker 도입 예정)                                          |
 
 ---
 
@@ -53,7 +53,7 @@ Spring Boot 기반 MVC 패턴으로 제작되었으며, 회원 관리, 스터디
 
 - Spring MVC 구조 기반 서버 렌더링
 - Spring Data JPA로 ORM 처리
-- 로그인: 세션 방식 or JWT (확장 예정)
+- 로그인: 세션 방식 (JWT는 추후 확장 예정)
 - Thymeleaf 템플릿 엔진
 - Swagger 도입 (REST API 기능 확장 시)
 - 로컬 개발용 H2 / 운영 MySQL 연동
