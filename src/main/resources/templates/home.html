@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StudyHub - 스터디 커뮤니티</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #2C2E33; /* 베이스: 차콜 그레이 */
+            color: #F4EFE9; /* 정보색상: 페일 베이지/아이보리 */
+            font-family: 'Pretendard', 'Noto Sans KR', sans-serif;
+            min-height: 100vh;
+        }
+
+        /* 네비게이션 바 */
+        .navbar {
+            background: rgba(44, 46, 51, 0.95); /* 베이스: 차콜 그레이 (투명도 적용) */
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            border-bottom: 2px solid #FF5C38; /* 브랜드 포인트: 선명한 주황 */
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #FF5C38; /* 브랜드 포인트: 선명한 주황 */
+            text-decoration: none;
+            text-shadow: 0 0 10px rgba(255, 92, 56, 0.3);
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-menu a {
+            color: #F4EFE9; /* 정보색상: 페일 베이지/아이보리 */
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav-menu a:hover {
+            color: #FF5C38; /* 브랜드 포인트: 선명한 주황 */
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-info {
+            color: #7FE7DC; /* 액션 피드백: 민트 블루 */
+            font-weight: 500;
+        }
+
+        .logout-btn {
+            background: #1E3A5F; /* 버튼/CTA: 딥 블루 */
+            color: #F4EFE9; /* 정보색상: 페일 베이지/아이보리 */
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .logout-btn:hover {
+            background: #FF5C38; /* 브랜드 포인트: 선명한 주황 */
+            transform: translateY(-1px);
+        }
+
+        /* 메인 컨테이너 */
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 120px 2rem 2rem 2rem;
+        }
+
+        /* 히어로 섹션 */
+        .hero-section {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .hero-title {
+            font-size: 3.5rem;
+            font-weight: 700;
+            color: #FF5C38; /* 브랜드 포인트: 선명한 주황 */
+            margin-bottom: 1rem;
+            text-shadow: 0 0 20px rgba(255, 92, 56, 0.5);
+        }
+
+        .hero-subtitle {
+            font-size: 1.3rem;
+            color: #F4EFE9; /* 정보색상: 페일 베이지/아이보리 */
+            margin-bottom: 2rem;
+        }
+
+        .welcome-message {
+            font-size: 1.2rem;
+            color: #7FE7DC; /* 액션 피드백: 민트 블루 */
+            margin-bottom: 2rem;
+            font-weight: 500;
+        }
+
+        /* 로그인 섹션 */
+        .login-section {
+            background: rgba(244, 239, 233, 0.1); /* 정보색상: 페일 베이지/아이보리 (투명도 적용) */
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2.5rem;
+            max-width: 400px;
+            margin: 0 auto;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 92, 56, 0.2); /* 브랜드 포인트: 선명한 주황 (투명도 적용) */
+        }
+
+        .login-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #F4EFE9; /* 정보색상: 페일 베이지/아이보리 */
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #F4EFE9; /* 정보색상: 페일 베이지/아이보리 */
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 2px solid rgba(244, 239, 233, 0.3); /* 정보색상: 페일 베이지/아이보리 (투명도 적용) */
+            border-radius: 10px;
+            font-size: 1rem;
+            background: rgba(44, 46, 51, 0.8); /* 베이스: 차콜 그레이 (투명도 적용) */
+            color: #F4EFE9; /* 정보색상: 페일 베이지/아이보리 */
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #FF5C38; /* 브랜드 포인트: 선명한 주황 */
+            box-shadow: 0 0 10px rgba(255, 92, 56, 0.3);
+        }
+
+        .form-group input::placeholder {
+            color: rgba(244, 239, 233, 0.6); /* 정보색상: 페일 베이지/아이보리 (투명도 적용) */
+        }
+
+        .login-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #1E3A5F 0%, #2C2E33 100%); /* 버튼/CTA: 딥 블루 → 베이스: 차콜 그레이 */
+            color: #F4EFE9; /* 정보색상: 페일 베이지/아이보리 */
+            border: none;
+            padding: 1rem;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .login-btn:hover {
+            background: linear-gradient(135deg, #FF5C38 0%, #1E3A5F 100%); /* 브랜드 포인트: 선명한 주황 → 버튼/CTA: 딥 블루 */
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 92, 56, 0.4);
+        }
+
+        .signup-link {
+            text-align: center;
+            margin-top: 1.5rem;
+        }
+
+        .signup-link a {
+            color: #7FE7DC; /* 액션 피드백: 민트 블루 */
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .signup-link a:hover {
+            color: #FF5C38; /* 브랜드 포인트: 선명한 주황 */
+            text-decoration: underline;
+        }
+
+        /* 사용자 대시보드 */
+        .dashboard-section {
+            background: rgba(244, 239, 233, 0.1); /* 정보색상: 페일 베이지/아이보리 (투명도 적용) */
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2.5rem;
+            max-width: 600px;
+            margin: 0 auto;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 92, 56, 0.2); /* 브랜드 포인트: 선명한 주황 (투명도 적용) */
+        }
+
+        .dashboard-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #F4EFE9; /* 정보색상: 페일 베이지/아이보리 */
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .dashboard-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .action-btn {
+            background: linear-gradient(135deg, #1E3A5F 0%, #2C2E33 100%); /* 버튼/CTA: 딥 블루 → 베이스: 차콜 그레이 */
+            color: #F4EFE9; /* 정보색상: 페일 베이지/아이보리 */
+            border: none;
+            padding: 1rem;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .action-btn:hover {
+            background: linear-gradient(135deg, #FF5C38 0%, #1E3A5F 100%); /* 브랜드 포인트: 선명한 주황 → 버튼/CTA: 딥 블루 */
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 92, 56, 0.4);
+        }
+
+        /* 피처 섹션 */
+        .features-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 4rem;
+        }
+
+        .feature-card {
+            background: rgba(244, 239, 233, 0.1); /* 정보색상: 페일 베이지/아이보리 (투명도 적용) */
+            padding: 2rem;
+            border-radius: 15px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 92, 56, 0.2); /* 브랜드 포인트: 선명한 주황 (투명도 적용) */
+            transition: all 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(255, 92, 56, 0.2);
+            border-color: rgba(255, 92, 56, 0.4);
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .feature-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #FF5C38; /* 브랜드 포인트: 선명한 주황 */
+        }
+
+        .feature-desc {
+            color: #F4EFE9; /* 정보색상: 페일 베이지/아이보리 */
+            line-height: 1.6;
+        }
+
+        /* 성공 메시지 */
+        .success-message {
+            background: linear-gradient(135deg, #7FE7DC 0%, #1E3A5F 100%); /* 액션 피드백: 민트 블루 → 버튼/CTA: 딥 블루 */
+            color: #F4EFE9; /* 정보색상: 페일 베이지/아이보리 */
+            padding: 1rem 2rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            text-align: center;
+            font-weight: 500;
+            box-shadow: 0 4px 15px rgba(127, 231, 220, 0.3);
+            border: 1px solid rgba(127, 231, 220, 0.3);
+        }
+
+        /* 반응형 */
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2.5rem;
+            }
+            
+            .nav-menu {
+                display: none;
+            }
+            
+            .main-container {
+                padding: 100px 1rem 1rem 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 네비게이션 바 -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" class="logo">StudyHub</a>
+            <ul class="nav-menu">
+                <li><a href="/studies">스터디 찾기</a></li>
+                <li><a href="/posts">커뮤니티</a></li>
+                <li><a href="/about">소개</a></li>
+                <!-- 로그인 상태에 따른 네비게이션 -->
+                <li th:if="${isLoggedIn}" class="user-menu">
+                    <span class="user-info" th:text="${userEmail}">사용자</span>
+                    <form th:action="@{/logout}" method="post" style="margin: 0;">
+                        <button type="submit" class="logout-btn">로그아웃</button>
+                    </form>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- 메인 컨테이너 -->
+    <div class="main-container">
+        <!-- 성공 메시지 -->
+        <div th:if="${successMessage}" class="success-message" th:text="${successMessage}">
+            회원가입이 완료되었습니다!
+        </div>
+
+        <!-- 히어로 섹션 -->
+        <div class="hero-section">
+            <h1 class="hero-title">StudyHub</h1>
+            <p class="hero-subtitle">함께 성장하는 스터디 모집 & 커뮤니티</p>
+            <!-- 로그인된 사용자에게 환영 메시지 -->
+            <p th:if="${isLoggedIn}" class="welcome-message" th:text="'환영합니다, ' + ${userEmail} + '님!'">환영합니다!</p>
+        </div>
+
+        <!-- 로그인되지 않은 사용자를 위한 로그인 섹션 -->
+        <div th:if="${!isLoggedIn}" class="login-section">
+            <h2 class="login-title">로그인</h2>
+            <form action="/login" method="post">
+                <div class="form-group">
+                    <label for="email">이메일</label>
+                    <input type="email" id="email" name="email" required placeholder="이메일을 입력하세요">
+                </div>
+                <div class="form-group">
+                    <label for="password">비밀번호</label>
+                    <input type="password" id="password" name="password" required placeholder="비밀번호를 입력하세요">
+                </div>
+                <button type="submit" class="login-btn">로그인</button>
+            </form>
+            <div class="signup-link">
+                <a href="/join">아직 회원이 아니신가요? 회원가입</a>
+            </div>
+        </div>
+
+        <!-- 로그인된 사용자를 위한 대시보드 -->
+        <div th:if="${isLoggedIn}" class="dashboard-section">
+            <h2 class="dashboard-title">내 대시보드</h2>
+            <p style="text-align: center; color: #F4EFE9; margin-bottom: 2rem;">
+                StudyHub에서 다양한 활동을 시작해보세요!
+            </p>
+            <div class="dashboard-actions">
+                <a href="/studies/new" class="action-btn">스터디 만들기</a>
+                <a href="/studies" class="action-btn">스터디 찾기</a>
+                <a href="/posts/new" class="action-btn">글쓰기</a>
+                <a href="/mypage" class="action-btn">마이페이지</a>
+            </div>
+        </div>
+
+        <!-- 피처 섹션 -->
+        <div class="features-section">
+            <div class="feature-card">
+                <div class="feature-icon">📚</div>
+                <h3 class="feature-title">스터디 모집</h3>
+                <p class="feature-desc">다양한 분야의 스터디를 찾고 참여하세요. 함께 공부하며 성장할 수 있습니다.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">💬</div>
+                <h3 class="feature-title">커뮤니티</h3>
+                <p class="feature-desc">학습 경험을 공유하고 질문을 통해 서로 도움을 주고받으세요.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🤝</div>
+                <h3 class="feature-title">네트워킹</h3>
+                <p class="feature-desc">같은 목표를 가진 사람들과 연결되어 새로운 인연을 만나보세요.</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html> 
