@@ -1,14 +1,14 @@
-// StudyHub 초기 ERD (MVP 기준 수정 버전)
+// StudyHub 초기 ERD - 개선 버전(v2)
 
 Table users {
   id int [pk, increment]
   email varchar [unique, not null]
-  password varchar [not null]
+  password varchar(60) [not null, note: 'bcrypt 대응']
   name varchar [not null]
-  education_status varchar [note: '고졸, 재학, 졸업, 중퇴, 휴학']
+  education_status varchar [note: '재학, 졸업, 중퇴, 휴학 등']
   university varchar
   major varchar
-  role varchar [default: 'USER', note: 'USER, ADMIN']
+  role enum('USER', 'ADMIN') [default: 'USER']
   created_at timestamp [default: `current_timestamp`]
 }
 
@@ -40,7 +40,7 @@ Table posts {
   title varchar [not null]
   content text
   user_id int [not null]
-  category varchar [note: 'FREE, QUESTION, REVIEW, INTERVIEW']
+  category varchar [note: 'FREE, QNA, REVIEW, INTERVIEW']
   created_at timestamp [default: `current_timestamp`]
 }
 
@@ -51,7 +51,6 @@ Table comments {
   content text
   parent_id int [note: 'null if root comment']
   created_at timestamp [default: `current_timestamp`]
-  is_deleted boolean [default: false]
 }
 
 Table reports {
@@ -69,9 +68,6 @@ Table files {
   study_id int
   type varchar [note: 'THUMBNAIL, RESUME']
   url varchar [not null]
-  size int
-  mime_type varchar
-  original_name varchar
   uploaded_at timestamp [default: `current_timestamp`]
 }
 
@@ -81,7 +77,7 @@ Ref: study_applications.study_id > studies.id
 Ref: posts.user_id > users.id
 Ref: comments.post_id > posts.id
 Ref: comments.user_id > users.id
-Ref: comments.parent_id > comments.id
+Ref: comments.parent_id > comments.id [delete: cascade]
 Ref: reports.target_user_id > users.id
 Ref: reports.post_id > posts.id
 Ref: files.user_id > users.id
