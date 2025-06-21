@@ -1,5 +1,9 @@
 package dev.kang.studyhub.web;
 
+import dev.kang.studyhub.domain.study.entity.Study;
+import dev.kang.studyhub.service.study.StudyService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -7,12 +11,17 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.List;
+
 /**
  * 홈페이지 컨트롤러
  * 메인 페이지(/)를 처리하는 컨트롤러입니다.
  */
 @Controller
+@RequiredArgsConstructor
 public class HomeController {
+    
+    private final StudyService studyService;
     
     /**
      * 홈페이지 메인 화면을 처리하는 메서드
@@ -48,6 +57,10 @@ public class HomeController {
         if ("join".equals(success)) {
             model.addAttribute("successMessage", "회원가입이 완료되었습니다! 로그인해주세요.");
         }
+        
+        // 최근 스터디 목록 조회 (최대 6개)
+        List<Study> recentStudies = studyService.findAll(PageRequest.of(0, 6)).getContent();
+        model.addAttribute("recentStudies", recentStudies);
         
         // "home" 템플릿을 렌더링하여 반환
         return "home";

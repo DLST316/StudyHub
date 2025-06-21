@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>스터디 신청자 관리 - StudyHub</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #2C2E33;
+            color: #F4EFE9;
+            font-family: 'Pretendard', 'Noto Sans KR', sans-serif;
+            min-height: 100vh;
+        }
+
+        .navbar {
+            background: rgba(44, 46, 51, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            border-bottom: 2px solid #FF5C38;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #FF5C38;
+            text-decoration: none;
+            text-shadow: 0 0 10px rgba(255, 92, 56, 0.3);
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-menu a {
+            color: #F4EFE9;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav-menu a:hover {
+            color: #FF5C38;
+        }
+
+        .main-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 120px 2rem 2rem 2rem;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .page-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #FF5C38;
+            margin-bottom: 1rem;
+            text-shadow: 0 0 20px rgba(255, 92, 56, 0.3);
+        }
+
+        .page-subtitle {
+            font-size: 1.1rem;
+            color: #F4EFE9;
+            opacity: 0.8;
+        }
+
+        .study-info {
+            background: rgba(244, 239, 233, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 3rem;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 92, 56, 0.2);
+            text-align: center;
+        }
+
+        .study-title {
+            font-size: 1.5rem;
+            color: #FF5C38;
+            margin-bottom: 1rem;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: #7FE7DC;
+        }
+
+        .empty-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        .empty-text {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+        }
+
+        .applications-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .application-card {
+            background: rgba(244, 239, 233, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 92, 56, 0.2);
+            transition: all 0.3s;
+        }
+
+        .application-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 50px rgba(255, 92, 56, 0.2);
+        }
+
+        .applicant-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .applicant-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #FF5C38;
+        }
+
+        .applicant-email {
+            color: #7FE7DC;
+            font-size: 0.9rem;
+        }
+
+        .application-date {
+            color: #F4EFE9;
+            opacity: 0.8;
+            font-size: 0.9rem;
+        }
+
+        .application-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #1E3A5F 0%, #2C2E33 100%);
+            color: #F4EFE9;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn:hover {
+            background: linear-gradient(135deg, #FF5C38 0%, #1E3A5F 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 92, 56, 0.4);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #7FE7DC 0%, #1E3A5F 100%);
+        }
+
+        .btn-success:hover {
+            background: linear-gradient(135deg, #1E3A5F 0%, #7FE7DC 100%);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #FF5C38 0%, #FF3B3B 100%);
+        }
+
+        .btn-danger:hover {
+            background: linear-gradient(135deg, #FF3B3B 0%, #FF5C38 100%);
+        }
+
+        .status-badge {
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .status-pending {
+            background: rgba(255, 92, 56, 0.2);
+            color: #FF5C38;
+            border: 1px solid rgba(255, 92, 56, 0.3);
+        }
+
+        .status-accepted {
+            background: rgba(127, 231, 220, 0.2);
+            color: #7FE7DC;
+            border: 1px solid rgba(127, 231, 220, 0.3);
+        }
+
+        .status-rejected {
+            background: rgba(255, 59, 59, 0.2);
+            color: #FF3B3B;
+            border: 1px solid rgba(255, 59, 59, 0.3);
+        }
+
+        .form-actions {
+            text-align: center;
+            margin-top: 3rem;
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                padding: 100px 1rem 1rem 1rem;
+            }
+            
+            .applicant-info {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .application-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" class="logo">StudyHub</a>
+            <ul class="nav-menu">
+                <li><a href="/studies">스터디 찾기</a></li>
+                <li><a href="/posts">커뮤니티</a></li>
+                <li><a href="/about">소개</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="main-container">
+        <div class="page-header">
+            <h1 class="page-title">스터디 신청자 관리</h1>
+            <p class="page-subtitle">스터디 신청자들을 관리해보세요</p>
+        </div>
+
+        <div class="study-info">
+            <h2 class="study-title" th:text="${study.title}"></h2>
+        </div>
+
+        <div th:if="${applications.size() == 0}" class="empty-state">
+            <div class="empty-icon">📝</div>
+            <div class="empty-text">아직 신청자가 없습니다.</div>
+        </div>
+
+        <div th:if="${applications.size() > 0}" class="applications-list">
+            <div th:each="app : ${applications}" class="application-card">
+                <div class="applicant-info">
+                    <div>
+                        <div class="applicant-name" th:text="${app.user.name}"></div>
+                        <div class="applicant-email" th:text="${app.user.email}"></div>
+                    </div>
+                    <div>
+                        <span class="status-badge status-pending" 
+                              th:if="${app.status == 'PENDING'}"
+                              th:text="'대기중'"></span>
+                        <span class="status-badge status-accepted" 
+                              th:if="${app.status == 'ACCEPTED'}"
+                              th:text="'수락됨'"></span>
+                        <span class="status-badge status-rejected" 
+                              th:if="${app.status == 'REJECTED'}"
+                              th:text="'거절됨'"></span>
+                    </div>
+                </div>
+                <div class="application-date">
+                    신청일: <span th:text="${app.appliedAt}"></span>
+                </div>
+                <div class="application-actions" th:if="${app.status == 'PENDING'}">
+                    <form th:action="@{'/studies/' + ${study.id} + '/applications/' + ${app.id} + '/accept'}" method="post" style="display:inline;">
+                        <button type="submit" class="btn btn-success">수락</button>
+                    </form>
+                    <form th:action="@{'/studies/' + ${study.id} + '/applications/' + ${app.id} + '/reject'}" method="post" style="display:inline;">
+                        <button type="submit" class="btn btn-danger">거절</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <a th:href="@{'/studies/' + ${study.id}}" class="btn">스터디 상세로</a>
+            <a th:href="@{/studies}" class="btn">목록으로</a>
+        </div>
+    </div>
+</body>
+</html> 

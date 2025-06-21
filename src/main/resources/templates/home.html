@@ -397,8 +397,31 @@
             <div class="dashboard-actions">
                 <a href="/studies/new" class="action-btn">스터디 만들기</a>
                 <a href="/studies" class="action-btn">스터디 찾기</a>
+                <a href="/studies/my" class="action-btn">내 스터디</a>
+                <a href="/studies/applications/my" class="action-btn">신청한 스터디</a>
                 <a href="/posts/new" class="action-btn">글쓰기</a>
                 <a href="/mypage" class="action-btn">마이페이지</a>
+            </div>
+        </div>
+
+        <!-- 최근 스터디 섹션 -->
+        <div th:if="${recentStudies != null && recentStudies.size() > 0}" class="recent-studies-section" style="margin-top: 4rem;">
+            <h2 style="color: #FF5C38; text-align: center; margin-bottom: 2rem; font-size: 2rem;">최근 등록된 스터디</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem;">
+                <div th:each="study : ${recentStudies}" class="feature-card" style="text-align: left;">
+                    <h3 th:text="${study.title}" style="color: #FF5C38; margin-bottom: 1rem; font-size: 1.2rem;"></h3>
+                    <p th:text="${study.description}" style="color: #F4EFE9; margin-bottom: 1rem; line-height: 1.5;"></p>
+                    <div style="font-size: 0.9rem; color: #7FE7DC; margin-bottom: 0.5rem;">
+                        개설자: <span th:text="${study.leader.name}"></span>
+                    </div>
+                    <div style="font-size: 0.9rem; color: #F4EFE9; margin-bottom: 1rem;">
+                        모집 인원: <span th:text="${study.recruitmentLimit}"></span>명
+                    </div>
+                    <a th:href="@{'/studies/' + ${study.id}}" class="action-btn" style="margin-top: auto;">상세 보기</a>
+                </div>
+            </div>
+            <div style="text-align: center; margin-top: 2rem;">
+                <a href="/studies" class="action-btn">더 많은 스터디 보기</a>
             </div>
         </div>
 

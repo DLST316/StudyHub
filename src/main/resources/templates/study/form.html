@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>스터디 개설/수정 - StudyHub</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #2C2E33;
+            color: #F4EFE9;
+            font-family: 'Pretendard', 'Noto Sans KR', sans-serif;
+            min-height: 100vh;
+        }
+
+        /* 네비게이션 바 */
+        .navbar {
+            background: rgba(44, 46, 51, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            border-bottom: 2px solid #FF5C38;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #FF5C38;
+            text-decoration: none;
+            text-shadow: 0 0 10px rgba(255, 92, 56, 0.3);
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-menu a {
+            color: #F4EFE9;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav-menu a:hover {
+            color: #FF5C38;
+        }
+
+        /* 메인 컨테이너 */
+        .main-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 120px 2rem 2rem 2rem;
+        }
+
+        /* 페이지 헤더 */
+        .page-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .page-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #FF5C38;
+            margin-bottom: 1rem;
+            text-shadow: 0 0 20px rgba(255, 92, 56, 0.3);
+        }
+
+        .page-subtitle {
+            font-size: 1.1rem;
+            color: #F4EFE9;
+            opacity: 0.8;
+        }
+
+        /* 폼 컨테이너 */
+        .form-container {
+            background: rgba(244, 239, 233, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 3rem;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 92, 56, 0.2);
+        }
+
+        /* 폼 그룹 */
+        .form-group {
+            margin-bottom: 2rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.8rem;
+            color: #F4EFE9;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 1rem 1.5rem;
+            border: 2px solid rgba(244, 239, 233, 0.3);
+            border-radius: 12px;
+            font-size: 1rem;
+            background: rgba(44, 46, 51, 0.8);
+            color: #F4EFE9;
+            transition: all 0.3s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #FF5C38;
+            box-shadow: 0 0 15px rgba(255, 92, 56, 0.3);
+        }
+
+        .form-input::placeholder {
+            color: rgba(244, 239, 233, 0.6);
+        }
+
+        .form-textarea {
+            min-height: 120px;
+            resize: vertical;
+            font-family: inherit;
+        }
+
+        /* 버튼 */
+        .btn {
+            background: linear-gradient(135deg, #1E3A5F 0%, #2C2E33 100%);
+            color: #F4EFE9;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn:hover {
+            background: linear-gradient(135deg, #FF5C38 0%, #1E3A5F 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 92, 56, 0.4);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #FF5C38 0%, #1E3A5F 100%);
+            width: 100%;
+            padding: 1.2rem;
+            font-size: 1.1rem;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #1E3A5F 0%, #FF5C38 100%);
+        }
+
+        /* 폼 액션 */
+        .form-actions {
+            margin-top: 3rem;
+            text-align: center;
+        }
+
+        .form-actions .btn {
+            margin: 0 0.5rem;
+        }
+
+        /* 도움말 텍스트 */
+        .help-text {
+            font-size: 0.9rem;
+            color: #7FE7DC;
+            margin-top: 0.5rem;
+            opacity: 0.8;
+        }
+
+        /* 반응형 */
+        @media (max-width: 768px) {
+            .main-container {
+                padding: 100px 1rem 1rem 1rem;
+            }
+            
+            .form-container {
+                padding: 2rem;
+            }
+            
+            .page-title {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 네비게이션 바 -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" class="logo">StudyHub</a>
+            <ul class="nav-menu">
+                <li><a href="/studies">스터디 찾기</a></li>
+                <li><a href="/posts">커뮤니티</a></li>
+                <li><a href="/about">소개</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- 메인 컨테이너 -->
+    <div class="main-container">
+        <!-- 페이지 헤더 -->
+        <div class="page-header">
+            <h1 class="page-title" th:text="${studyId != null} ? '스터디 수정' : '스터디 개설'"></h1>
+            <p class="page-subtitle" th:text="${studyId != null} ? '스터디 정보를 수정해주세요' : '새로운 스터디를 만들어보세요'"></p>
+        </div>
+
+        <!-- 폼 컨테이너 -->
+        <form th:action="${studyId != null} ? @{'/studies/edit/' + ${studyId}} : @{/studies/new}" method="post" class="form-container">
+            <div class="form-group">
+                <label for="title" class="form-label">스터디명 *</label>
+                <input type="text" id="title" name="title" th:value="${studyForm.title}" required 
+                       class="form-input" placeholder="예: Java 스프링 부트 스터디">
+                <div class="help-text">스터디의 이름을 입력해주세요</div>
+            </div>
+
+            <div class="form-group">
+                <label for="description" class="form-label">스터디 설명 *</label>
+                <textarea id="description" name="description" th:text="${studyForm.description}" required 
+                          class="form-input form-textarea" 
+                          placeholder="스터디의 목적, 학습 내용, 진행 방식 등을 자세히 설명해주세요"></textarea>
+                <div class="help-text">스터디에 대한 자세한 설명을 입력해주세요</div>
+            </div>
+
+            <div class="form-group">
+                <label for="recruitmentLimit" class="form-label">모집 인원 *</label>
+                <input type="number" id="recruitmentLimit" name="recruitmentLimit" th:value="${studyForm.recruitmentLimit}" 
+                       min="1" max="50" required class="form-input" placeholder="예: 5">
+                <div class="help-text">모집할 인원 수를 입력해주세요 (1-50명)</div>
+            </div>
+
+            <div class="form-group">
+                <label for="requirement" class="form-label">모집 조건</label>
+                <input type="text" id="requirement" name="requirement" th:value="${studyForm.requirement}" 
+                       class="form-input" placeholder="예: Java 기초 지식, 2학년 이상, 열정적인 학습 의지">
+                <div class="help-text">참여자에게 요구되는 조건이나 자격을 입력해주세요</div>
+            </div>
+
+            <div class="form-group">
+                <label for="deadline" class="form-label">모집 마감일 *</label>
+                <input type="date" id="deadline" name="deadline" th:value="${studyForm.deadline}" 
+                       required class="form-input">
+                <div class="help-text">스터디 모집을 마감할 날짜를 선택해주세요</div>
+            </div>
+
+            <button type="submit" class="btn btn-primary">
+                <span th:text="${studyId != null} ? '스터디 수정하기' : '스터디 개설하기'"></span>
+            </button>
+        </form>
+
+        <!-- 폼 액션 -->
+        <div class="form-actions">
+            <a th:href="@{/studies}" class="btn">목록으로 돌아가기</a>
+        </div>
+    </div>
+</body>
+</html> 

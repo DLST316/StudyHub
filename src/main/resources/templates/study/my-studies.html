@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>내가 개설한 스터디 - StudyHub</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #2C2E33;
+            color: #F4EFE9;
+            font-family: 'Pretendard', 'Noto Sans KR', sans-serif;
+            min-height: 100vh;
+        }
+
+        .navbar {
+            background: rgba(44, 46, 51, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            border-bottom: 2px solid #FF5C38;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #FF5C38;
+            text-decoration: none;
+            text-shadow: 0 0 10px rgba(255, 92, 56, 0.3);
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-menu a {
+            color: #F4EFE9;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav-menu a:hover {
+            color: #FF5C38;
+        }
+
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 120px 2rem 2rem 2rem;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .page-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #FF5C38;
+            margin-bottom: 1rem;
+            text-shadow: 0 0 20px rgba(255, 92, 56, 0.3);
+        }
+
+        .page-subtitle {
+            font-size: 1.1rem;
+            color: #F4EFE9;
+            opacity: 0.8;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: #7FE7DC;
+        }
+
+        .empty-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        .empty-text {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+        }
+
+        .studies-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .study-card {
+            background: rgba(244, 239, 233, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 92, 56, 0.2);
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .study-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #FF5C38, #7FE7DC);
+        }
+
+        .study-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 60px rgba(255, 92, 56, 0.2);
+            border-color: rgba(255, 92, 56, 0.4);
+        }
+
+        .study-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #FF5C38;
+            margin-bottom: 1rem;
+            line-height: 1.3;
+        }
+
+        .study-description {
+            color: #F4EFE9;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .study-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+        }
+
+        .study-info {
+            color: #F4EFE9;
+            opacity: 0.8;
+        }
+
+        .study-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #1E3A5F 0%, #2C2E33 100%);
+            color: #F4EFE9;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn:hover {
+            background: linear-gradient(135deg, #FF5C38 0%, #1E3A5F 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 92, 56, 0.4);
+        }
+
+        .btn-small {
+            padding: 0.7rem 1.2rem;
+            font-size: 0.9rem;
+        }
+
+        .form-actions {
+            text-align: center;
+            margin-top: 3rem;
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                padding: 100px 1rem 1rem 1rem;
+            }
+            
+            .studies-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .study-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" class="logo">StudyHub</a>
+            <ul class="nav-menu">
+                <li><a href="/studies">스터디 찾기</a></li>
+                <li><a href="/posts">커뮤니티</a></li>
+                <li><a href="/about">소개</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="main-container">
+        <div class="page-header">
+            <h1 class="page-title">내가 개설한 스터디</h1>
+            <p class="page-subtitle">개설한 스터디를 관리해보세요</p>
+        </div>
+
+        <div th:if="${studies.size() == 0}" class="empty-state">
+            <div class="empty-icon">📚</div>
+            <div class="empty-text">아직 개설한 스터디가 없습니다.</div>
+            <a th:href="@{/studies/new}" class="btn">첫 번째 스터디 만들기</a>
+        </div>
+
+        <div th:if="${studies.size() > 0}" class="studies-grid">
+            <div th:each="study : ${studies}" class="study-card">
+                <h2 class="study-title" th:text="${study.title}"></h2>
+                <p class="study-description" th:text="${study.description}"></p>
+                <div class="study-meta">
+                    <span class="study-info">모집 <span th:text="${study.recruitmentLimit}"></span>명</span>
+                    <span class="study-info">마감일: <span th:text="${study.deadline}"></span></span>
+                </div>
+                <div class="study-actions">
+                    <a th:href="@{'/studies/' + ${study.id}}" class="btn btn-small">상세 보기</a>
+                    <a th:href="@{'/studies/edit/' + ${study.id}}" class="btn btn-small">수정</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <a th:href="@{/studies}" class="btn">전체 스터디 보기</a>
+            <a th:href="@{/studies/new}" class="btn">새 스터디 만들기</a>
+        </div>
+    </div>
+</body>
+</html> 
