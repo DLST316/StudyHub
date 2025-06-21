@@ -80,10 +80,16 @@ public class UserController {
             return "user/join";
         }
 
-        // 폼 검증이 성공한 경우 UserService를 통해 회원가입 처리
-        userService.join(form);
-        
-        // 회원가입 성공 후 홈페이지로 리다이렉트 (성공 메시지와 함께)
-        return "redirect:/?success=join";
+        try {
+            // 폼 검증이 성공한 경우 UserService를 통해 회원가입 처리
+            userService.join(form);
+            
+            // 회원가입 성공 후 홈페이지로 리다이렉트 (성공 메시지와 함께)
+            return "redirect:/?success=join";
+        } catch (dev.kang.studyhub.service.user.exception.AlreadyExistsEmailException e) {
+            // 중복 이메일 예외 처리
+            result.rejectValue("email", "duplicate.email", e.getMessage());
+            return "user/join";
+        }
     }
 }
