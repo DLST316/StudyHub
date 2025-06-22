@@ -284,12 +284,33 @@
             <form th:if="${isLeader}" th:action="@{'/studies/delete/' + ${study.id}}" method="post" style="display:inline;">
                 <button type="submit" class="btn btn-danger" onclick="return confirm('정말 삭제하시겠습니까?')">삭제</button>
             </form>
+            
+            <!-- 신청하지 않은 경우 -->
             <form th:if="${!isLeader && !isApplied}" th:action="@{'/studies/' + ${study.id} + '/apply'}" method="post" style="display:inline;">
                 <button type="submit" class="btn btn-primary">스터디 신청</button>
             </form>
-            <form th:if="${!isLeader && isApplied}" th:action="@{'/studies/' + ${study.id} + '/cancel'}" method="post" style="display:inline;">
-                <button type="submit" class="btn btn-danger">신청 취소</button>
-            </form>
+            
+            <!-- 신청한 경우 - 상태에 따라 다른 표시 -->
+            <div th:if="${!isLeader && isApplied}" style="display:inline;">
+                <!-- 대기중인 경우 -->
+                <form th:if="${applicationStatus == T(dev.kang.studyhub.domain.study.model.ApplicationStatus).PENDING}" 
+                      th:action="@{'/studies/' + ${study.id} + '/cancel'}" method="post" style="display:inline;">
+                    <button type="submit" class="btn btn-danger">신청 취소</button>
+                </form>
+                
+                <!-- 승인된 경우 -->
+                <div th:if="${applicationStatus == T(dev.kang.studyhub.domain.study.model.ApplicationStatus).APPROVED}" 
+                     class="btn" style="background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%); cursor: default;">
+                    승인됨 ✓
+                </div>
+                
+                <!-- 거절된 경우 -->
+                <div th:if="${applicationStatus == T(dev.kang.studyhub.domain.study.model.ApplicationStatus).REJECTED}" 
+                     class="btn" style="background: linear-gradient(135deg, #f44336 0%, #da190b 100%); cursor: default;">
+                    거절됨 ✗
+                </div>
+            </div>
+            
             <a th:if="${isLeader}" th:href="@{'/studies/' + ${study.id} + '/applications'}" class="btn">신청자 관리</a>
         </div>
     </div>

@@ -96,7 +96,18 @@ public class StudyController {
         try {
             User currentUser = getCurrentUser();
             model.addAttribute("isLeader", study.isLeader(currentUser));
-            model.addAttribute("isApplied", studyApplicationService.hasApplied(currentUser, study));
+            
+            // 신청 상태 확인
+            boolean isApplied = studyApplicationService.hasApplied(currentUser, study);
+            model.addAttribute("isApplied", isApplied);
+            
+            // 신청 상태가 있다면 상태 정보도 추가
+            if (isApplied) {
+                var application = studyApplicationService.findByUserAndStudy(currentUser, study);
+                if (application.isPresent()) {
+                    model.addAttribute("applicationStatus", application.get().getStatus());
+                }
+            }
         } catch (IllegalStateException e) {
             model.addAttribute("isLeader", false);
             model.addAttribute("isApplied", false);

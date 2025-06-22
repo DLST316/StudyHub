@@ -130,4 +130,11 @@ public class StudyApplicationService {
     public boolean isApproved(User user, Study study) {
         return studyApplicationRepository.existsByUserAndStudyAndStatus(user, study, ApplicationStatus.APPROVED);
     }
+
+    /**
+     * 특정 사용자의 특정 스터디 신청 내역 조회
+     */
+    public Optional<StudyApplication> findByUserAndStudy(User user, Study study) {
+        return studyApplicationRepository.findByUserAndStudy(user, study);
+    }
 } 
