@@ -358,16 +358,6 @@
                         <button type="submit" class="btn btn-danger">거절</button>
                     </form>
                 </div>
-                <!-- 임시: 모든 신청에 버튼 표시 (디버깅용) -->
-                <div class="application-actions" th:if="${app.status != T(dev.kang.studyhub.domain.study.model.ApplicationStatus).PENDING}">
-                    <span style="color: #FF5C38; font-size: 0.9rem;">이미 처리된 신청입니다.</span>
-                </div>
-                <!-- 디버그 정보 (개발 중에만 표시) -->
-                <div class="debug-info" style="margin-top: 0.5rem; font-size: 0.8rem; color: #FF5C38;">
-                    <span>상태: </span><span th:text="${app.status}"></span>
-                    <span> | 상태명: </span><span th:text="${app.status.name()}"></span>
-                    <span> | ID: </span><span th:text="${app.id}"></span>
-                </div>
             </div>
         </div>
 
