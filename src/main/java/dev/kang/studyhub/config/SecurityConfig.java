@@ -44,18 +44,24 @@ public class SecurityConfig {
                 // URL별 접근 권한 설정
                 .authorizeHttpRequests((auth) -> auth
                         // 다음 URL들은 인증 없이 접근 가능 (permitAll)
-                        .requestMatchers("/", "/join", "/css/**", "/js/**", "/images/**","/h2-console/**").permitAll()
+                        .requestMatchers("/", "/join", "/login", "/css/**", "/js/**", "/images/**","/h2-console/**").permitAll()
                         // 그 외 모든 요청은 인증이 필요 (authenticated)
                         .anyRequest().authenticated()
                 )
                 
                 // 폼 로그인 설정
                 .formLogin((form) -> form
+                        // 커스텀 로그인 페이지 설정
+                        .loginPage("/login")
+                        .loginProcessingUrl("/login")
                         // 로그인 시 사용할 username 파라미터 이름을 "email"로 설정
                         // 기본값은 "username"이지만, 우리는 이메일을 사용자 식별자로 사용
                         .usernameParameter("email")
+                        .passwordParameter("password")
                         // 로그인 성공 시 리다이렉트할 URL
-                        .defaultSuccessUrl("/")
+                        .defaultSuccessUrl("/?success=login")
+                        // 로그인 실패 시 리다이렉트할 URL
+                        .failureUrl("/login?error=true")
                         // 로그인 페이지 접근을 모든 사용자에게 허용
                         .permitAll()
                 )
