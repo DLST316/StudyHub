@@ -126,17 +126,16 @@ public class StudyApplicationController {
     @PostMapping("/{studyId}/applications/{applicationId}/accept")
     public String acceptApplication(@PathVariable Long studyId, @PathVariable Long applicationId) {
         User user = getCurrentUser();
-        
         Study study = studyService.findById(studyId)
                 .orElseThrow(() -> new IllegalArgumentException("스터디를 찾을 수 없습니다."));
-        
         // 스터디 개설자만 수락할 수 있음
         if (!study.isLeader(user)) {
             throw new IllegalStateException("스터디 개설자만 수락할 수 있습니다.");
         }
-        
+        // 신청 내역 존재 여부 체크
+        StudyApplication application = applicationRepository.findById(applicationId)
+                .orElseThrow(() -> new IllegalArgumentException("신청 내역이 존재하지 않습니다."));
         applicationService.approve(applicationId);
-        
         return "redirect:/studies/" + studyId + "/applications?success=accepted";
     }
 
@@ -147,17 +146,16 @@ public class StudyApplicationController {
     @PostMapping("/{studyId}/applications/{applicationId}/reject")
     public String rejectApplication(@PathVariable Long studyId, @PathVariable Long applicationId) {
         User user = getCurrentUser();
-        
         Study study = studyService.findById(studyId)
                 .orElseThrow(() -> new IllegalArgumentException("스터디를 찾을 수 없습니다."));
-        
         // 스터디 개설자만 거절할 수 있음
         if (!study.isLeader(user)) {
             throw new IllegalStateException("스터디 개설자만 거절할 수 있습니다.");
         }
-        
+        // 신청 내역 존재 여부 체크
+        StudyApplication application = applicationRepository.findById(applicationId)
+                .orElseThrow(() -> new IllegalArgumentException("신청 내역이 존재하지 않습니다."));
         applicationService.reject(applicationId);
-        
         return "redirect:/studies/" + studyId + "/applications?success=rejected";
     }
 

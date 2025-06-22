@@ -200,10 +200,10 @@ class StudyRepositoryTest {
     @DisplayName("활성 스터디 개수를 조회할 수 있어야 한다")
     void countActiveStudies_Success() {
         // when
-        long activeStudyCount = studyRepository.countActiveStudies(LocalDate.now());
+        long activeCount = studyRepository.countActiveStudies(LocalDate.now());
 
         // then
-        assertThat(activeStudyCount).isEqualTo(2); // study1, study2만 활성
+        assertThat(activeCount).isEqualTo(2); // study1, study2만 활성
     }
 
     @Test
@@ -212,14 +212,83 @@ class StudyRepositoryTest {
         // given
         String newTitle = "수정된 스터디 제목";
         String newDescription = "수정된 스터디 설명";
+        int newRecruitmentLimit = 10;
+        String newRequirement = "수정된 모집 조건";
+        LocalDate newDeadline = LocalDate.now().plusDays(60);
 
         // when
-        study1.updateStudy(newTitle, newDescription, 10, "수정된 조건", LocalDate.now().plusDays(60));
+        study1.updateStudy(newTitle, newDescription, newRecruitmentLimit, newRequirement, newDeadline);
         Study updatedStudy = studyRepository.save(study1);
 
         // then
         assertThat(updatedStudy.getTitle()).isEqualTo(newTitle);
         assertThat(updatedStudy.getDescription()).isEqualTo(newDescription);
-        assertThat(updatedStudy.getRecruitmentLimit()).isEqualTo(10);
+        assertThat(updatedStudy.getRecruitmentLimit()).isEqualTo(newRecruitmentLimit);
+        assertThat(updatedStudy.getRequirement()).isEqualTo(newRequirement);
+        assertThat(updatedStudy.getDeadline()).isEqualTo(newDeadline);
+    }
+
+    @Test
+    @DisplayName("스터디를 삭제할 수 있어야 한다")
+    void deleteStudy_Success() {
+        // when
+        studyRepository.delete(study1);
+        List<Study> remainingStudies = studyRepository.findAllOrderByCreatedAtDesc();
+
+        // then
+        assertThat(remainingStudies).hasSize(2);
+        assertThat(remainingStudies).noneMatch(study -> study.getTitle().equals("스프링 부트 스터디"));
+    }
+
+    @Test
+    @DisplayName("제목이 비슷한 스터디들을 검색할 수 있어야 한다")
+    void findByTitleContainingOrderByCreatedAtDesc_MultipleResults_Success() {
+        // given
+        Study similarStudy = Study.builder()
+                .title("스프링 클라우드 스터디")
+                .description("마이크로서비스 아키텍처")
+                .leader(testUser1)
+                .recruitmentLimit(3)
+                .build();
+        studyRepository.save(similarStudy);
+
+        // when
+        List<Study> springStudies = studyRepository.findByTitleContainingOrderByCreatedAtDesc("스프링");
+
+        // then
+        assertThat(springStudies).hasSize(2);
+        assertThat(springStudies).allMatch(study -> study.getTitle().contains("스프링"));
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 ID로 조회 시 빈 결과를 반환해야 한다")
+    void findById_NonExistentId_ReturnsEmpty() {
+        // when
+        var result = studyRepository.findById(999L);
+
+        // then
+        assertThat(result).isEmpty();
+    }
+
+    @Test
+    @DisplayName("특정 사용자가 개설한 스터디가 없을 때 빈 리스트를 반환해야 한다")
+    void findByLeaderOrderByCreatedAtDesc_NoStudies_ReturnsEmpty() {
+        // given
+        User newUser = User.builder()
+                .name("새로운 사용자")
+                .email("newuser@example.com")
+                .password("password789")
+                .university("새로운 대학교")
+                .major("새로운 전공")
+                .educationStatus(EducationStatus.ENROLLED)
+                .role("USER")
+                .build();
+        userRepository.save(newUser);
+
+        // when
+        List<Study> studies = studyRepository.findByLeaderOrderByCreatedAtDesc(newUser);
+
+        // then
+        assertThat(studies).isEmpty();
     }
 } 

@@ -7,13 +7,65 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.servlet.ModelAndView;
 
+/**
+ * 전역 예외 처리를 담당하는 컨트롤러 어드바이스
+ * 
+ * 주요 기능:
+ * - 사용자 관련 예외 처리 (이메일 중복 등)
+ * - 스터디 관련 예외 처리 (존재하지 않는 스터디, 권한 없음 등)
+ * - 일반적인 비즈니스 예외 처리
+ */
 @ControllerAdvice
 public class UserControllerAdvice {
 
+    /**
+     * 이메일 중복 예외 처리
+     * 회원가입 폼에 에러 메시지를 표시하고 다시 폼을 보여줌
+     */
     @ExceptionHandler(AlreadyExistsEmailException.class)
-    public String handleAlreadyExistsEmail(AlreadyExistsEmailException ex, @ModelAttribute("userJoinForm") UserJoinForm form, BindingResult bindingResult, Model model) {
+    public String handleAlreadyExistsEmail(AlreadyExistsEmailException ex, 
+                                         @ModelAttribute("userJoinForm") UserJoinForm form, 
+                                         BindingResult bindingResult, 
+                                         Model model) {
         bindingResult.rejectValue("email", "duplicate", ex.getMessage());
         return "user/join";
+    }
+
+    /**
+     * 스터디를 찾을 수 없는 경우 예외 처리
+     * 에러 페이지로 리다이렉트
+     */
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ModelAndView handleIllegalArgumentException(IllegalArgumentException ex) {
+        ModelAndView mav = new ModelAndView("error/404");
+        mav.addObject("message", ex.getMessage());
+        mav.addObject("error", "요청한 리소스를 찾을 수 없습니다.");
+        return mav;
+    }
+
+    /**
+     * 권한 없음, 중복 신청 등 비즈니스 규칙 위반 예외 처리
+     * 에러 페이지로 리다이렉트
+     */
+    @ExceptionHandler(IllegalStateException.class)
+    public ModelAndView handleIllegalStateException(IllegalStateException ex) {
+        ModelAndView mav = new ModelAndView("error/400");
+        mav.addObject("message", ex.getMessage());
+        mav.addObject("error", "잘못된 요청입니다.");
+        return mav;
+    }
+
+    /**
+     * 기타 예상치 못한 예외 처리
+     * 서버 에러 페이지로 리다이렉트
+     */
+    @ExceptionHandler(Exception.class)
+    public ModelAndView handleGenericException(Exception ex) {
+        ModelAndView mav = new ModelAndView("error/500");
+        mav.addObject("message", "서버 내부 오류가 발생했습니다.");
+        mav.addObject("error", "일시적인 문제가 발생했습니다. 잠시 후 다시 시도해주세요.");
+        return mav;
     }
 } 

@@ -56,6 +56,8 @@ public class HomeController {
         // 회원가입 완료 후 리다이렉트될 때 전달되는 파라미터를 처리
         if ("join".equals(success)) {
             model.addAttribute("successMessage", "회원가입이 완료되었습니다! 로그인해주세요.");
+        } else if ("login".equals(success)) {
+            model.addAttribute("successMessage", "로그인되었습니다.");
         }
         
         // 최근 스터디 목록 조회 (최대 6개)
