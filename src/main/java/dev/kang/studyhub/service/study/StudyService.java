@@ -27,6 +27,7 @@ import java.util.Optional;
 public class StudyService {
 
     private final StudyRepository studyRepository;
+    private final StudyApplicationService studyApplicationService;
 
     /**
      * 스터디 생성
@@ -107,5 +108,23 @@ public class StudyService {
      */
     public long countByLeader(User leader) {
         return studyRepository.countByLeader(leader);
+    }
+
+    /**
+     * 특정 사용자가 참여한 스터디 목록 조회 (개설한 스터디 + 승인받은 스터디)
+     */
+    public List<Study> findParticipatedStudies(User user) {
+        // 개설한 스터디 목록
+        List<Study> createdStudies = findByLeader(user);
+        
+        // 승인받은 스터디 목록
+        List<Study> approvedStudies = studyApplicationService.findApprovedStudiesByUser(user);
+        
+        // 중복 제거하고 합치기
+        createdStudies.addAll(approvedStudies.stream()
+                .filter(study -> !createdStudies.contains(study))
+                .toList());
+        
+        return createdStudies;
     }
 } 

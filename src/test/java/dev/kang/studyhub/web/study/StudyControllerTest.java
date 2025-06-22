@@ -5,6 +5,7 @@ import dev.kang.studyhub.domain.study.entity.Study;
 import dev.kang.studyhub.domain.user.entity.User;
 import dev.kang.studyhub.domain.user.model.EducationStatus;
 import dev.kang.studyhub.service.study.StudyApplicationService;
+import dev.kang.studyhub.service.study.StudyCommentService;
 import dev.kang.studyhub.service.study.StudyService;
 import dev.kang.studyhub.service.user.UserService;
 import org.junit.jupiter.api.BeforeEach;
@@ -67,6 +68,9 @@ class StudyControllerTest {
     @MockBean
     private StudyApplicationService studyApplicationService;
 
+    @MockBean
+    private StudyCommentService studyCommentService;
+
     private User testUser;
     private Study testStudy;
 
@@ -78,6 +82,7 @@ class StudyControllerTest {
      * - 테스트용 스터디 엔티티 생성
      * - UserService Mock 설정 (이메일로 사용자 조회)
      * - StudyApplicationService Mock 설정 (신청 여부 확인)
+     * - StudyCommentService Mock 설정 (댓글 목록 조회 시 빈 리스트 반환)
      */
     @BeforeEach
     void setUp() {
@@ -108,6 +113,9 @@ class StudyControllerTest {
         
         // StudyApplicationService Mock 설정 - 신청 여부 확인 시 기본적으로 false 반환
         when(studyApplicationService.hasApplied(any(User.class), any(Study.class))).thenReturn(false);
+        
+        // StudyCommentService Mock 설정 - 댓글 목록 조회 시 빈 리스트 반환
+        when(studyCommentService.getCommentsByStudy(any(Study.class))).thenReturn(List.of());
     }
 
     @Test

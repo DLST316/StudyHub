@@ -3,6 +3,7 @@ package dev.kang.studyhub.web.study;
 import dev.kang.studyhub.domain.study.entity.Study;
 import dev.kang.studyhub.domain.user.entity.User;
 import dev.kang.studyhub.service.study.StudyApplicationService;
+import dev.kang.studyhub.service.study.StudyCommentService;
 import dev.kang.studyhub.service.study.StudyService;
 import dev.kang.studyhub.service.user.UserService;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +36,7 @@ public class StudyController {
     private final StudyService studyService;
     private final UserService userService;
     private final StudyApplicationService studyApplicationService;
+    private final StudyCommentService studyCommentService;
 
     /**
      * 현재 로그인된 사용자를 가져오는 헬퍼 메서드
@@ -88,13 +90,30 @@ public class StudyController {
      * GET /studies/{id}
      */
     @GetMapping("/{id}")
-    public String viewStudy(@PathVariable Long id, Model model) {
+    public String viewStudy(@PathVariable Long id, Model model, 
+                           @RequestParam(required = false) String error) {
         Study study = studyService.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("스터디를 찾을 수 없습니다."));
+        
+        // 에러 메시지 처리
+        if (error != null) {
+            switch (error) {
+                case "invalid":
+                    model.addAttribute("errorMessage", "잘못된 요청입니다.");
+                    break;
+                case "permission":
+                    model.addAttribute("errorMessage", "댓글 작성 권한이 없습니다.");
+                    break;
+                case "unknown":
+                    model.addAttribute("errorMessage", "알 수 없는 오류가 발생했습니다.");
+                    break;
+            }
+        }
         
         // 현재 사용자 정보 가져오기
         try {
             User currentUser = getCurrentUser();
+            model.addAttribute("currentUser", currentUser);
             model.addAttribute("isLeader", study.isLeader(currentUser));
             
             // 신청 상태 확인
@@ -108,10 +127,20 @@ public class StudyController {
                     model.addAttribute("applicationStatus", application.get().getStatus());
                 }
             }
+            
+            // 스터디 멤버인지 확인 (댓글 작성 권한)
+            boolean isMember = studyApplicationService.isApprovedMember(currentUser, study);
+            model.addAttribute("isMember", isMember);
         } catch (IllegalStateException e) {
+            model.addAttribute("currentUser", null);
             model.addAttribute("isLeader", false);
             model.addAttribute("isApplied", false);
+            model.addAttribute("isMember", false);
         }
+        
+        // 댓글 목록 조회
+        var comments = studyCommentService.getCommentsByStudy(study);
+        model.addAttribute("comments", comments);
         
         model.addAttribute("study", study);
         return "study/detail";
@@ -222,14 +251,14 @@ public class StudyController {
     }
 
     /**
-     * 내가 개설한 스터디 목록
+     * 내가 참여한 스터디 목록 (개설한 스터디 + 승인받은 스터디)
      * GET /studies/my
      */
     @GetMapping("/my")
     public String myStudies(Model model) {
         User currentUser = getCurrentUser();
-        List<Study> myStudies = studyService.findByLeader(currentUser);
-        model.addAttribute("studies", myStudies);
+        List<Study> participatedStudies = studyService.findParticipatedStudies(currentUser);
+        model.addAttribute("studies", participatedStudies);
         return "study/my-studies";
     }
 } 

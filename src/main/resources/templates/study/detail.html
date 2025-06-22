@@ -194,6 +194,244 @@
             background: linear-gradient(135deg, #FF3B3B 0%, #FF5C38 100%);
         }
 
+        /* 댓글 섹션 */
+        .comments-section {
+            background: rgba(244, 239, 233, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 3rem;
+            margin-top: 3rem;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 92, 56, 0.2);
+        }
+
+        .comments-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid rgba(255, 92, 56, 0.3);
+        }
+
+        .comments-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #FF5C38;
+        }
+
+        .comment-form {
+            margin-bottom: 2rem;
+        }
+
+        .comment-textarea {
+            width: 100%;
+            min-height: 100px;
+            background: rgba(44, 46, 51, 0.8);
+            border: 2px solid rgba(255, 92, 56, 0.3);
+            border-radius: 12px;
+            padding: 1rem;
+            color: #F4EFE9;
+            font-family: inherit;
+            font-size: 1rem;
+            resize: vertical;
+            transition: border-color 0.3s;
+        }
+
+        .comment-textarea:focus {
+            outline: none;
+            border-color: #FF5C38;
+        }
+
+        .comment-submit {
+            background: linear-gradient(135deg, #FF5C38 0%, #1E3A5F 100%);
+            color: #F4EFE9;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 1rem;
+        }
+
+        .comment-submit:hover {
+            background: linear-gradient(135deg, #1E3A5F 0%, #FF5C38 100%);
+            transform: translateY(-1px);
+        }
+
+        .comment-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .comment-item {
+            background: rgba(44, 46, 51, 0.6);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border-left: 4px solid #7FE7DC;
+        }
+
+        .comment-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .comment-author {
+            font-weight: 600;
+            color: #FF5C38;
+        }
+
+        .comment-date {
+            font-size: 0.8rem;
+            color: #7FE7DC;
+        }
+
+        .comment-content {
+            color: #F4EFE9;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .comment-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .comment-edit-btn, .comment-delete-btn {
+            background: none;
+            border: 1px solid rgba(255, 92, 56, 0.5);
+            color: #F4EFE9;
+            padding: 0.3rem 0.8rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .comment-edit-btn:hover {
+            background: rgba(255, 92, 56, 0.2);
+            border-color: #FF5C38;
+        }
+
+        .comment-delete-btn:hover {
+            background: rgba(255, 59, 59, 0.2);
+            border-color: #FF3B3B;
+        }
+
+        .comment-edit-form {
+            display: none;
+            margin-top: 1rem;
+        }
+
+        .comment-edit-textarea {
+            width: 100%;
+            min-height: 80px;
+            background: rgba(44, 46, 51, 0.8);
+            border: 2px solid rgba(255, 92, 56, 0.3);
+            border-radius: 8px;
+            padding: 0.8rem;
+            color: #F4EFE9;
+            font-family: inherit;
+            font-size: 0.9rem;
+            resize: vertical;
+        }
+
+        .comment-edit-textarea:focus {
+            outline: none;
+            border-color: #FF5C38;
+        }
+
+        .comment-edit-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.8rem;
+        }
+
+        .comment-save-btn, .comment-cancel-btn {
+            background: none;
+            border: 1px solid rgba(255, 92, 56, 0.5);
+            color: #F4EFE9;
+            padding: 0.3rem 0.8rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .comment-save-btn:hover {
+            background: rgba(76, 175, 80, 0.2);
+            border-color: #4CAF50;
+        }
+
+        .comment-cancel-btn:hover {
+            background: rgba(255, 92, 56, 0.2);
+            border-color: #FF5C38;
+        }
+
+        .no-comments {
+            text-align: center;
+            color: #7FE7DC;
+            font-style: italic;
+            padding: 2rem;
+        }
+
+        /* 제한된 댓글 섹션 */
+        .comments-restricted {
+            text-align: center;
+            padding: 3rem 2rem;
+        }
+
+        .restricted-message {
+            background: rgba(44, 46, 51, 0.6);
+            border-radius: 16px;
+            padding: 3rem;
+            border: 2px solid rgba(255, 92, 56, 0.3);
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .restricted-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            filter: drop-shadow(0 0 10px rgba(255, 92, 56, 0.5));
+        }
+
+        .restricted-message h3 {
+            color: #FF5C38;
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .restricted-message p {
+            color: #F4EFE9;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+            font-size: 1rem;
+        }
+
+        .restricted-actions {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .error-message {
+            background: rgba(255, 59, 59, 0.1);
+            border: 1px solid rgba(255, 59, 59, 0.3);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 2rem;
+            color: #FF3B3B;
+            text-align: center;
+        }
+
         /* 반응형 */
         @media (max-width: 768px) {
             .main-container {
@@ -234,6 +472,9 @@
 
     <!-- 메인 컨테이너 -->
     <div class="main-container">
+        <!-- 에러 메시지 -->
+        <div th:if="${errorMessage}" class="error-message" th:text="${errorMessage}"></div>
+        
         <!-- 스터디 헤더 -->
         <div class="study-header">
             <h1 class="study-title" th:text="${study.title}"></h1>
@@ -313,6 +554,172 @@
             
             <a th:if="${isLeader}" th:href="@{'/studies/' + ${study.id} + '/applications'}" class="btn">신청자 관리</a>
         </div>
+
+        <!-- 댓글 섹션 -->
+        <div class="comments-section">
+            <div class="comments-header">
+                <h2 class="comments-title">댓글</h2>
+                <span class="comment-count" th:text="${#lists.size(comments)} + '개의 댓글'"></span>
+            </div>
+
+            <!-- 스터디원이 아닌 경우 안내 메시지 -->
+            <div th:if="${!isMember}" class="comments-restricted">
+                <div class="restricted-message">
+                    <div class="restricted-icon">🔒</div>
+                    <h3>스터디원만 댓글을 볼 수 있습니다</h3>
+                    <p>이 스터디의 댓글을 보려면 스터디에 신청하고 승인받아야 합니다.</p>
+                    <div class="restricted-actions">
+                        <!-- 신청하지 않은 경우 -->
+                        <form th:if="${!isLeader && !isApplied}" th:action="@{'/studies/' + ${study.id} + '/apply'}" method="post" style="display:inline;">
+                            <button type="submit" class="btn btn-primary">스터디 신청하기</button>
+                        </form>
+                        
+                        <!-- 신청한 경우 - 상태에 따라 다른 표시 -->
+                        <div th:if="${!isLeader && isApplied}" style="display:inline;">
+                            <!-- 대기중인 경우 -->
+                            <div th:if="${applicationStatus == T(dev.kang.studyhub.domain.study.model.ApplicationStatus).PENDING}" 
+                                 class="btn" style="background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%); cursor: default;">
+                                신청 대기중 ⏳
+                            </div>
+                            
+                            <!-- 거절된 경우 -->
+                            <div th:if="${applicationStatus == T(dev.kang.studyhub.domain.study.model.ApplicationStatus).REJECTED}" 
+                                 class="btn" style="background: linear-gradient(135deg, #f44336 0%, #da190b 100%); cursor: default;">
+                                신청이 거절되었습니다 ✗
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 스터디원인 경우 댓글 섹션 표시 -->
+            <div th:if="${isMember}">
+                <!-- 댓글 작성 폼 -->
+                <div class="comment-form">
+                    <form th:action="@{'/studies/' + ${study.id} + '/comments'}" method="post">
+                        <textarea name="content" class="comment-textarea" placeholder="댓글을 입력하세요..." required></textarea>
+                        <button type="submit" class="comment-submit">댓글 작성</button>
+                    </form>
+                </div>
+
+                <!-- 댓글 목록 -->
+                <div class="comment-list">
+                    <div th:if="${#lists.isEmpty(comments)}" class="no-comments">
+                        아직 댓글이 없습니다. 첫 번째 댓글을 작성해보세요!
+                    </div>
+                    
+                    <div th:each="comment : ${comments}" class="comment-item" th:attr="data-comment-id=${comment.id}">
+                        <div class="comment-header">
+                            <span class="comment-author" th:text="${comment.user.name}"></span>
+                            <span class="comment-date" th:text="${#temporals.format(comment.createdAt, 'yyyy-MM-dd HH:mm')}"></span>
+                        </div>
+                        <div class="comment-content" th:text="${comment.content}"></div>
+                        
+                        <!-- 댓글 수정/삭제 버튼 (작성자 또는 스터디 개설자만 표시) -->
+                        <div th:if="${currentUser != null && (comment.user.id == currentUser.id || isLeader)}" 
+                             class="comment-actions">
+                            <button class="comment-edit-btn" th:attr="onclick='editComment(' + ${comment.id} + ')'">수정</button>
+                            <button class="comment-delete-btn" th:attr="onclick='deleteComment(' + ${comment.id} + ')'">삭제</button>
+                        </div>
+                        
+                        <!-- 댓글 수정 폼 -->
+                        <div class="comment-edit-form" th:attr="id='edit-form-' + ${comment.id}">
+                            <textarea class="comment-edit-textarea" th:attr="id='edit-textarea-${comment.id}'"></textarea>
+                            <div class="comment-edit-actions">
+                                <button class="comment-save-btn" th:attr="onclick='saveComment(' + ${comment.id} + ')'">저장</button>
+                                <button class="comment-cancel-btn" th:attr="onclick='cancelEdit(' + ${comment.id} + ')'">취소</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
+
+    <!-- JavaScript -->
+    <script th:inline="javascript">
+        // 댓글 수정 모드 진입
+        function editComment(commentId) {
+            const commentItem = document.querySelector(`[data-comment-id="${commentId}"]`);
+            const contentDiv = commentItem.querySelector('.comment-content');
+            const editForm = commentItem.querySelector(`#edit-form-${commentId}`);
+            const editTextarea = commentItem.querySelector(`#edit-textarea-${commentId}`);
+            
+            // 현재 내용을 textarea에 설정
+            editTextarea.value = contentDiv.textContent.trim();
+            
+            // 수정 폼 표시
+            editForm.style.display = 'block';
+            contentDiv.style.display = 'none';
+        }
+
+        // 댓글 수정 취소
+        function cancelEdit(commentId) {
+            const commentItem = document.querySelector(`[data-comment-id="${commentId}"]`);
+            const contentDiv = commentItem.querySelector('.comment-content');
+            const editForm = commentItem.querySelector(`#edit-form-${commentId}`);
+            
+            // 수정 폼 숨김
+            editForm.style.display = 'none';
+            contentDiv.style.display = 'block';
+        }
+
+        // 댓글 수정 저장
+        function saveComment(commentId) {
+            const commentItem = document.querySelector(`[data-comment-id="${commentId}"]`);
+            const editTextarea = commentItem.querySelector(`#edit-textarea-${commentId}`);
+            const content = editTextarea.value.trim();
+            
+            if (!content) {
+                alert('댓글 내용을 입력해주세요.');
+                return;
+            }
+
+            fetch(`/studies/[[${study.id}]]/comments/${commentId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `content=${encodeURIComponent(content)}`
+            })
+            .then(response => response.text())
+            .then(result => {
+                if (result === 'success') {
+                    // 성공 시 페이지 새로고침
+                    location.reload();
+                } else {
+                    alert('댓글 수정에 실패했습니다.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('댓글 수정 중 오류가 발생했습니다.');
+            });
+        }
+
+        // 댓글 삭제
+        function deleteComment(commentId) {
+            if (!confirm('정말로 이 댓글을 삭제하시겠습니까?')) {
+                return;
+            }
+
+            fetch(`/studies/[[${study.id}]]/comments/${commentId}`, {
+                method: 'DELETE'
+            })
+            .then(response => response.text())
+            .then(result => {
+                if (result === 'success') {
+                    // 성공 시 페이지 새로고침
+                    location.reload();
+                } else {
+                    alert('댓글 삭제에 실패했습니다.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('댓글 삭제 중 오류가 발생했습니다.');
+            });
+        }
+    </script>
 </body>
 </html> 

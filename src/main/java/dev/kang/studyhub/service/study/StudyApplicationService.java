@@ -137,4 +137,28 @@ public class StudyApplicationService {
     public Optional<StudyApplication> findByUserAndStudy(User user, Study study) {
         return studyApplicationRepository.findByUserAndStudy(user, study);
     }
+
+    /**
+     * 특정 사용자가 스터디에 승인된 멤버인지 확인
+     * 스터디 개설자도 포함합니다.
+     */
+    public boolean isApprovedMember(User user, Study study) {
+        // 스터디 개설자는 항상 승인된 멤버로 간주
+        if (study.isLeader(user)) {
+            return true;
+        }
+        
+        // 승인된 신청이 있는지 확인
+        return isApproved(user, study);
+    }
+
+    /**
+     * 특정 사용자가 승인받은 스터디 목록 조회
+     */
+    public List<Study> findApprovedStudiesByUser(User user) {
+        return studyApplicationRepository.findByUserAndStatusOrderByAppliedAtDesc(user, ApplicationStatus.APPROVED)
+                .stream()
+                .map(StudyApplication::getStudy)
+                .toList();
+    }
 } 
