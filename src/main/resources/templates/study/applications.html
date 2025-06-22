@@ -107,6 +107,25 @@
             margin-bottom: 1rem;
         }
 
+        .study-stats {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: rgba(255, 92, 56, 0.1);
+            border-radius: 10px;
+            border: 1px solid rgba(255, 92, 56, 0.2);
+        }
+
+        .stats-text {
+            color: #F4EFE9;
+            font-size: 0.9rem;
+        }
+
+        .stats-count {
+            color: #7FE7DC;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
         .empty-state {
             text-align: center;
             padding: 4rem 2rem;
@@ -162,6 +181,13 @@
         .applicant-email {
             color: #7FE7DC;
             font-size: 0.9rem;
+        }
+
+        .applicant-details {
+            color: #F4EFE9;
+            opacity: 0.7;
+            font-size: 0.85rem;
+            margin-top: 0.3rem;
         }
 
         .application-date {
@@ -278,7 +304,17 @@
 
         <div class="study-info">
             <h2 class="study-title" th:text="${study.title}"></h2>
+            <div class="study-stats" th:if="${study.recruitmentLimit != null}">
+                <span class="stats-text">승인된 인원: </span>
+                <span class="stats-count" th:text="${approvedCount} + '/' + ${study.recruitmentLimit}"></span>
+            </div>
         </div>
+
+        <!-- 성공 메시지 -->
+        <div th:if="${successMessage}" class="message success-message" th:text="${successMessage}"></div>
+        
+        <!-- 에러 메시지 -->
+        <div th:if="${errorMessage}" class="message error-message" th:text="${errorMessage}"></div>
 
         <div th:if="${applications.size() == 0}" class="empty-state">
             <div class="empty-icon">📝</div>
@@ -291,29 +327,46 @@
                     <div>
                         <div class="applicant-name" th:text="${app.user.name}"></div>
                         <div class="applicant-email" th:text="${app.user.email}"></div>
+                        <div class="applicant-details" th:if="${app.user.university != null or app.user.major != null}">
+                            <span th:if="${app.user.university != null}" th:text="${app.user.university}"></span>
+                            <span th:if="${app.user.university != null and app.user.major != null}"> · </span>
+                            <span th:if="${app.user.major != null}" th:text="${app.user.major}"></span>
+                            <span th:if="${app.user.educationStatus != null}"> · </span>
+                            <span th:if="${app.user.educationStatus != null}" th:text="${app.user.educationStatus.displayName}"></span>
+                        </div>
                     </div>
                     <div>
                         <span class="status-badge status-pending" 
                               th:if="${app.status == 'PENDING'}"
                               th:text="'대기중'"></span>
                         <span class="status-badge status-accepted" 
-                              th:if="${app.status == 'ACCEPTED'}"
-                              th:text="'수락됨'"></span>
+                              th:if="${app.status == 'APPROVED'}"
+                              th:text="'승인됨'"></span>
                         <span class="status-badge status-rejected" 
                               th:if="${app.status == 'REJECTED'}"
                               th:text="'거절됨'"></span>
                     </div>
                 </div>
                 <div class="application-date">
-                    신청일: <span th:text="${app.appliedAt}"></span>
+                    신청일: <span th:text="${#temporals.format(app.appliedAt, 'yyyy년 MM월 dd일 HH:mm')}"></span>
                 </div>
-                <div class="application-actions" th:if="${app.status == 'PENDING'}">
+                <div class="application-actions" th:if="${app.status == T(dev.kang.studyhub.domain.study.model.ApplicationStatus).PENDING}">
                     <form th:action="@{'/studies/' + ${study.id} + '/applications/' + ${app.id} + '/accept'}" method="post" style="display:inline;">
-                        <button type="submit" class="btn btn-success">수락</button>
+                        <button type="submit" class="btn btn-success">승인</button>
                     </form>
                     <form th:action="@{'/studies/' + ${study.id} + '/applications/' + ${app.id} + '/reject'}" method="post" style="display:inline;">
                         <button type="submit" class="btn btn-danger">거절</button>
                     </form>
+                </div>
+                <!-- 임시: 모든 신청에 버튼 표시 (디버깅용) -->
+                <div class="application-actions" th:if="${app.status != T(dev.kang.studyhub.domain.study.model.ApplicationStatus).PENDING}">
+                    <span style="color: #FF5C38; font-size: 0.9rem;">이미 처리된 신청입니다.</span>
+                </div>
+                <!-- 디버그 정보 (개발 중에만 표시) -->
+                <div class="debug-info" style="margin-top: 0.5rem; font-size: 0.8rem; color: #FF5C38;">
+                    <span>상태: </span><span th:text="${app.status}"></span>
+                    <span> | 상태명: </span><span th:text="${app.status.name()}"></span>
+                    <span> | ID: </span><span th:text="${app.id}"></span>
                 </div>
             </div>
         </div>

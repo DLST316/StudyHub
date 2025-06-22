@@ -63,6 +63,17 @@ public class StudyApplicationService {
     public void approve(Long applicationId) {
         StudyApplication application = studyApplicationRepository.findById(applicationId)
                 .orElseThrow(() -> new IllegalArgumentException("신청 내역이 존재하지 않습니다."));
+        
+        Study study = application.getStudy();
+        
+        // 인원 제한 체크
+        if (study.getRecruitmentLimit() != null) {
+            long approvedCount = countApprovedApplications(study);
+            if (approvedCount >= study.getRecruitmentLimit()) {
+                throw new IllegalStateException("모집 인원이 가득 찼습니다. (현재: " + approvedCount + "/" + study.getRecruitmentLimit() + ")");
+            }
+        }
+        
         application.approve();
         studyApplicationRepository.save(application);
     }

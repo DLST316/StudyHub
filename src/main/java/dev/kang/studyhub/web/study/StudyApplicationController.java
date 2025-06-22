@@ -100,7 +100,9 @@ public class StudyApplicationController {
      * GET /studies/{studyId}/applications
      */
     @GetMapping("/{studyId}/applications")
-    public String listApplications(@PathVariable Long studyId, Model model) {
+    public String listApplications(@PathVariable Long studyId, Model model,
+                                 @RequestParam(value = "success", required = false) String success,
+                                 @RequestParam(value = "error", required = false) String error) {
         User user = getCurrentUser();
         
         Study study = studyService.findById(studyId)
@@ -113,8 +115,25 @@ public class StudyApplicationController {
         
         List<StudyApplication> applications = applicationService.findByStudy(study);
         
+        // 승인된 신청자 수 계산
+        long approvedCount = applicationService.countApprovedApplications(study);
+        
         model.addAttribute("study", study);
         model.addAttribute("applications", applications);
+        model.addAttribute("approvedCount", approvedCount);
+        
+        // 성공/에러 메시지 처리
+        if (success != null) {
+            if ("accepted".equals(success)) {
+                model.addAttribute("successMessage", "신청이 승인되었습니다.");
+            } else if ("rejected".equals(success)) {
+                model.addAttribute("successMessage", "신청이 거절되었습니다.");
+            }
+        }
+        
+        if (error != null) {
+            model.addAttribute("errorMessage", error);
+        }
         
         return "study/applications";
     }
@@ -135,8 +154,14 @@ public class StudyApplicationController {
         // 신청 내역 존재 여부 체크
         StudyApplication application = applicationRepository.findById(applicationId)
                 .orElseThrow(() -> new IllegalArgumentException("신청 내역이 존재하지 않습니다."));
-        applicationService.approve(applicationId);
-        return "redirect:/studies/" + studyId + "/applications?success=accepted";
+        
+        try {
+            applicationService.approve(applicationId);
+            return "redirect:/studies/" + studyId + "/applications?success=accepted";
+        } catch (IllegalStateException e) {
+            // 인원 제한 등의 비즈니스 로직 예외 처리
+            return "redirect:/studies/" + studyId + "/applications?error=" + e.getMessage();
+        }
     }
 
     /**
