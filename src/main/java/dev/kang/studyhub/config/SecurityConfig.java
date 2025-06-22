@@ -4,6 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -18,6 +21,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
  * - 비밀번호 암호화 설정
  */
 @Configuration
+@EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
 
@@ -34,15 +38,16 @@ public class SecurityConfig {
         http
                 // CSRF(Cross-Site Request Forgery) 보호 기능을 비활성화
                 // 개발 환경에서는 편의를 위해 비활성화하지만, 운영 환경에서는 활성화해야 합니다
-                .csrf().disable()
+                .csrf(AbstractHttpConfigurer::disable)
                 
                 // H2 콘솔의 iframe 사용을 허용
                 // H2 데이터베이스 콘솔이 iframe 내에서 정상 작동하도록 설정
-                .headers().frameOptions().disable()
-                .and()
+                .headers(headers -> headers
+                        .frameOptions(HeadersConfigurer.FrameOptionsConfig::disable)
+                )
                 
                 // URL별 접근 권한 설정
-                .authorizeHttpRequests((auth) -> auth
+                .authorizeHttpRequests(auth -> auth
                         // 다음 URL들은 인증 없이 접근 가능 (permitAll)
                         .requestMatchers("/", "/join", "/login", "/css/**", "/js/**", "/images/**","/h2-console/**").permitAll()
                         // 그 외 모든 요청은 인증이 필요 (authenticated)
@@ -50,7 +55,7 @@ public class SecurityConfig {
                 )
                 
                 // 폼 로그인 설정
-                .formLogin((form) -> form
+                .formLogin(form -> form
                         // 커스텀 로그인 페이지 설정
                         .loginPage("/login")
                         .loginProcessingUrl("/login")
@@ -67,7 +72,7 @@ public class SecurityConfig {
                 )
                 
                 // 로그아웃 설정
-                .logout((logout) -> logout
+                .logout(logout -> logout
                         // 로그아웃 요청을 처리할 URL
                         .logoutUrl("/logout")
                         // 로그아웃 성공 시 리다이렉트할 URL
