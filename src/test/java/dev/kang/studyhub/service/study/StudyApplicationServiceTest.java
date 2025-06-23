@@ -155,14 +155,14 @@ class StudyApplicationServiceTest {
     @DisplayName("특정 사용자의 신청 내역을 조회할 수 있어야 한다")
     void findByUser_Success() {
         // given
-        when(studyApplicationRepository.findByUserOrderByAppliedAtDesc(user)).thenReturn(Arrays.asList(application));
+        when(studyApplicationRepository.findByUserWithStudyAndLeader(user)).thenReturn(Arrays.asList(application));
 
         // when
         List<StudyApplication> result = studyApplicationService.findByUser(user);
 
         // then
         assertThat(result).hasSize(1);
-        verify(studyApplicationRepository, times(1)).findByUserOrderByAppliedAtDesc(user);
+        verify(studyApplicationRepository, times(1)).findByUserWithStudyAndLeader(user);
     }
 
     @Test

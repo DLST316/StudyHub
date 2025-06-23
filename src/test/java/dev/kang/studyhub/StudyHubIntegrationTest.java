@@ -5,6 +5,14 @@ import dev.kang.studyhub.domain.user.model.EducationStatus;
 import dev.kang.studyhub.domain.user.repository.UserRepository;
 import dev.kang.studyhub.service.user.UserService;
 import dev.kang.studyhub.web.user.UserJoinForm;
+import dev.kang.studyhub.domain.study.entity.Study;
+import dev.kang.studyhub.domain.study.entity.StudyApplication;
+import dev.kang.studyhub.domain.study.entity.StudyComment;
+import dev.kang.studyhub.domain.study.model.ApplicationStatus;
+import dev.kang.studyhub.domain.study.repository.StudyApplicationRepository;
+import dev.kang.studyhub.service.study.StudyService;
+import dev.kang.studyhub.service.study.StudyApplicationService;
+import dev.kang.studyhub.service.study.StudyCommentService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,6 +58,18 @@ class StudyHubIntegrationTest {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private StudyService studyService;
+
+    @Autowired
+    private StudyApplicationService studyApplicationService;
+
+    @Autowired
+    private StudyCommentService studyCommentService;
+
+    @Autowired
+    private StudyApplicationRepository studyApplicationRepository;
 
     @Test
     @DisplayName("애플리케이션 컨텍스트가 정상적으로 로딩되어야 한다")
@@ -153,5 +173,53 @@ class StudyHubIntegrationTest {
         assertThat(savedUser).isPresent();
         assertThat(savedUser.get().getPassword()).isNotEqualTo("plainPassword");
         assertThat(savedUser.get().getPassword()).startsWith("$2a$"); // BCrypt 해시 형식
+    }
+
+    @Test
+    @DisplayName("스터디 생성부터 신청, 승인, 댓글 작성까지 전체 플로우가 정상 동작해야 한다")
+    void studyFullFlow_CompleteSuccess() {
+        // 1. 스터디 개설자 회원가입
+        UserJoinForm leaderForm = new UserJoinForm();
+        leaderForm.setName("리더");
+        leaderForm.setEmail("leader@example.com");
+        leaderForm.setPassword("leaderpass");
+        leaderForm.setEducationStatus(EducationStatus.ENROLLED);
+        userService.join(leaderForm);
+        User leader = userRepository.findByEmail("leader@example.com").orElseThrow();
+
+        // 2. 신청자 회원가입
+        UserJoinForm applicantForm = new UserJoinForm();
+        applicantForm.setName("신청자");
+        applicantForm.setEmail("applicant@example.com");
+        applicantForm.setPassword("applicantpass");
+        applicantForm.setEducationStatus(EducationStatus.ENROLLED);
+        userService.join(applicantForm);
+        User applicant = userRepository.findByEmail("applicant@example.com").orElseThrow();
+
+        // 3. 스터디 생성
+        Study study = Study.builder()
+                .title("통합테스트 스터디")
+                .description("통합테스트용 스터디입니다.")
+                .leader(leader)
+                .recruitmentLimit(3)
+                .requirement("테스트 전공")
+                .build();
+        studyService.createStudy(study);
+        assertThat(study.getId()).isNotNull();
+
+        // 4. 신청자가 스터디 신청
+        studyApplicationService.apply(applicant, study);
+        StudyApplication application = studyApplicationRepository.findByUserAndStudy(applicant, study).orElseThrow();
+        assertThat(application.getStatus()).isEqualTo(ApplicationStatus.PENDING);
+
+        // 5. 리더가 신청 승인
+        studyApplicationService.approve(application.getId());
+        StudyApplication approvedApp = studyApplicationRepository.findById(application.getId()).orElseThrow();
+        assertThat(approvedApp.getStatus()).isEqualTo(ApplicationStatus.APPROVED);
+
+        // 6. 신청자가 댓글 작성
+        StudyComment comment = studyCommentService.createComment("통합테스트 댓글입니다.", applicant, study);
+        assertThat(comment.getId()).isNotNull();
+        assertThat(comment.getContent()).isEqualTo("통합테스트 댓글입니다.");
     }
 } 
