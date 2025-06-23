@@ -87,4 +87,17 @@ public interface StudyApplicationRepository extends JpaRepository<StudyApplicati
      */
     @Query("SELECT COUNT(sa) FROM StudyApplication sa WHERE sa.study = :study AND sa.status = 'APPROVED'")
     long countApprovedApplicationsByStudy(@Param("study") Study study);
+
+    @Query("select sa from StudyApplication sa " +
+            "join fetch sa.study s " +
+            "join fetch s.leader " +
+            "where sa.user = :user " +
+            "order by sa.appliedAt desc")
+    List<StudyApplication> findByUserWithStudyAndLeader(@Param("user") User user);
+
+    List<StudyApplication> findByUser(User user);
+
+    List<StudyApplication> findByStudy(Study study);
+
+    List<StudyApplication> findByUserAndStatus(User user, ApplicationStatus status);
 } 

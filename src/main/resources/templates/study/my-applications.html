@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>내가 신청한 스터디 - StudyHub</title>
+    <title>신청/참여 스터디 - StudyHub</title>
     <style>
         * {
             margin: 0;
@@ -276,39 +276,39 @@
 
     <div class="main-container">
         <div class="page-header">
-            <h1 class="page-title">내가 신청한 스터디</h1>
-            <p class="page-subtitle">신청한 스터디의 상태를 확인해보세요</p>
+            <h1 class="page-title">신청/참여 스터디 현황</h1>
+            <p class="page-subtitle">신청했거나 참여가 승인된 스터디 목록입니다.</p>
         </div>
 
         <div th:if="${applications.size() == 0}" class="empty-state">
             <div class="empty-icon">📝</div>
-            <div class="empty-text">아직 신청한 스터디가 없습니다.</div>
+            <div class="empty-text">아직 신청하거나 참여 중인 스터디가 없습니다.</div>
             <a th:href="@{/studies}" class="btn">스터디 찾아보기</a>
         </div>
 
         <div th:if="${applications.size() > 0}" class="applications-grid">
-            <div th:each="app : ${applications}" class="application-card">
-                <h2 class="study-title" th:text="${app.study.title}"></h2>
-                <p class="study-description" th:text="${app.study.description}"></p>
+            <div th:each="studyApp : ${applications}" class="application-card">
+                <h2 class="study-title" th:text="${studyApp.study.title}"></h2>
+                <p class="study-description" th:text="${studyApp.study.description}"></p>
                 
                 <span class="status-badge status-pending" 
-                      th:if="${app.status == 'PENDING'}"
+                      th:if="${studyApp.status.name() == 'PENDING'}"
                       th:text="'대기중'"></span>
                 <span class="status-badge status-accepted" 
-                      th:if="${app.status == 'ACCEPTED'}"
+                      th:if="${studyApp.status.name() == 'ACCEPTED'}"
                       th:text="'수락됨'"></span>
                 <span class="status-badge status-rejected" 
-                      th:if="${app.status == 'REJECTED'}"
+                      th:if="${studyApp.status.name() == 'REJECTED'}"
                       th:text="'거절됨'"></span>
                 
                 <div class="application-meta">
-                    <span class="study-leader">개설자: <span th:text="${app.study.leader.name}"></span></span>
-                    <span class="application-date" th:text="${app.appliedAt}"></span>
+                    <span class="study-leader">개설자: <span th:text="${studyApp.study.leader.name}"></span></span>
+                    <span class="application-date" th:text="${#temporals.format(studyApp.appliedAt, 'yyyy-MM-dd HH:mm')}"></span>
                 </div>
                 
                 <div class="application-actions">
-                    <a th:href="@{'/studies/' + ${app.study.id}}" class="btn btn-small">상세 보기</a>
-                    <form th:if="${app.status == 'PENDING'}" th:action="@{'/studies/' + ${app.study.id} + '/cancel'}" method="post" style="display:inline;">
+                    <a th:href="@{'/studies/' + ${studyApp.study.id}}" class="btn btn-small">상세 보기</a>
+                    <form th:if="${studyApp.status.name() == 'PENDING'}" th:action="@{'/studies/' + ${studyApp.study.id} + '/cancel'}" method="post" style="display:inline;">
                         <button type="submit" class="btn btn-small btn-danger">신청 취소</button>
                     </form>
                 </div>

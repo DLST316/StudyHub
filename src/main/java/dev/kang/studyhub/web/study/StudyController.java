@@ -251,14 +251,14 @@ public class StudyController {
     }
 
     /**
-     * 내가 참여한 스터디 목록 (개설한 스터디 + 승인받은 스터디)
+     * 내가 개설한 스터디 목록
      * GET /studies/my
      */
     @GetMapping("/my")
     public String myStudies(Model model) {
         User currentUser = getCurrentUser();
-        List<Study> participatedStudies = studyService.findParticipatedStudies(currentUser);
-        model.addAttribute("studies", participatedStudies);
+        List<Study> createdStudies = studyService.findByLeader(currentUser);
+        model.addAttribute("studies", createdStudies);
         return "study/my-studies";
     }
 } 

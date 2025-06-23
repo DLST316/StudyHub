@@ -93,7 +93,7 @@ public class StudyApplicationService {
      * 특정 사용자의 신청 내역 조회
      */
     public List<StudyApplication> findByUser(User user) {
-        return studyApplicationRepository.findByUserOrderByAppliedAtDesc(user);
+        return studyApplicationRepository.findByUserWithStudyAndLeader(user);
     }
 
     /**

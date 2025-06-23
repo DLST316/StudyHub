@@ -248,7 +248,7 @@
             border: none;
             padding: 1rem;
             border-radius: 10px;
-            font-size: 1rem;
+            font-size: 1.1rem;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s;
@@ -256,6 +256,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            text-align: center;
         }
 
         .action-btn:hover {
@@ -364,9 +365,11 @@
         <!-- 히어로 섹션 -->
         <div class="hero-section">
             <h1 class="hero-title">StudyHub</h1>
-            <p class="hero-subtitle">함께 성장하는 스터디 모집 & 커뮤니티</p>
+            <p class="hero-subtitle">함께 성장하는 스터디 커뮤니티</p>
             <!-- 로그인된 사용자에게 환영 메시지 -->
-            <p th:if="${isLoggedIn}" class="welcome-message" th:text="'환영합니다, ' + ${userEmail} + '님!'">환영합니다!</p>
+            <div th:if="${user != null}" class="welcome-message"
+                 th:text="|${user.nickname}님, StudyHub에 오신 것을 환영합니다!|">
+            </div>
         </div>
 
         <!-- 로그인되지 않은 사용자를 위한 로그인 섹션 -->
@@ -391,16 +394,10 @@
         <!-- 로그인된 사용자를 위한 대시보드 -->
         <div th:if="${isLoggedIn}" class="dashboard-section">
             <h2 class="dashboard-title">내 대시보드</h2>
-            <p style="text-align: center; color: #F4EFE9; margin-bottom: 2rem;">
-                StudyHub에서 다양한 활동을 시작해보세요!
-            </p>
             <div class="dashboard-actions">
-                <a href="/studies/new" class="action-btn">스터디 만들기</a>
-                <a href="/studies" class="action-btn">스터디 찾기</a>
-                <a href="/studies/my" class="action-btn">내 스터디</a>
-                <a href="/studies/applications/my" class="action-btn">신청한 스터디</a>
-                <a href="/posts/new" class="action-btn">글쓰기</a>
-                <a href="/mypage" class="action-btn">마이페이지</a>
+                <a th:href="@{/studies/new}" class="action-btn">새 스터디 만들기</a>
+                <a th:href="@{/studies/my}" class="action-btn">내가 개설한 스터디</a>
+                <a th:href="@{/studies/applications/my}" class="action-btn">신청/참여 스터디</a>
             </div>
         </div>
 
