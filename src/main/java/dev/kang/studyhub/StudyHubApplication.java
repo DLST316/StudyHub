@@ -8,6 +8,9 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import dev.kang.studyhub.domain.board.Board;
+import dev.kang.studyhub.domain.board.BoardRepository;
+import java.time.LocalDateTime;
 
 /**
  * StudyHub 애플리케이션의 메인 클래스
@@ -24,6 +27,7 @@ import org.springframework.context.annotation.Bean;
 public class StudyHubApplication {
 
     private final UserService userService;
+    private final BoardRepository boardRepository;
 
     public static void main(String[] args) {
         SpringApplication.run(StudyHubApplication.class, args);
@@ -61,6 +65,16 @@ public class StudyHubApplication {
                 
                 userService.join(form2);
                 System.out.println("테스트 사용자 2 생성 완료: 강인석2 (lolvslol66@icloud.com)");
+            }
+
+            // 커뮤니티 Board row 자동 생성
+            if (boardRepository.findByName("커뮤니티") == null) {
+                Board board = new Board();
+                board.setName("커뮤니티");
+                board.setDescription("StudyHub 단일 커뮤니티 게시판");
+                board.setCreatedAt(LocalDateTime.now());
+                boardRepository.save(board);
+                System.out.println("커뮤니티 Board row 자동 생성 완료");
             }
         };
     }
