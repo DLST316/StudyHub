@@ -24,9 +24,23 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
+import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
+import dev.kang.studyhub.domain.board.*;
+import dev.kang.studyhub.domain.board.PostLike.LikeType;
+import dev.kang.studyhub.domain.board.PostLikeRepository;
+import dev.kang.studyhub.domain.board.BoardRepository;
+import dev.kang.studyhub.service.board.PostService;
+import dev.kang.studyhub.service.board.PostCommentService;
+import dev.kang.studyhub.service.ImageUploadService;
+import org.mockito.Mockito;
+import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.mock.web.MockMultipartFile;
 
 /**
  * StudyHub 애플리케이션의 통합 테스트
@@ -70,6 +84,27 @@ class StudyHubIntegrationTest {
 
     @Autowired
     private StudyApplicationRepository studyApplicationRepository;
+
+    @Autowired
+    private PostService postService;
+
+    @Autowired
+    private PostCommentService postCommentService;
+
+    @Autowired
+    private BoardRepository boardRepository;
+
+    @Autowired
+    private PostRepository postRepository;
+
+    @Autowired
+    private PostLikeRepository postLikeRepository;
+
+    @Autowired
+    private PostCommentRepository postCommentRepository;
+
+    @SpyBean
+    private ImageUploadService imageUploadService;
 
     @Test
     @DisplayName("애플리케이션 컨텍스트가 정상적으로 로딩되어야 한다")
@@ -221,5 +256,109 @@ class StudyHubIntegrationTest {
         StudyComment comment = studyCommentService.createComment("통합테스트 댓글입니다.", applicant, study);
         assertThat(comment.getId()).isNotNull();
         assertThat(comment.getContent()).isEqualTo("통합테스트 댓글입니다.");
+    }
+
+    @Test
+    @DisplayName("게시판 전체 플로우: 게시글/댓글/추천/이미지 업로드/예외/권한 등")
+    void communityFullFlow_CompleteSuccess() throws Exception {
+        // 1. 게시판(Board) 생성
+        Board board = new Board();
+        board.setName("자유게시판");
+        board.setCreatedAt(LocalDateTime.now());
+        boardRepository.save(board);
+
+        // 2. 사용자 2명 회원가입
+        UserJoinForm user1Form = new UserJoinForm();
+        user1Form.setName("작성자");
+        user1Form.setEmail("author@ex.com");
+        user1Form.setPassword("pw1");
+        user1Form.setEducationStatus(EducationStatus.ENROLLED);
+        userService.join(user1Form);
+        User author = userRepository.findByEmail("author@ex.com").orElseThrow();
+
+        UserJoinForm user2Form = new UserJoinForm();
+        user2Form.setName("추천자");
+        user2Form.setEmail("liker@ex.com");
+        user2Form.setPassword("pw2");
+        user2Form.setEducationStatus(EducationStatus.ENROLLED);
+        userService.join(user2Form);
+        User liker = userRepository.findByEmail("liker@ex.com").orElseThrow();
+
+        // 3. 이미지 업로드(Mock)
+        MockMultipartFile image = new MockMultipartFile("file", "test.jpg", "image/jpeg", new byte[]{1,2,3});
+        org.mockito.Mockito.doReturn("https://mock.cloudinary.com/test.jpg")
+            .when(imageUploadService).uploadImage(image);
+        String imageUrl = imageUploadService.uploadImage(image);
+        System.out.println("[TEST] imageUrl=" + imageUrl);
+        assertThat(imageUploadService.isValidImageUrl(imageUrl)).isTrue();
+
+        // 4. 게시글 작성 (이미지 포함)
+        Post post = new Post();
+        post.setBoard(board);
+        post.setUser(author);
+        post.setTitle("테스트 게시글");
+        post.setContent("본문 내용 <img src='" + imageUrl + "'>");
+        post.setViewCount(0);
+        post.setLikeCount(0);
+        post.setDislikeCount(0);
+        post.setNotice(false);
+        post.setCreatedAt(LocalDateTime.now());
+        post.setUpdatedAt(LocalDateTime.now());
+        Post savedPost = postService.savePost(post);
+        assertThat(savedPost.getId()).isNotNull();
+        assertThat(savedPost.getContent()).contains(imageUrl);
+
+        // 5. 게시글 목록/상세 조회
+        List<Post> posts = postService.getPosts(board, org.springframework.data.domain.PageRequest.of(0, 10)).getContent();
+        assertThat(posts).extracting("title").contains("테스트 게시글");
+        Post foundPost = postService.getPost(savedPost.getId());
+        assertThat(foundPost.getTitle()).isEqualTo("테스트 게시글");
+
+        // 6. 게시글 조회수 증가
+        postService.increaseView(savedPost.getId());
+        assertThat(postService.getPost(savedPost.getId()).getViewCount()).isEqualTo(1);
+
+        // 7. 댓글 작성/조회
+        PostComment comment = new PostComment();
+        comment.setPost(savedPost);
+        comment.setUser(liker);
+        comment.setContent("댓글 내용");
+        comment.setLikeCount(0);
+        comment.setCreatedAt(LocalDateTime.now());
+        PostComment savedComment = postCommentService.saveComment(comment);
+        assertThat(savedComment.getId()).isNotNull();
+        List<PostComment> comments = postCommentService.getComments(savedPost);
+        assertThat(comments).extracting("content").contains("댓글 내용");
+
+        // 8. 댓글 삭제
+        postCommentService.deleteComment(savedComment.getId());
+        assertThat(postCommentService.getComments(savedPost)).isEmpty();
+
+        // 9. 게시글 추천/비추천(토글, 취소, 변경)
+        String likeMsg = postService.toggleLike(savedPost.getId(), liker, LikeType.LIKE);
+        assertThat(likeMsg).contains("추천");
+        assertThat(postService.getLikeCounts(savedPost.getId()).getLikeCount()).isEqualTo(1);
+        // 같은 사용자가 다시 추천 → 취소
+        String cancelMsg = postService.toggleLike(savedPost.getId(), liker, LikeType.LIKE);
+        assertThat(cancelMsg).contains("취소");
+        assertThat(postService.getLikeCounts(savedPost.getId()).getLikeCount()).isEqualTo(0);
+        // 비추천
+        String dislikeMsg = postService.toggleLike(savedPost.getId(), liker, LikeType.DISLIKE);
+        assertThat(dislikeMsg).contains("비추천");
+        assertThat(postService.getLikeCounts(savedPost.getId()).getDislikeCount()).isEqualTo(1);
+        // 비추천 → 추천 변경
+        String changeMsg = postService.toggleLike(savedPost.getId(), liker, LikeType.LIKE);
+        assertThat(changeMsg).contains("추천");
+        assertThat(postService.getLikeCounts(savedPost.getId()).getLikeCount()).isEqualTo(1);
+        assertThat(postService.getLikeCounts(savedPost.getId()).getDislikeCount()).isEqualTo(0);
+
+        // 10. 게시글 삭제
+        postService.deletePost(savedPost.getId());
+        assertThatThrownBy(() -> postService.getPost(savedPost.getId())).isInstanceOf(Exception.class);
+
+        // 11. 예외/경계 상황: 없는 게시글/댓글 접근, 권한 없는 요청 등
+        assertThatThrownBy(() -> postService.getPost(99999L)).isInstanceOf(Exception.class);
+        assertThatThrownBy(() -> postCommentService.getComment(99999L)).isInstanceOf(Exception.class);
+        // 권한 없는 사용자가 게시글/댓글 삭제 등은 실제 컨트롤러/시큐리티 통합에서 별도 검증 필요
     }
 } 
