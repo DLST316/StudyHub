@@ -13,6 +13,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
@@ -50,16 +51,18 @@ public class CommunityController {
         
         // 현재 사용자의 추천/비추천 상태 확인
         PostLike.LikeType userLikeStatus = null;
+        User currentUser = null;
         if (userDetails != null) {
-            User user = userService.findByEmail(userDetails.getUsername()).orElse(null);
-            if (user != null) {
-                userLikeStatus = postService.getUserLikeStatus(id, user);
+            currentUser = userService.findByEmail(userDetails.getUsername()).orElse(null);
+            if (currentUser != null) {
+                userLikeStatus = postService.getUserLikeStatus(id, currentUser);
             }
         }
         
         model.addAttribute("post", post);
         model.addAttribute("comments", commentService.getComments(post));
         model.addAttribute("userLikeStatus", userLikeStatus);
+        model.addAttribute("currentUser", currentUser);
         return "community/post-detail";
     }
 
@@ -123,5 +126,30 @@ public class CommunityController {
         comment.setContent(content);
         commentService.saveComment(comment);
         return "redirect:/community/post/" + id;
+    }
+
+    /** 댓글 삭제 */
+    @PostMapping("/comment/{commentId}/delete")
+    @ResponseBody
+    public ResponseEntity<String> deleteComment(@PathVariable Long commentId, @AuthenticationPrincipal UserDetails userDetails) {
+        if (userDetails == null) {
+            return ResponseEntity.status(401).body("로그인이 필요합니다.");
+        }
+        
+        try {
+            User user = userService.findByEmail(userDetails.getUsername()).orElseThrow();
+            PostComment comment = commentService.getComment(commentId);
+            
+            // 댓글 작성자만 삭제 가능
+            if (!comment.getUser().getId().equals(user.getId())) {
+                return ResponseEntity.status(403).body("댓글 작성자만 삭제할 수 있습니다.");
+            }
+            
+            commentService.deleteComment(commentId);
+            return ResponseEntity.ok("댓글이 삭제되었습니다.");
+            
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("댓글 삭제 중 오류가 발생했습니다.");
+        }
     }
 } 

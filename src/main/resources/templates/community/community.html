@@ -1,7 +1,7 @@
 <!--
   커뮤니티(게시판) 목록 페이지
   - 게시글 리스트, 글쓰기 버튼, 인기글(추천순 상위 5개)
-  - Bootstrap5 + custom.css 컬러 팔레트
+  - 모던한 디자인과 반응형 레이아웃
 -->
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
@@ -9,51 +9,101 @@
     <title>커뮤니티 - StudyHub</title>
     <link rel="stylesheet" th:href="@{/css/custom.css}"/>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css"/>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
 <div th:replace="~{layout/layout :: layout(~{::section})}">
     <section>
-        <div class="container py-4">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h2>커뮤니티</h2>
-                <a href="/community/write" class="btn btn-primary">글쓰기</a>
+        <div class="container">
+            <!-- 커뮤니티 헤더 -->
+            <div class="community-container">
+                <div class="community-header">
+                    <h1 class="community-title">
+                        <i class="bi bi-people-fill me-3" style="color: var(--brand-color);"></i>
+                        커뮤니티
+                    </h1>
+                    <a href="/community/write" class="write-btn">
+                        <i class="bi bi-pencil-square me-2"></i>
+                        글쓰기
+                    </a>
+                </div>
+
+                <!-- 인기글 섹션 -->
+                <div class="popular-posts">
+                    <h3 class="popular-title">
+                        <i class="bi bi-fire"></i>
+                        🔥 인기글 TOP 5
+                    </h3>
+                    <div class="post-list">
+                        <div class="post-item" th:each="post, postStat : ${posts.content}" th:if="${postStat.index} < 5" th:object="${post}">
+                            <a th:href="@{'/community/post/' + *{id}}" class="post-title" th:text="*{title}"></a>
+                            <span class="like-badge">
+                                <i class="bi bi-heart-fill me-1"></i>
+                                <span th:text="*{likeCount}">0</span>
+                            </span>
+                        </div>
+                        <div class="post-item text-center text-muted" th:if="${posts.content == null or #lists.isEmpty(posts.content)}">
+                            <i class="bi bi-inbox me-2"></i>
+                            인기글이 없습니다.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 전체 게시글 리스트 -->
+                <div class="post-list">
+                    <div class="post-item" th:each="post : ${posts.content}" th:object="${post}">
+                        <div class="d-flex align-items-center">
+                            <a th:href="@{'/community/post/' + *{id}}" class="post-title" th:text="*{title}"></a>
+                            <div class="d-flex align-items-center ms-3">
+                                <span class="text-muted me-3" style="font-size: 0.9rem;">
+                                    <i class="bi bi-person me-1"></i>
+                                    <span th:text="${post.user != null ? post.user.name : '익명'}"></span>
+                                </span>
+                                <span class="text-muted me-3" style="font-size: 0.9rem;">
+                                    <i class="bi bi-calendar3 me-1"></i>
+                                    <span th:text="${#temporals.format(post.createdAt, 'MM-dd HH:mm')}"></span>
+                                </span>
+                                <span class="text-muted me-3" style="font-size: 0.9rem;">
+                                    <i class="bi bi-eye me-1"></i>
+                                    <span th:text="*{viewCount}"></span>
+                                </span>
+                            </div>
+                        </div>
+                        <span class="like-badge">
+                            <i class="bi bi-heart-fill me-1"></i>
+                            <span th:text="*{likeCount}">0</span>
+                        </span>
+                    </div>
+                    <div class="post-item text-center text-muted" th:if="${posts.content == null or #lists.isEmpty(posts.content)}">
+                        <i class="bi bi-inbox me-2"></i>
+                        게시글이 없습니다.
+                    </div>
+                </div>
+
+                <!-- 페이지네이션 -->
+                <nav th:if="${posts.totalPages > 1}" class="mt-4">
+                    <ul class="pagination">
+                        <li class="page-item" th:classappend="${posts.first} ? 'disabled'">
+                            <a class="page-link" th:href="@{'/community?page=' + ${posts.number - 1}}">
+                                <i class="bi bi-chevron-left"></i>
+                                이전
+                            </a>
+                        </li>
+                        <li class="page-item" th:each="i : ${#numbers.sequence(0, posts.totalPages-1)}" th:classappend="${i == posts.number} ? 'active'">
+                            <a class="page-link" th:href="@{'/community?page=' + ${i}}" th:text="${i+1}"></a>
+                        </li>
+                        <li class="page-item" th:classappend="${posts.last} ? 'disabled'">
+                            <a class="page-link" th:href="@{'/community?page=' + ${posts.number + 1}}">
+                                다음
+                                <i class="bi bi-chevron-right"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
             </div>
-            <!-- 인기글 섹션 -->
-            <div class="mb-4">
-                <h5>🔥 인기글 TOP 5</h5>
-                <ul class="list-group list-group-flush">
-                    <li class="list-group-item" th:each="post, postStat : ${posts.content}" th:if="${postStat.index} < 5" th:object="${post}">
-                        <a th:href="@{'/community/post/' + *{id}}" th:text="*{title}"></a>
-                        <span class="badge bg-danger ms-2" th:text="*{likeCount}">0</span>
-                    </li>
-                    <li class="list-group-item text-muted" th:if="${posts.content == null or #lists.isEmpty(posts.content)}">인기글이 없습니다.</li>
-                </ul>
-            </div>
-            <!-- 게시글 리스트 -->
-            <div class="card p-3 mb-4">
-                <h5 class="mb-3">전체 게시글</h5>
-                <ul class="list-group list-group-flush">
-                    <li class="list-group-item" th:each="post : ${posts.content}" th:object="${post}">
-                        <a th:href="@{'/community/post/' + *{id}}" th:text="*{title}"></a>
-                        <span class="badge bg-danger ms-2" th:text="*{likeCount}">0</span>
-                    </li>
-                    <li class="list-group-item text-muted" th:if="${posts.content == null or #lists.isEmpty(posts.content)}">게시글이 없습니다.</li>
-                </ul>
-            </div>
-            <!-- 페이지네이션 -->
-            <nav th:if="${posts.totalPages > 1}">
-                <ul class="pagination justify-content-center">
-                    <li class="page-item" th:classappend="${posts.first} ? 'disabled'">
-                        <a class="page-link" th:href="@{'/community?page=' + ${posts.number - 1}}">이전</a>
-                    </li>
-                    <li class="page-item" th:each="i : ${#numbers.sequence(0, posts.totalPages-1)}" th:classappend="${i == posts.number} ? 'active'">
-                        <a class="page-link" th:href="@{'/community?page=' + ${i}}" th:text="${i+1}"></a>
-                    </li>
-                    <li class="page-item" th:classappend="${posts.last} ? 'disabled'">
-                        <a class="page-link" th:href="@{'/community?page=' + ${posts.number + 1}}">다음</a>
-                    </li>
-                </ul>
-            </nav>
         </div>
     </section>
 </div>

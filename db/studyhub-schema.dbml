@@ -1,4 +1,4 @@
-// StudyHub ERD - MVP 확정 버전(V3, not null 등 제약 완전 반영)
+// StudyHub ERD - MVP 확정 버전(V4, 추천 시스템 변경)
 
 Table users {
   id int [pk, increment]
