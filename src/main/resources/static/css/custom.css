@@ -6,19 +6,26 @@
     --info-color: #F4EFE9;
     --button-color: #1E3A5F;
     --action-color: #7FE7DC;
-    --text-primary: #2C2E33;
-    --text-secondary: #6C757D;
-    --bg-light: #F8F9FA;
-    --border-color: #E9ECEF;
-    --shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    --shadow-hover: 0 4px 20px rgba(0, 0, 0, 0.15);
+    --text-primary: #F4EFE9;
+    --text-secondary: #B0B3B8;
+    --bg-main: #23242a;
+    --bg-card: #2C2E33;
+    --bg-light: #35363c;
+    --border-color: #393A40;
+    --shadow: 0 4px 24px rgba(44,46,51,0.15);
+    --shadow-hover: 0 8px 32px rgba(44,46,51,0.22);
 }
 
 body {
     font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-    min-height: 100vh;
+    background: var(--bg-main);
     color: var(--text-primary);
+    min-height: 100vh;
+}
+
+body.post-detail-page {
+    background: var(--bg-main) !important;
+    color: var(--text-primary) !important;
 }
 
 /* 커뮤니티 목록 페이지 */
@@ -108,16 +115,24 @@ body {
     transform: translateX(5px);
 }
 
+/* 게시글 목록 제목 가독성 개선 */
 .post-title {
-    color: var(--text-primary);
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 1.1rem;
-    transition: color 0.3s ease;
+    background: rgba(244, 239, 233, 0.18); /* 정보색상, 약간 밝은 배경 */
+    color: #FF5C38; /* 브랜드 포인트 컬러 */
+    font-weight: 800;
+    font-size: 1.15rem;
+    border-radius: 8px;
+    padding: 0.3rem 0.8rem;
+    box-shadow: 0 2px 8px rgba(44,46,51,0.10);
+    text-shadow: 0 2px 8px rgba(255,92,56,0.10);
+    display: inline-block;
+    margin-bottom: 0.2rem;
+    transition: background 0.2s, color 0.2s;
 }
-
 .post-title:hover {
-    color: var(--brand-color);
+    background: #FF5C38;
+    color: #fff;
+    text-shadow: 0 4px 16px rgba(255,92,56,0.18);
 }
 
 .like-badge {
@@ -129,52 +144,81 @@ body {
     font-weight: 600;
 }
 
-/* 게시글 상세 페이지 */
+/* 게시글 상세 카드형/분리감/가독성 강화 (post-detail.html 전용) */
 .post-detail-container {
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(10px);
-    border-radius: 20px;
-    box-shadow: var(--shadow);
-    padding: 2.5rem;
-    margin: 2rem 0;
-}
-
-.post-header {
-    margin-bottom: 2rem;
-    padding-bottom: 1.5rem;
-    border-bottom: 2px solid var(--border-color);
+    background: rgba(244, 239, 233, 0.10); /* 밝은 반투명 카드 */
+    border-radius: 18px;
+    box-shadow: 0 8px 32px rgba(44,46,51,0.18);
+    padding: 2.5rem 2rem 2rem 2rem;
+    margin: 2.5rem auto;
+    max-width: 700px;
+    width: 100%;
+    transition: box-shadow 0.3s;
+    border: 1.5px solid #FF5C38;
 }
 
 .post-title-detail {
-    font-size: 2.2rem;
-    font-weight: 700;
-    color: var(--primary-color);
-    margin-bottom: 1rem;
-    line-height: 1.3;
-}
-
-.post-meta {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    color: var(--text-secondary);
-    font-size: 0.95rem;
-}
-
-.post-author {
-    font-weight: 600;
-    color: var(--brand-color);
+    color: #FF5C38;
+    font-size: 2rem;
+    font-weight: 900;
+    background: rgba(255, 92, 56, 0.08);
+    border-radius: 10px;
+    padding: 0.5rem 1.2rem;
+    margin-bottom: 1.2rem;
+    box-shadow: 0 2px 8px rgba(255,92,56,0.10);
+    text-shadow: 0 2px 8px rgba(255,92,56,0.13);
+    display: inline-block;
 }
 
 .post-content {
-    font-size: 1.1rem;
-    line-height: 1.8;
-    color: var(--text-primary);
-    margin-bottom: 2rem;
-    padding: 1.5rem;
-    background: var(--bg-light);
+    background: rgba(244,239,233,0.18);
+    color: #F4EFE9;
     border-radius: 10px;
-    border-left: 4px solid var(--brand-color);
+    padding: 1.5rem 1.2rem;
+    margin-bottom: 2.2rem;
+    font-size: 1.13rem;
+    line-height: 1.8;
+    box-shadow: 0 2px 8px rgba(44,46,51,0.08);
+    border-left: 5px solid #FF5C38;
+    word-break: break-all;
+}
+
+body.post-detail-page .post-detail-container {
+    background: rgba(244, 239, 233, 0.10) !important;
+    border-radius: 18px !important;
+    box-shadow: 0 8px 32px rgba(44,46,51,0.18) !important;
+    padding: 2.5rem 2rem 2rem 2rem !important;
+    margin: 2.5rem auto !important;
+    max-width: 700px !important;
+    width: 100% !important;
+    transition: box-shadow 0.3s !important;
+    border: 1.5px solid #FF5C38 !important;
+}
+
+body.post-detail-page .post-title-detail {
+    color: #FF5C38 !important;
+    font-size: 2rem !important;
+    font-weight: 900 !important;
+    background: rgba(255, 92, 56, 0.08) !important;
+    border-radius: 10px !important;
+    padding: 0.5rem 1.2rem !important;
+    margin-bottom: 1.2rem !important;
+    box-shadow: 0 2px 8px rgba(255,92,56,0.10) !important;
+    text-shadow: 0 2px 8px rgba(255,92,56,0.13) !important;
+    display: inline-block !important;
+}
+
+body.post-detail-page .post-content {
+    background: rgba(244,239,233,0.18) !important;
+    color: #F4EFE9 !important;
+    border-radius: 10px !important;
+    padding: 1.5rem 1.2rem !important;
+    margin-bottom: 2.2rem !important;
+    font-size: 1.13rem !important;
+    line-height: 1.8 !important;
+    box-shadow: 0 2px 8px rgba(44,46,51,0.08) !important;
+    border-left: 5px solid #FF5C38 !important;
+    word-break: break-all !important;
 }
 
 /* 추천/비추천 버튼 */
@@ -182,210 +226,193 @@ body {
     display: flex;
     gap: 1rem;
     margin-bottom: 2rem;
-    padding: 1rem 0;
-    border-bottom: 1px solid var(--border-color);
+    align-items: center;
+    flex-wrap: wrap;
 }
 
 .like-btn, .dislike-btn {
-    padding: 0.8rem 1.5rem;
-    border-radius: 50px;
+    padding: 0.7rem 1.5rem;
+    border-radius: 30px;
+    font-weight: 700;
+    font-size: 1rem;
+    border: none;
+    outline: none;
+    background: var(--button-color);
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(44,46,51,0.10);
+    transition: background 0.2s, box-shadow 0.2s, transform 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+}
+
+.like-btn-outline {
+    background: transparent;
+    color: var(--brand-color);
+    border: 2px solid var(--brand-color);
+}
+
+.like-btn:hover, .dislike-btn:hover, .like-btn-outline:hover, .dislike-btn-outline:hover {
+    background: var(--brand-color);
+    color: #fff;
+    transform: translateY(-2px) scale(1.04);
+    box-shadow: var(--shadow-hover);
+}
+
+.dislike-btn {
+    background: #44454b;
+    color: #fff;
+}
+
+.dislike-btn-outline {
+    background: transparent;
+    color: #FF5C38;
+    border: 2px solid #FF5C38;
+}
+
+.back-btn {
+    margin-left: auto;
+    color: var(--action-color);
     font-weight: 600;
-    transition: all 0.3s ease;
-    border: 2px solid transparent;
+    text-decoration: none;
+    padding: 0.5rem 1.2rem;
+    border-radius: 20px;
+    background: transparent;
+    border: 1.5px solid var(--action-color);
+    transition: background 0.2s, color 0.2s;
+}
+
+.back-btn:hover {
+    background: var(--action-color);
+    color: var(--primary-color);
+}
+
+/* 댓글 섹션 */
+.comments-section {
+    margin-top: 2.5rem;
+}
+
+.comments-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--brand-color);
+    margin-bottom: 1.2rem;
     display: flex;
     align-items: center;
     gap: 0.5rem;
 }
 
-.like-btn {
-    background: linear-gradient(135deg, #FF5C38, #FF7A5A);
-    color: white;
-}
-
-.like-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-hover);
-    color: white;
-}
-
-.like-btn-outline {
-    background: white;
-    color: var(--brand-color);
-    border-color: var(--brand-color);
-}
-
-.like-btn-outline:hover {
-    background: var(--brand-color);
-    color: white;
-}
-
-.dislike-btn {
-    background: linear-gradient(135deg, #6C757D, #8A8A8A);
-    color: white;
-}
-
-.dislike-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-hover);
-    color: white;
-}
-
-.dislike-btn-outline {
-    background: white;
-    color: var(--text-secondary);
-    border-color: var(--text-secondary);
-}
-
-.dislike-btn-outline:hover {
-    background: var(--text-secondary);
-    color: white;
-}
-
-.back-btn {
-    background: var(--button-color);
-    color: white;
-    padding: 0.8rem 1.5rem;
-    border-radius: 50px;
-    text-decoration: none;
-    font-weight: 600;
-    transition: all 0.3s ease;
-}
-
-.back-btn:hover {
-    background: #2A4A7A;
-    color: white;
-    transform: translateY(-2px);
-}
-
-/* 댓글 섹션 */
-.comments-section {
-    margin-top: 2rem;
-}
-
-.comments-title {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--primary-color);
-    margin-bottom: 1.5rem;
-    padding-bottom: 0.5rem;
-    border-bottom: 2px solid var(--border-color);
-}
-
 .comment-list {
-    margin-bottom: 2rem;
+    margin-bottom: 1.5rem;
 }
 
 .comment-item {
-    background: white;
-    border-radius: 15px;
-    padding: 1.5rem;
-    margin-bottom: 1rem;
-    box-shadow: var(--shadow);
-    border-left: 4px solid var(--action-color);
-    transition: all 0.3s ease;
+    background: var(--bg-light);
+    border-radius: 10px;
+    box-shadow: 0 1px 4px rgba(44,46,51,0.07);
+    padding: 1.1rem 1.2rem 0.7rem 1.2rem;
+    margin-bottom: 1.1rem;
+    transition: box-shadow 0.2s, transform 0.2s;
+    position: relative;
 }
 
 .comment-item:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-hover);
+    box-shadow: 0 4px 16px rgba(44,46,51,0.13);
+    transform: translateY(-2px) scale(1.01);
 }
 
 .comment-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 0.8rem;
+    margin-bottom: 0.3rem;
 }
 
 .comment-author {
-    font-weight: 700;
-    color: var(--brand-color);
+    font-weight: 600;
+    color: var(--action-color);
     font-size: 1rem;
 }
 
 .comment-time {
     color: var(--text-secondary);
-    font-size: 0.85rem;
+    font-size: 0.95rem;
+    margin-left: 0.7rem;
 }
 
 .comment-content {
     color: var(--text-primary);
-    line-height: 1.6;
-    margin-bottom: 0.8rem;
+    font-size: 1.08rem;
+    margin-bottom: 0.2rem;
+    word-break: break-all;
 }
 
 .comment-actions {
     display: flex;
-    gap: 1rem;
-    justify-content: flex-end;
+    gap: 0.5rem;
 }
 
 .comment-btn {
-    padding: 0.4rem 1rem;
-    border-radius: 20px;
-    font-size: 0.85rem;
-    font-weight: 600;
-    transition: all 0.3s ease;
+    background: none;
     border: none;
+    color: var(--brand-color);
+    font-weight: 600;
+    font-size: 1rem;
     cursor: pointer;
+    padding: 0.2rem 0.7rem;
+    border-radius: 8px;
+    transition: background 0.2s, color 0.2s;
 }
 
-.edit-btn {
-    background: var(--action-color);
-    color: white;
-}
-
-.edit-btn:hover {
-    background: #6BD4C8;
-    transform: translateY(-1px);
-}
-
-.delete-btn {
-    background: #DC3545;
-    color: white;
-}
-
-.delete-btn:hover {
-    background: #C82333;
-    transform: translateY(-1px);
+.comment-btn.delete-btn:hover {
+    background: var(--brand-color);
+    color: #fff;
 }
 
 /* 댓글 작성 폼 */
 .comment-form {
-    background: white;
-    border-radius: 15px;
-    padding: 1.5rem;
-    box-shadow: var(--shadow);
+    background: var(--bg-light);
+    border-radius: 10px;
+    padding: 1.2rem 1.2rem 1rem 1.2rem;
+    box-shadow: 0 1px 4px rgba(44,46,51,0.07);
 }
 
 .comment-textarea {
-    border: 2px solid var(--border-color);
-    border-radius: 10px;
-    padding: 1rem;
-    font-size: 1rem;
+    width: 100%;
+    border-radius: 8px;
+    border: 1.5px solid var(--border-color);
+    background: #23242a;
+    color: var(--text-primary);
+    font-size: 1.08rem;
+    padding: 0.8rem 1rem;
     resize: vertical;
-    transition: border-color 0.3s ease;
+    min-height: 70px;
+    margin-bottom: 0.7rem;
+    transition: border 0.2s, box-shadow 0.2s;
 }
 
 .comment-textarea:focus {
-    border-color: var(--brand-color);
-    box-shadow: 0 0 0 0.2rem rgba(255, 92, 56, 0.25);
+    border: 1.5px solid var(--brand-color);
     outline: none;
+    box-shadow: 0 2px 8px rgba(255,92,56,0.08);
 }
 
 .comment-submit {
-    background: linear-gradient(135deg, var(--brand-color), #FF7A5A);
+    background: var(--brand-color);
+    color: #fff;
     border: none;
-    padding: 0.8rem 2rem;
-    border-radius: 50px;
-    color: white;
-    font-weight: 600;
-    transition: all 0.3s ease;
+    border-radius: 8px;
+    padding: 0.6rem 1.5rem;
+    font-weight: 700;
+    font-size: 1.05rem;
+    transition: background 0.2s, box-shadow 0.2s;
+    box-shadow: 0 1px 4px rgba(44,46,51,0.07);
 }
 
 .comment-submit:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-hover);
+    background: var(--action-color);
+    color: var(--primary-color);
 }
 
 /* 페이지네이션 */
@@ -442,6 +469,26 @@ body {
         align-items: flex-start;
         gap: 0.5rem;
     }
+    
+    .post-detail-container {
+        padding: 1.2rem 0.5rem;
+        margin: 1rem 0.2rem;
+        max-width: 98vw;
+    }
+    .post-title-detail {
+        font-size: 1.3rem;
+        padding: 0.3rem 0.7rem;
+    }
+    .post-content {
+        font-size: 1rem;
+        padding: 1rem 0.7rem;
+    }
+    .comment-item {
+        padding: 0.7rem 0.7rem 0.5rem 0.7rem;
+    }
+    .comment-form {
+        padding: 0.7rem 0.7rem 0.5rem 0.7rem;
+    }
 }
 
 /* 애니메이션 */
@@ -477,4 +524,179 @@ body {
 
 ::-webkit-scrollbar-thumb:hover {
     background: #FF7A5A;
+}
+
+body.post-detail-page .like-section {
+    display: flex !important;
+    gap: 1rem !important;
+    margin-bottom: 2rem !important;
+    align-items: center !important;
+    flex-wrap: wrap !important;
+}
+body.post-detail-page .like-btn,
+body.post-detail-page .dislike-btn,
+body.post-detail-page .like-btn-outline,
+body.post-detail-page .dislike-btn-outline {
+    padding: 0.7rem 1.5rem !important;
+    border-radius: 30px !important;
+    font-weight: 700 !important;
+    font-size: 1rem !important;
+    border: none !important;
+    outline: none !important;
+    background: var(--button-color) !important;
+    color: #fff !important;
+    box-shadow: 0 2px 8px rgba(44,46,51,0.10) !important;
+    transition: background 0.2s, box-shadow 0.2s, transform 0.2s !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+    cursor: pointer !important;
+}
+body.post-detail-page .like-btn-outline {
+    background: transparent !important;
+    color: var(--brand-color) !important;
+    border: 2px solid var(--brand-color) !important;
+}
+body.post-detail-page .dislike-btn {
+    background: #44454b !important;
+    color: #fff !important;
+}
+body.post-detail-page .dislike-btn-outline {
+    background: transparent !important;
+    color: #FF5C38 !important;
+    border: 2px solid #FF5C38 !important;
+}
+body.post-detail-page .back-btn {
+    margin-left: auto !important;
+    color: var(--action-color) !important;
+    font-weight: 600 !important;
+    text-decoration: none !important;
+    padding: 0.5rem 1.2rem !important;
+    border-radius: 20px !important;
+    background: transparent !important;
+    border: 1.5px solid var(--action-color) !important;
+    transition: background 0.2s, color 0.2s !important;
+}
+body.post-detail-page .back-btn:hover {
+    background: var(--action-color) !important;
+    color: var(--primary-color) !important;
+}
+body.post-detail-page .comments-section {
+    margin-top: 2.5rem !important;
+}
+body.post-detail-page .comments-title {
+    font-size: 1.3rem !important;
+    font-weight: 700 !important;
+    color: var(--brand-color) !important;
+    margin-bottom: 1.2rem !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+}
+body.post-detail-page .comment-list {
+    margin-bottom: 1.5rem !important;
+}
+body.post-detail-page .comment-item {
+    background: var(--bg-light) !important;
+    border-radius: 10px !important;
+    box-shadow: 0 1px 4px rgba(44,46,51,0.07) !important;
+    padding: 1.1rem 1.2rem 0.7rem 1.2rem !important;
+    margin-bottom: 1.1rem !important;
+    transition: box-shadow 0.2s, transform 0.2s !important;
+    position: relative !important;
+}
+body.post-detail-page .comment-item:hover {
+    box-shadow: 0 4px 16px rgba(44,46,51,0.13) !important;
+    transform: translateY(-2px) scale(1.01) !important;
+}
+body.post-detail-page .comment-header {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    margin-bottom: 0.3rem !important;
+}
+body.post-detail-page .comment-author {
+    font-weight: 600 !important;
+    color: var(--action-color) !important;
+    font-size: 1rem !important;
+}
+body.post-detail-page .comment-time {
+    color: var(--text-secondary) !important;
+    font-size: 0.95rem !important;
+    margin-left: 0.7rem !important;
+}
+body.post-detail-page .comment-content {
+    color: var(--text-primary) !important;
+    font-size: 1.08rem !important;
+    margin-bottom: 0.2rem !important;
+    word-break: break-all !important;
+}
+body.post-detail-page .comment-actions {
+    display: flex !important;
+    gap: 0.5rem !important;
+}
+body.post-detail-page .comment-btn {
+    background: none !important;
+    border: none !important;
+    color: var(--brand-color) !important;
+    font-weight: 600 !important;
+    font-size: 1rem !important;
+    cursor: pointer !important;
+    padding: 0.2rem 0.7rem !important;
+    border-radius: 8px !important;
+    transition: background 0.2s, color 0.2s !important;
+}
+body.post-detail-page .comment-btn.delete-btn:hover {
+    background: var(--brand-color) !important;
+    color: #fff !important;
+}
+body.post-detail-page .comment-form {
+    background: var(--bg-light) !important;
+    border-radius: 10px !important;
+    padding: 1.2rem 1.2rem 1rem 1.2rem !important;
+    box-shadow: 0 1px 4px rgba(44,46,51,0.07) !important;
+}
+body.post-detail-page .comment-textarea.form-control {
+    width: 100% !important;
+    border-radius: 8px !important;
+    border: 1.5px solid var(--border-color) !important;
+    background: #23242a !important;
+    color: var(--text-primary) !important;
+    font-size: 1.08rem !important;
+    padding: 0.8rem 1rem !important;
+    resize: vertical !important;
+    min-height: 70px !important;
+    margin-bottom: 0.7rem !important;
+    transition: border 0.2s, box-shadow 0.2s !important;
+}
+body.post-detail-page .comment-textarea.form-control:focus {
+    border: 1.5px solid var(--brand-color) !important;
+    outline: none !important;
+    box-shadow: 0 2px 8px rgba(255,92,56,0.08) !important;
+}
+body.post-detail-page .comment-submit {
+    background: var(--brand-color) !important;
+    color: #fff !important;
+    border: none !important;
+    border-radius: 8px !important;
+    padding: 0.6rem 1.5rem !important;
+    font-weight: 700 !important;
+    font-size: 1.05rem !important;
+    transition: background 0.2s, box-shadow 0.2s !important;
+    box-shadow: 0 1px 4px rgba(44,46,51,0.07) !important;
+}
+body.post-detail-page .comment-submit:hover {
+    background: var(--action-color) !important;
+    color: var(--primary-color) !important;
+}
+
+body.post-detail-page .post-detail-main {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    min-height: 100vh !important;
+    width: 100% !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
 } 

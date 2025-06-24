@@ -4,10 +4,11 @@
   - 모던한 디자인과 반응형 레이아웃
 -->
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      th:replace="~{layout/layout :: layout(~{::body})}">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title th:text="${post.title} + ' - StudyHub'"></title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" th:href="@{/css/custom.css}"/>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"/>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css"/>
@@ -16,193 +17,156 @@
     <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="container">
-        <div class="post-detail-container">
-            <!-- 게시글 헤더 -->
-            <div class="post-header">
-                <h1 class="post-title-detail" th:text="${post.title}">게시글 제목</h1>
-                <div class="post-meta">
-                    <span class="post-author">
-                        <i class="bi bi-person-circle me-1"></i>
-                        <span th:text="${post.user != null ? post.user.name : '익명'}">작성자</span>
-                    </span>
-                    <span>
-                        <i class="bi bi-calendar3 me-1"></i>
-                        <span th:text="${#temporals.format(post.createdAt, 'yyyy년 MM월 dd일 HH:mm')}">작성일</span>
-                    </span>
-                    <span>
-                        <i class="bi bi-eye me-1"></i>
-                        조회 <span th:text="${post.viewCount}">0</span>
-                    </span>
-                </div>
-            </div>
+<div th:replace="~{layout/layout :: layout(~{::section})}">
+    <section>
+        <main class="container post-detail-main">
+            <section class="post-detail-container">
+                <header class="post-header">
+                    <h1 class="post-title-detail" th:text="${post.title}">게시글 제목</h1>
+                    <div class="post-meta">
+                        <span class="post-author">
+                            <i class="bi bi-person-circle me-1"></i>
+                            <span th:text="${post.user != null ? post.user.name : '익명'}">작성자</span>
+                        </span>
+                        <span>
+                            <i class="bi bi-calendar3 me-1"></i>
+                            <span th:text="${#temporals.format(post.createdAt, 'yyyy년 MM월 dd일 HH:mm')}">작성일</span>
+                        </span>
+                        <span>
+                            <i class="bi bi-eye me-1"></i>
+                            조회 <span th:text="${post.viewCount}">0</span>
+                        </span>
+                    </div>
+                </header>
 
-            <!-- 게시글 내용 -->
-            <div class="post-content" th:utext="${post.content}">게시글 내용</div>
+                <article class="post-content" th:utext="${post.content}">게시글 내용</article>
 
-            <!-- 추천/비추천 버튼 -->
-            <div class="like-section" th:if="${currentUser != null}">
-                <form th:action="@{'/community/post/' + ${post.id} + '/like'}" method="post" style="display:inline">
-                    <button type="submit" 
-                            th:class="${userLikeStatus == T(dev.kang.studyhub.domain.board.PostLike$LikeType).LIKE ? 'like-btn' : 'like-btn like-btn-outline'}">
-                        <i class="bi bi-hand-thumbs-up-fill"></i>
-                        추천 <span th:text="${post.likeCount}">0</span>
-                    </button>
-                </form>
-                <form th:action="@{'/community/post/' + ${post.id} + '/dislike'}" method="post" style="display:inline">
-                    <button type="submit" 
-                            th:class="${userLikeStatus == T(dev.kang.studyhub.domain.board.PostLike$LikeType).DISLIKE ? 'dislike-btn' : 'dislike-btn dislike-btn-outline'}">
-                        <i class="bi bi-hand-thumbs-down-fill"></i>
-                        비추천 <span th:text="${post.dislikeCount}">0</span>
-                    </button>
-                </form>
-                <a href="/community" class="back-btn">
-                    <i class="bi bi-arrow-left me-2"></i>
-                    목록으로
-                </a>
-            </div>
-            <div class="like-section" th:if="${currentUser == null}">
-                <div class="text-center text-muted mb-3">
-                    <p>추천/비추천을 하려면 <a href="/login">로그인</a>이 필요합니다.</p>
-                </div>
-                <a href="/community" class="back-btn">
-                    <i class="bi bi-arrow-left me-2"></i>
-                    목록으로
-                </a>
-            </div>
+                <nav class="like-section" aria-label="추천/비추천 및 목록 이동">
+                    <div th:if="${currentUser != null}" style="display: flex; gap: 1rem; align-items: center;">
+                        <form th:action="@{'/community/post/' + ${post.id} + '/like'}" method="post" style="display:inline">
+                            <button type="submit" th:class="${userLikeStatus == T(dev.kang.studyhub.domain.board.PostLike$LikeType).LIKE ? 'like-btn' : 'like-btn like-btn-outline'}">
+                                <i class="bi bi-hand-thumbs-up-fill"></i>
+                                추천 <span th:text="${post.likeCount}">0</span>
+                            </button>
+                        </form>
+                        <form th:action="@{'/community/post/' + ${post.id} + '/dislike'}" method="post" style="display:inline">
+                            <button type="submit" th:class="${userLikeStatus == T(dev.kang.studyhub.domain.board.PostLike$LikeType).DISLIKE ? 'dislike-btn' : 'dislike-btn dislike-btn-outline'}">
+                                <i class="bi bi-hand-thumbs-down-fill"></i>
+                                비추천 <span th:text="${post.dislikeCount}">0</span>
+                            </button>
+                        </form>
+                    </div>
+                    <div th:if="${currentUser == null}" class="text-muted" style="flex:1;">
+                        <span>추천/비추천을 하려면 <a href="/login">로그인</a>이 필요합니다.</span>
+                    </div>
+                    <a href="/community" class="back-btn ms-auto">
+                        <i class="bi bi-arrow-left me-2"></i>목록으로
+                    </a>
+                </nav>
 
-            <!-- 댓글 섹션 -->
-            <div class="comments-section">
-                <h3 class="comments-title">
-                    <i class="bi bi-chat-dots me-2"></i>
-                    댓글
-                </h3>
-                
-                <!-- 댓글 목록 -->
-                <div class="comment-list">
-                    <div class="comment-item" th:each="comment : ${comments}">
-                        <div class="comment-header">
-                            <div>
-                                <span class="comment-author" th:text="${comment.user != null ? comment.user.name : '익명'}">댓글 작성자</span>
-                                <span class="comment-time" th:text="${#temporals.format(comment.createdAt, 'MM월 dd일 HH:mm')}">작성시간</span>
+                <section class="comments-section">
+                    <h2 class="comments-title">
+                        <i class="bi bi-chat-dots me-2"></i>댓글
+                    </h2>
+                    <div class="comment-list">
+                        <div class="comment-item" th:each="comment : ${comments}">
+                            <div class="comment-header">
+                                <div>
+                                    <span class="comment-author" th:text="${comment.user != null ? comment.user.name : '익명'}">댓글 작성자</span>
+                                    <span class="comment-time" th:text="${#temporals.format(comment.createdAt, 'MM월 dd일 HH:mm')}">작성시간</span>
+                                </div>
+                                <div class="comment-actions" th:if="${currentUser != null and comment.user != null and comment.user.id == currentUser.id}">
+                                    <button class="comment-btn delete-btn" th:onclick="'deleteComment(' + ${comment.id} + ')'">
+                                        <i class="bi bi-trash me-1"></i>삭제
+                                    </button>
+                                </div>
                             </div>
-                            <!-- 댓글 작성자만 삭제 버튼 표시 -->
-                            <div class="comment-actions" th:if="${currentUser != null and comment.user != null and comment.user.id == currentUser.id}">
-                                <button class="comment-btn delete-btn" 
-                                        th:onclick="'deleteComment(' + ${comment.id} + ')'">
-                                    <i class="bi bi-trash me-1"></i>
-                                    삭제
+                            <div class="comment-content" th:text="${comment.content}">댓글 내용</div>
+                        </div>
+                        <div class="comment-item text-center text-muted" th:if="${#lists.isEmpty(comments)}">
+                            <i class="bi bi-chat me-2"></i>댓글이 없습니다.
+                        </div>
+                    </div>
+
+                    <div class="comment-form mt-3" th:if="${currentUser != null}">
+                        <form th:action="@{'/community/post/' + ${post.id} + '/comment'}" method="post">
+                            <textarea name="content" class="comment-textarea form-control" rows="4" placeholder="댓글을 입력하세요..." required></textarea>
+                            <div class="d-flex justify-content-end mt-2">
+                                <button type="submit" class="comment-submit">
+                                    <i class="bi bi-send me-2"></i>댓글 등록
                                 </button>
                             </div>
-                        </div>
-                        <div class="comment-content" th:text="${comment.content}">댓글 내용</div>
+                        </form>
                     </div>
-                    <div class="comment-item text-center text-muted" th:if="${#lists.isEmpty(comments)}">
-                        <i class="bi bi-chat me-2"></i>
-                        댓글이 없습니다.
+                    <div class="comment-form text-center text-muted" th:if="${currentUser == null}">
+                        <p>댓글을 작성하려면 <a href="/login">로그인</a>이 필요합니다.</p>
                     </div>
-                </div>
-
-                <!-- 댓글 작성 폼 -->
-                <div class="comment-form" th:if="${currentUser != null}">
-                    <form th:action="@{'/community/post/' + ${post.id} + '/comment'}" method="post">
-                        <div class="mb-3">
-                            <textarea name="content" class="comment-textarea form-control" 
-                                      rows="4" placeholder="댓글을 입력하세요..." required></textarea>
-                        </div>
-                        <div class="d-flex justify-content-end">
-                            <button type="submit" class="comment-submit">
-                                <i class="bi bi-send me-2"></i>
-                                댓글 등록
-                            </button>
-                        </div>
-                    </form>
-                </div>
-                <div class="comment-form text-center text-muted" th:if="${currentUser == null}">
-                    <p>댓글을 작성하려면 <a href="/login">로그인</a>이 필요합니다.</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    
-    <!-- 댓글 삭제 스크립트 -->
-    <script>
-        let commentIdToDelete = null;
-        
-        function deleteComment(commentId) {
-            commentIdToDelete = commentId;
-            
-            // 모달이 없으면 동적으로 생성
-            let modal = document.getElementById('deleteCommentModal');
-            if (!modal) {
-                modal = createDeleteModal();
-                document.body.appendChild(modal);
-            }
-            
-            const bootstrapModal = new bootstrap.Modal(modal);
-            bootstrapModal.show();
-        }
-        
-        function createDeleteModal() {
-            const modal = document.createElement('div');
-            modal.id = 'deleteCommentModal';
-            modal.className = 'modal fade';
-            modal.setAttribute('tabindex', '-1');
-            
-            modal.innerHTML = `
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title">댓글 삭제</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                        </div>
-                        <div class="modal-body">
-                            정말로 이 댓글을 삭제하시겠습니까?
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
-                            <button type="button" class="btn btn-danger" id="confirmDelete">삭제</button>
-                        </div>
-                    </div>
-                </div>
-            `;
-            
-            // 삭제 버튼 이벤트 리스너 추가
-            setTimeout(() => {
-                const confirmBtn = modal.querySelector('#confirmDelete');
-                if (confirmBtn) {
-                    confirmBtn.addEventListener('click', function() {
-                        if (commentIdToDelete) {
-                            fetch('/community/comment/' + commentIdToDelete + '/delete', {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                }
-                            })
-                            .then(response => {
-                                if (response.ok) {
-                                    location.reload();
-                                } else {
-                                    alert('댓글 삭제에 실패했습니다.');
-                                }
-                            })
-                            .catch(error => {
-                                console.error('Error:', error);
-                                alert('댓글 삭제 중 오류가 발생했습니다.');
-                            });
-                        }
-                        
-                        const bootstrapModal = bootstrap.Modal.getInstance(modal);
-                        bootstrapModal.hide();
-                    });
+                </section>
+            </section>
+        </main>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        <script>
+            let commentIdToDelete = null;
+            function deleteComment(commentId) {
+                commentIdToDelete = commentId;
+                let modal = document.getElementById('deleteCommentModal');
+                if (!modal) {
+                    modal = createDeleteModal();
+                    document.body.appendChild(modal);
                 }
-            }, 100);
-            
-            return modal;
-        }
-    </script>
+                const bootstrapModal = new bootstrap.Modal(modal);
+                bootstrapModal.show();
+            }
+            function createDeleteModal() {
+                const modal = document.createElement('div');
+                modal.id = 'deleteCommentModal';
+                modal.className = 'modal fade';
+                modal.setAttribute('tabindex', '-1');
+                modal.innerHTML = `
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">댓글 삭제</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">정말로 이 댓글을 삭제하시겠습니까?</div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                                <button type="button" class="btn btn-danger" id="confirmDelete">삭제</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                setTimeout(() => {
+                    const confirmBtn = modal.querySelector('#confirmDelete');
+                    if (confirmBtn) {
+                        confirmBtn.addEventListener('click', function() {
+                            if (commentIdToDelete) {
+                                fetch('/community/comment/' + commentIdToDelete + '/delete', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' }
+                                })
+                                .then(response => {
+                                    if (response.ok) {
+                                        location.reload();
+                                    } else {
+                                        alert('댓글 삭제에 실패했습니다.');
+                                    }
+                                })
+                                .catch(error => {
+                                    console.error('Error:', error);
+                                    alert('댓글 삭제 중 오류가 발생했습니다.');
+                                });
+                            }
+                            const bootstrapModal = bootstrap.Modal.getInstance(modal);
+                            bootstrapModal.hide();
+                        });
+                    }
+                }, 100);
+                return modal;
+            }
+        </script>
+    </section>
+</div>
 </body>
 </html> 
