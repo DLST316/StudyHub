@@ -37,6 +37,10 @@ dependencies {
     implementation("me.paulschwarz:spring-dotenv:3.0.0")
     implementation 'org.springframework.boot:spring-boot-starter-security'
     runtimeOnly 'com.h2database:h2'
+    
+    // Cloudinary 의존성 추가
+    implementation 'com.cloudinary:cloudinary-http44:1.36.0'
+    implementation 'com.cloudinary:cloudinary-taglib:1.36.0'
 
 }
 

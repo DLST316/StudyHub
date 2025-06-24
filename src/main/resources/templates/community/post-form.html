@@ -1,7 +1,8 @@
 <!--
   게시글 작성/수정 폼
-  - 제목, 내용, 이미지 첨부
-  - 유효성 메시지, Bootstrap5
+  - 제목, 내용 (리치 텍스트 에디터)
+  - 이미지 드래그 앤 드롭 업로드
+  - 유효성 메시지
 -->
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
@@ -9,33 +10,244 @@
     <title>글쓰기 - StudyHub</title>
     <link rel="stylesheet" th:href="@{/css/custom.css}"/>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"/>
+    <!-- Quill 에디터 CSS -->
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <style>
+        .editor-container {
+            background: white;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            border: 1px solid #ddd;
+        }
+        
+        .ql-editor {
+            min-height: 300px;
+            font-size: 16px;
+            line-height: 1.6;
+            color: #333 !important; /* 강제로 검은색 설정 */
+        }
+        
+        .ql-editor p {
+            color: #333 !important;
+        }
+        
+        .ql-editor h1, .ql-editor h2, .ql-editor h3 {
+            color: #333 !important;
+        }
+        
+        .ql-editor img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+        
+        /* Quill 툴바 스타일 수정 */
+        .ql-toolbar {
+            background: #f8f9fa;
+            border-bottom: 1px solid #ddd;
+            border-radius: 8px 8px 0 0;
+        }
+        
+        .ql-toolbar button {
+            color: #333 !important;
+        }
+        
+        .ql-toolbar .ql-stroke {
+            stroke: #333 !important;
+        }
+        
+        .ql-toolbar .ql-fill {
+            fill: #333 !important;
+        }
+        
+        .ql-toolbar .ql-picker {
+            color: #333 !important;
+        }
+        
+        .ql-toolbar .ql-picker-label {
+            color: #333 !important;
+        }
+        
+        .ql-toolbar .ql-picker-options {
+            background: white !important;
+            color: #333 !important;
+        }
+        
+        .upload-area {
+            border: 2px dashed #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            background: #f8f9fa;
+            transition: all 0.3s;
+            margin-bottom: 1rem;
+        }
+        
+        .upload-area.dragover {
+            border-color: #FF5C38;
+            background: #fff5f2;
+        }
+        
+        .upload-area.hidden {
+            display: none;
+        }
+        
+        .image-preview {
+            max-width: 200px;
+            max-height: 200px;
+            border-radius: 8px;
+            margin: 10px;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .loading.show {
+            display: block;
+        }
+        
+        /* 다크모드에서 에디터 영역 강제로 라이트모드 유지 */
+        .editor-container * {
+            color: inherit;
+        }
+        
+        .ql-editor * {
+            color: #333 !important;
+        }
+    </style>
 </head>
 <body>
 <div th:replace="~{layout/layout :: layout(~{::section})}">
     <section>
         <div class="container py-4">
             <h2 th:text="${#strings.isEmpty(postForm.title) ? '글쓰기' : '글 수정'}"></h2>
-            <form th:action="@{/community/write}" th:object="${postForm}" method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+            <form th:action="@{/community/write}" th:object="${postForm}" method="post" class="needs-validation" novalidate>
                 <div class="mb-3">
                     <label for="title" class="form-label">제목</label>
                     <input type="text" th:field="*{title}" class="form-control" id="title" required>
                     <div class="invalid-feedback" th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></div>
                 </div>
+                
                 <div class="mb-3">
                     <label for="content" class="form-label">내용</label>
-                    <textarea th:field="*{content}" class="form-control" id="content" rows="8" required></textarea>
+                    <div class="editor-container">
+                        <div id="editor"></div>
+                    </div>
+                    <textarea th:field="*{content}" id="content" style="display: none;"></textarea>
                     <div class="invalid-feedback" th:if="${#fields.hasErrors('content')}" th:errors="*{content}"></div>
                 </div>
-                <div class="mb-3">
-                    <label for="file" class="form-label">이미지 첨부</label>
-                    <input type="file" class="form-control" id="file" name="file" accept="image/*">
+                
+                <div class="loading" id="loading">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">업로드 중...</span>
+                    </div>
+                    <p class="mt-2">이미지 업로드 중...</p>
                 </div>
+                
                 <button type="submit" class="btn btn-primary">저장</button>
+                <a href="/community" class="btn btn-secondary">취소</a>
             </form>
         </div>
     </section>
 </div>
+
+<!-- Quill 에디터 JS -->
+<script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
 <script>
+// Quill 에디터 초기화
+var quill = new Quill('#editor', {
+    theme: 'snow',
+    modules: {
+        toolbar: [
+            ['bold', 'italic', 'underline'],           // 기본 텍스트 스타일
+            [{ 'list': 'ordered'}, { 'list': 'bullet' }], // 목록
+            ['link', 'image'],                         // 링크, 이미지
+            ['clean']                                  // 서식 지우기
+        ]
+    },
+    placeholder: '내용을 입력하세요...'
+});
+
+// 이미지 핸들러 설정
+var toolbar = quill.getModule('toolbar');
+toolbar.addHandler('image', function() {
+    selectLocalImage();
+});
+
+// 로컬 이미지 선택 함수
+function selectLocalImage() {
+    const input = document.createElement('input');
+    input.setAttribute('type', 'file');
+    input.setAttribute('accept', 'image/*');
+    input.click();
+
+    input.onchange = function() {
+        const file = input.files[0];
+        if (file) {
+            uploadImage(file);
+        }
+    };
+}
+
+// 이미지 업로드 함수
+function uploadImage(file) {
+    const formData = new FormData();
+    formData.append('file', file);
+    
+    // 로딩 표시
+    document.getElementById('loading').classList.add('show');
+    
+    fetch('/api/images/upload', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        document.getElementById('loading').classList.remove('show');
+        
+        if (data.success) {
+            // 에디터에 이미지 삽입
+            const range = quill.getSelection();
+            quill.insertEmbed(range.index, 'image', data.url);
+            quill.setSelection(range.index + 1);
+        } else {
+            // Cloudinary 설정 오류인 경우 특별한 메시지 표시
+            if (data.setupRequired) {
+                alert('이미지 업로드 기능이 현재 설정되지 않았습니다.\n\n' + 
+                      '이미지를 사용하려면:\n' +
+                      '1. Cloudinary 계정을 생성하세요\n' +
+                      '2. application.yml에서 cloudinary 설정을 업데이트하세요\n' +
+                      '3. 애플리케이션을 재시작하세요');
+            } else {
+                alert('이미지 업로드 실패: ' + data.message);
+            }
+        }
+    })
+    .catch(error => {
+        document.getElementById('loading').classList.remove('show');
+        console.error('Error:', error);
+        alert('이미지 업로드 중 오류가 발생했습니다.');
+    });
+}
+
+// 폼 제출 시 에디터 내용을 textarea에 복사
+document.querySelector('form').addEventListener('submit', function(e) {
+    const content = quill.root.innerHTML;
+    document.getElementById('content').value = content;
+});
+
+// 페이지 로드 시 기존 내용이 있으면 에디터에 설정
+document.addEventListener('DOMContentLoaded', function() {
+    const content = document.getElementById('content').value;
+    if (content) {
+        quill.root.innerHTML = content;
+    }
+});
+
 // 부트스트랩 폼 검증
 (() => {
   'use strict';

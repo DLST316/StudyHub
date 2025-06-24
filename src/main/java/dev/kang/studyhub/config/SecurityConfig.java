@@ -50,6 +50,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         // 다음 URL들은 인증 없이 접근 가능 (permitAll)
                         .requestMatchers("/", "/join", "/login", "/css/**", "/js/**", "/images/**","/h2-console/**").permitAll()
+                        // 이미지 업로드 API는 인증된 사용자만 접근 가능
+                        .requestMatchers("/api/images/**").authenticated()
                         // 그 외 모든 요청은 인증이 필요 (authenticated)
                         .anyRequest().authenticated()
                 )
