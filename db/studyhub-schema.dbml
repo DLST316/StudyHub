@@ -33,6 +33,17 @@ Table posts {
   updated_at timestamp
 }
 
+Table post_likes {
+  id int [pk, increment]
+  post_id int [not null]
+  user_id int [not null]
+  type enum('LIKE', 'DISLIKE') [not null, note: '추천 또는 비추천']
+  created_at timestamp [default: `current_timestamp`, not null]
+  indexes {
+    (post_id, user_id) [unique, note: '한 사용자는 한 게시글에 하나의 추천/비추천만 가능']
+  }
+}
+
 Table post_comments {
   id int [pk, increment]
   post_id int [not null]
@@ -97,6 +108,8 @@ Table reports {
 
 Ref: boards.id < posts.board_id
 Ref: users.id < posts.user_id
+Ref: posts.id < post_likes.post_id
+Ref: users.id < post_likes.user_id
 Ref: posts.id < post_comments.post_id
 Ref: users.id < post_comments.user_id
 Ref: post_comments.parent_id > post_comments.id [delete: cascade]

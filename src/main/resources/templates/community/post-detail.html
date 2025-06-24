@@ -24,10 +24,16 @@
             <!-- 추천/비추천 버튼 -->
             <div class="mb-3">
                 <form th:action="@{'/community/post/' + ${post.id} + '/like'}" method="post" style="display:inline">
-                    <button type="submit" class="btn btn-outline-danger">추천 <span th:text="${post.likeCount}"></span></button>
+                    <button type="submit" 
+                            th:class="${userLikeStatus == T(dev.kang.studyhub.domain.board.PostLike$LikeType).LIKE ? 'btn btn-danger' : 'btn btn-outline-danger'}">
+                        <i class="bi bi-hand-thumbs-up"></i> 추천 <span th:text="${post.likeCount}"></span>
+                    </button>
                 </form>
                 <form th:action="@{'/community/post/' + ${post.id} + '/dislike'}" method="post" style="display:inline">
-                    <button type="submit" class="btn btn-outline-secondary">비추천 <span th:text="${post.dislikeCount}"></span></button>
+                    <button type="submit" 
+                            th:class="${userLikeStatus == T(dev.kang.studyhub.domain.board.PostLike$LikeType).DISLIKE ? 'btn btn-secondary' : 'btn btn-outline-secondary'}">
+                        <i class="bi bi-hand-thumbs-down"></i> 비추천 <span th:text="${post.dislikeCount}"></span>
+                    </button>
                 </form>
                 <a href="/community" class="btn btn-link">목록</a>
             </div>

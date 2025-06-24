@@ -3,6 +3,7 @@ package dev.kang.studyhub.web.board;
 import dev.kang.studyhub.domain.board.Board;
 import dev.kang.studyhub.domain.board.Post;
 import dev.kang.studyhub.domain.board.PostComment;
+import dev.kang.studyhub.domain.board.PostLike;
 import dev.kang.studyhub.domain.user.entity.User;
 import dev.kang.studyhub.service.board.BoardService;
 import dev.kang.studyhub.service.board.PostService;
@@ -43,11 +44,22 @@ public class CommunityController {
 
     /** 게시글 상세 */
     @GetMapping("/post/{id}")
-    public String detail(@PathVariable Long id, Model model) {
+    public String detail(@PathVariable Long id, Model model, @AuthenticationPrincipal UserDetails userDetails) {
         Post post = postService.getPost(id);
         postService.increaseView(id);
+        
+        // 현재 사용자의 추천/비추천 상태 확인
+        PostLike.LikeType userLikeStatus = null;
+        if (userDetails != null) {
+            User user = userService.findByEmail(userDetails.getUsername()).orElse(null);
+            if (user != null) {
+                userLikeStatus = postService.getUserLikeStatus(id, user);
+            }
+        }
+        
         model.addAttribute("post", post);
         model.addAttribute("comments", commentService.getComments(post));
+        model.addAttribute("userLikeStatus", userLikeStatus);
         return "community/post-detail";
     }
 
@@ -75,17 +87,27 @@ public class CommunityController {
         return "redirect:/community";
     }
 
-    /** 추천 */
+    /** 추천/비추천 처리 */
     @PostMapping("/post/{id}/like")
-    public String like(@PathVariable Long id) {
-        postService.increaseLike(id);
+    public String toggleLike(@PathVariable Long id, @AuthenticationPrincipal UserDetails userDetails) {
+        if (userDetails == null) return "redirect:/login";
+        User user = userService.findByEmail(userDetails.getUsername()).orElseThrow();
+        
+        String result = postService.toggleLike(id, user, PostLike.LikeType.LIKE);
+        // TODO: 결과 메시지를 세션에 저장하여 표시할 수 있도록 개선
+        
         return "redirect:/community/post/" + id;
     }
 
-    /** 비추천 */
+    /** 비추천 처리 */
     @PostMapping("/post/{id}/dislike")
-    public String dislike(@PathVariable Long id) {
-        postService.increaseDislike(id);
+    public String toggleDislike(@PathVariable Long id, @AuthenticationPrincipal UserDetails userDetails) {
+        if (userDetails == null) return "redirect:/login";
+        User user = userService.findByEmail(userDetails.getUsername()).orElseThrow();
+        
+        String result = postService.toggleLike(id, user, PostLike.LikeType.DISLIKE);
+        // TODO: 결과 메시지를 세션에 저장하여 표시할 수 있도록 개선
+        
         return "redirect:/community/post/" + id;
     }
 
