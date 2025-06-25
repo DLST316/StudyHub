@@ -9,6 +9,7 @@ Table users {
   university varchar [not null]
   major varchar [not null]
   role enum('USER', 'ADMIN') [default: 'USER', not null]
+  is_blocked boolean [default: false, not null]
   created_at timestamp [default: `current_timestamp`, not null]
 }
 
