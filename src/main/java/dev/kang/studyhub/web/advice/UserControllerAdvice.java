@@ -2,12 +2,18 @@ package dev.kang.studyhub.web.advice;
 
 import dev.kang.studyhub.service.user.exception.AlreadyExistsEmailException;
 import dev.kang.studyhub.web.user.UserJoinForm;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.multipart.support.MissingServletRequestPartException;
 import org.springframework.web.servlet.ModelAndView;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 전역 예외 처리를 담당하는 컨트롤러 어드바이스
@@ -31,6 +37,18 @@ public class UserControllerAdvice {
                                          Model model) {
         bindingResult.rejectValue("email", "duplicate", ex.getMessage());
         return "user/join";
+    }
+
+    /**
+     * 파일 파라미터 누락 예외 처리
+     * API 요청의 경우 JSON 응답, 웹 요청의 경우 에러 페이지 반환
+     */
+    @ExceptionHandler(MissingServletRequestPartException.class)
+    public ResponseEntity<Map<String, Object>> handleMissingServletRequestPart(MissingServletRequestPartException ex) {
+        Map<String, Object> response = new HashMap<>();
+        response.put("success", false);
+        response.put("message", "필수 파라미터가 누락되었습니다: " + ex.getRequestPartName());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
 
     /**
@@ -68,4 +86,5 @@ public class UserControllerAdvice {
         mav.addObject("error", "일시적인 문제가 발생했습니다. 잠시 후 다시 시도해주세요.");
         return mav;
     }
+
 } 
