@@ -88,4 +88,28 @@ public class UserService {
     public void save(User user) {
         userRepository.save(user);
     }
+
+    /**
+     * 관리자: 유저 차단
+     * @param userId 차단할 유저의 ID
+     * @throws IllegalArgumentException 유저가 존재하지 않을 때
+     */
+    public void blockUser(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 유저입니다."));
+        user.setBlocked(true);
+        userRepository.save(user);
+    }
+
+    /**
+     * 관리자: 유저 차단 해제
+     * @param userId 차단 해제할 유저의 ID
+     * @throws IllegalArgumentException 유저가 존재하지 않을 때
+     */
+    public void unblockUser(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 유저입니다."));
+        user.setBlocked(false);
+        userRepository.save(user);
+    }
 }
