@@ -368,7 +368,7 @@
             <p class="hero-subtitle">함께 성장하는 스터디 커뮤니티</p>
             <!-- 로그인된 사용자에게 환영 메시지 -->
             <div th:if="${user != null}" class="welcome-message"
-                 th:text="|${user.nickname}님, StudyHub에 오신 것을 환영합니다!|">
+                 th:text="|${user.name}님, StudyHub에 오신 것을 환영합니다!|">
             </div>
         </div>
 

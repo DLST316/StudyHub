@@ -522,7 +522,7 @@
         <div class="action-buttons">
             <a th:href="@{/studies}" class="btn">목록으로</a>
             <a th:if="${isLeader}" th:href="@{'/studies/edit/' + ${study.id}}" class="btn btn-primary">수정</a>
-            <form th:if="${isLeader}" th:action="@{'/studies/delete/' + ${study.id}}" method="post" style="display:inline;">
+            <form th:if="${isLeader or (currentUser != null and currentUser.role == 'ADMIN')}" th:action="@{'/studies/delete/' + ${study.id}}" method="post" style="display:inline;">
                 <button type="submit" class="btn btn-danger" onclick="return confirm('정말 삭제하시겠습니까?')">삭제</button>
             </form>
             
@@ -616,7 +616,7 @@
                         <div class="comment-content" th:text="${comment.content}"></div>
                         
                         <!-- 댓글 수정/삭제 버튼 (작성자 또는 스터디 개설자만 표시) -->
-                        <div th:if="${currentUser != null && (comment.user.id == currentUser.id || isLeader)}" 
+                        <div th:if="${currentUser != null && (comment.user.id == currentUser.id || isLeader || (currentUser.role == 'ADMIN'))}" 
                              class="comment-actions">
                             <button class="comment-edit-btn" th:attr="onclick='editComment(' + ${comment.id} + ')'">수정</button>
                             <button class="comment-delete-btn" th:attr="onclick='deleteComment(' + ${comment.id} + ')'">삭제</button>

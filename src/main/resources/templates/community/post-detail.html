@@ -55,6 +55,12 @@
                                 비추천 <span th:text="${post.dislikeCount}">0</span>
                             </button>
                         </form>
+                        <form th:if="${currentUser != null and (post.user != null and post.user.id == currentUser.id or currentUser.role == 'ADMIN')}"
+                              th:action="@{'/community/post/' + ${post.id} + '/delete'}" method="post" style="display:inline; margin-left:1rem;">
+                            <button type="submit" class="btn btn-danger">
+                                <i class="bi bi-trash"></i> 게시글 삭제
+                            </button>
+                        </form>
                     </div>
                     <div th:if="${currentUser == null}" class="text-muted" style="flex:1;">
                         <span>추천/비추천을 하려면 <a href="/login">로그인</a>이 필요합니다.</span>
@@ -75,7 +81,7 @@
                                     <span class="comment-author" th:text="${comment.user != null ? comment.user.name : '익명'}">댓글 작성자</span>
                                     <span class="comment-time" th:text="${#temporals.format(comment.createdAt, 'MM월 dd일 HH:mm')}">작성시간</span>
                                 </div>
-                                <div class="comment-actions" th:if="${currentUser != null and comment.user != null and comment.user.id == currentUser.id}">
+                                <div class="comment-actions" th:if="${currentUser != null and comment.user != null and (comment.user.id == currentUser.id or currentUser.role == 'ADMIN')}">
                                     <button class="comment-btn delete-btn" th:onclick="'deleteComment(' + ${comment.id} + ')'">
                                         <i class="bi bi-trash me-1"></i>삭제
                                     </button>

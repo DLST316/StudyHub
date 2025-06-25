@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>스터디 관리</title>
+</head>
+<body>
+    <h2 style="text-align:center; color:#FF5C38;">스터디 관리</h2>
+    <div th:if="${studies.empty}">
+        <p style="text-align:center; color:#7FE7DC;">스터디가 없습니다.</p>
+    </div>
+    <div th:unless="${studies.empty}">
+        <table border="1" style="margin:auto;">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>제목</th>
+                    <th>리더</th>
+                    <th>생성일</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="study : ${studies}">
+                    <td th:text="${study.id}"></td>
+                    <td th:text="${study.title}"></td>
+                    <td th:text="${study.leader.name}"></td>
+                    <td th:text="${#temporals.format(study.createdAt, 'yyyy-MM-dd HH:mm')}"></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</body>
+</html> 

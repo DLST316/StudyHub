@@ -2,9 +2,7 @@ package dev.kang.studyhub.web.admin;
 
 import dev.kang.studyhub.domain.board.PostRepository;
 import dev.kang.studyhub.domain.board.PostCommentRepository;
-import dev.kang.studyhub.domain.board.ReportRepository;
 import dev.kang.studyhub.domain.study.repository.StudyRepository;
-import dev.kang.studyhub.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -22,40 +20,16 @@ import org.springframework.web.bind.annotation.RequestParam;
 @RequestMapping("/admin")
 @RequiredArgsConstructor
 public class AdminPageController {
-    private final UserRepository userRepository;
     private final PostRepository postRepository;
     private final PostCommentRepository commentRepository;
     private final StudyRepository studyRepository;
-    private final ReportRepository reportRepository;
 
     /**
      * 관리자 대시보드
      */
-    @GetMapping
+    @GetMapping({"/", "/dashboard"})
     public String dashboard() {
         return "admin/dashboard";
-    }
-
-    /**
-     * 사용자 관리 페이지
-     */
-    @GetMapping("/users")
-    public String users(@PageableDefault(size = 20) Pageable pageable, Model model) {
-        Page<?> users = userRepository.findAll(pageable);
-        model.addAttribute("users", users);
-        return "admin/users";
-    }
-
-    /**
-     * 차단된 사용자 목록
-     */
-    @GetMapping("/users/blocked")
-    public String blockedUsers(@PageableDefault(size = 20) Pageable pageable, Model model) {
-        // TODO: 차단된 사용자만 조회하는 메서드 구현 필요
-        Page<?> users = userRepository.findAll(pageable);
-        model.addAttribute("users", users);
-        model.addAttribute("isBlockedList", true);
-        return "admin/users";
     }
 
     /**
@@ -86,28 +60,6 @@ public class AdminPageController {
         Page<?> studies = studyRepository.findAll(pageable);
         model.addAttribute("studies", studies);
         return "admin/studies";
-    }
-
-    /**
-     * 신고 관리 페이지
-     */
-    @GetMapping("/reports")
-    public String reports(@PageableDefault(size = 20) Pageable pageable, Model model) {
-        Page<?> reports = reportRepository.findAll(pageable);
-        model.addAttribute("reports", reports);
-        return "admin/reports";
-    }
-
-    /**
-     * 대기중인 신고 목록
-     */
-    @GetMapping("/reports/pending")
-    public String pendingReports(@PageableDefault(size = 20) Pageable pageable, Model model) {
-        // TODO: 대기중인 신고만 조회하는 메서드 구현 필요
-        Page<?> reports = reportRepository.findAll(pageable);
-        model.addAttribute("reports", reports);
-        model.addAttribute("isPendingList", true);
-        return "admin/reports";
     }
 
     /**

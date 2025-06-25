@@ -11,6 +11,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,7 +21,7 @@ import java.util.stream.Collectors;
 /**
  * 관리자 신고 처리 API
  */
-@RestController
+@Controller
 @RequestMapping("/admin/reports")
 @RequiredArgsConstructor
 public class AdminReportController {
@@ -28,9 +29,26 @@ public class AdminReportController {
     private final UserRepository userRepository;
 
     /**
+     * 신고 관리 페이지
+     */
+    @GetMapping
+    public String reportsPage() {
+        return "admin/reports";
+    }
+
+    /**
+     * 대기중인 신고 목록 페이지
+     */
+    @GetMapping("/pending")
+    public String pendingReportsPage() {
+        return "admin/reports";
+    }
+
+    /**
      * 신고 목록 조회 (페이지네이션)
      */
     @GetMapping("/api")
+    @ResponseBody
     public Page<ReportDto> getReportsApi(
             @PageableDefault(size = 20) Pageable pageable,
             @RequestParam(required = false) Report.ReportStatus status,
@@ -55,7 +73,8 @@ public class AdminReportController {
     /**
      * 신고 상세 조회
      */
-    @GetMapping("/{reportId}")
+    @GetMapping("/api/{reportId}")
+    @ResponseBody
     public ResponseEntity<ReportDto> getReport(@PathVariable Long reportId) {
         return reportRepository.findById(reportId)
                 .map(ReportDto::from)
@@ -66,7 +85,8 @@ public class AdminReportController {
     /**
      * 신고 처리 (승인/거부)
      */
-    @PostMapping("/{reportId}/resolve")
+    @PostMapping("/api/{reportId}/resolve")
+    @ResponseBody
     public ResponseEntity<?> resolveReport(
             @PathVariable Long reportId,
             @RequestBody Map<String, String> request) {
@@ -91,7 +111,8 @@ public class AdminReportController {
     /**
      * 신고 통계
      */
-    @GetMapping("/stats")
+    @GetMapping("/api/stats")
+    @ResponseBody
     public ResponseEntity<Map<String, Object>> getReportStats() {
         Map<String, Object> stats = Map.of(
             "pending", reportRepository.countByIsResolvedFalse(),

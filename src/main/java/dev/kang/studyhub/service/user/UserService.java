@@ -103,10 +103,17 @@ public class UserService {
      * @param userId 차단할 유저의 ID
      * @return 차단 완료 메시지
      * @throws IllegalArgumentException 유저가 존재하지 않을 때
+     * @throws IllegalStateException 관리자 계정을 차단하려고 할 때
      */
     public String blockUser(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 유저입니다."));
+        
+        // 관리자 계정은 차단할 수 없음
+        if ("ADMIN".equals(user.getRole())) {
+            throw new IllegalStateException("관리자 계정은 차단할 수 없습니다.");
+        }
+        
         user.setBlocked(true);
         userRepository.save(user);
         return "유저가 차단되었습니다.";

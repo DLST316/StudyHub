@@ -128,8 +128,8 @@
                         <td>${user.name || '-'}</td>
                         <td>${new Date(user.createdAt).toLocaleDateString()}</td>
                         <td>
-                            <span class="badge ${user.isBlocked ? 'badge-blocked' : 'badge-active'}">
-                                ${user.isBlocked ? '차단' : '활성'}
+                            <span class="badge ${user.blocked ? 'badge-blocked' : 'badge-active'}">
+                                ${user.blocked ? '차단' : '활성'}
                             </span>
                         </td>
                         <td>
@@ -137,13 +137,17 @@
                                 <button class="btn" onclick="viewUserDetail(${user.id})" style="padding: 0.5rem 1rem; font-size: 0.875rem;">
                                     👁️ 상세
                                 </button>
-                                ${user.isBlocked ? 
-                                    `<button class="btn btn-success" onclick="unblockUser(${user.id})" style="padding: 0.5rem 1rem; font-size: 0.875rem;">
-                                        ✅ 해제
+                                ${user.role === 'ADMIN' ? 
+                                    `<button class="btn btn-secondary" disabled style="padding: 0.5rem 1rem; font-size: 0.875rem; cursor: not-allowed;">
+                                        🔒 관리자
                                     </button>` :
-                                    `<button class="btn btn-danger" onclick="blockUser(${user.id})" style="padding: 0.5rem 1rem; font-size: 0.875rem;">
-                                        🚫 차단
-                                    </button>`
+                                    user.blocked ? 
+                                        `<button class="btn btn-success" onclick="unblockUser(${user.id})" style="padding: 0.5rem 1rem; font-size: 0.875rem;">
+                                            ✅ 해제
+                                        </button>` :
+                                        `<button class="btn btn-danger" onclick="blockUser(${user.id})" style="padding: 0.5rem 1rem; font-size: 0.875rem;">
+                                            🚫 차단
+                                        </button>`
                                 }
                             </div>
                         </td>
@@ -209,16 +213,18 @@
                 if (!confirm('이 사용자를 차단하시겠습니까?')) return;
                 
                 try {
-                    const response = await fetch(`/admin/users/${userId}/block`, {
+                    const response = await fetch(`/admin/users/api/${userId}/block`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' }
                     });
                     
+                    const result = await response.json();
+                    
                     if (response.ok) {
-                        alert('사용자가 차단되었습니다.');
+                        alert(result.message || '사용자가 차단되었습니다.');
                         loadUsers(currentPage, currentSearch, currentStatus);
                     } else {
-                        alert('차단 처리에 실패했습니다.');
+                        alert(result.error || '차단 처리에 실패했습니다.');
                     }
                 } catch (error) {
                     console.error('사용자 차단 실패:', error);
@@ -231,7 +237,7 @@
                 if (!confirm('이 사용자의 차단을 해제하시겠습니까?')) return;
                 
                 try {
-                    const response = await fetch(`/admin/users/${userId}/unblock`, {
+                    const response = await fetch(`/admin/users/api/${userId}/unblock`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' }
                     });
@@ -251,7 +257,7 @@
             // 사용자 상세 정보 보기
             async function viewUserDetail(userId) {
                 try {
-                    const response = await fetch(`/admin/users/${userId}`);
+                    const response = await fetch(`/admin/users/api/${userId}`);
                     const user = await response.json();
                     
                     const modal = document.getElementById('userModal');
@@ -272,8 +278,8 @@
                         </div>
                         <div style="margin-bottom: 1rem;">
                             <strong>상태:</strong> 
-                            <span class="badge ${user.isBlocked ? 'badge-blocked' : 'badge-active'}">
-                                ${user.isBlocked ? '차단' : '활성'}
+                            <span class="badge ${user.blocked ? 'badge-blocked' : 'badge-active'}">
+                                ${user.blocked ? '차단' : '활성'}
                             </span>
                         </div>
                     `;

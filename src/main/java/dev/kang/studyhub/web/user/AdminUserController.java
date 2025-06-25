@@ -8,9 +8,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 관리자 전용 유저 관리 컨트롤러
@@ -18,7 +21,7 @@ import java.util.List;
  * - 유저 차단/차단 해제
  * - 유저 상세 정보 조회
  */
-@RestController
+@Controller
 @RequestMapping("/admin/users")
 @RequiredArgsConstructor
 public class AdminUserController {
@@ -26,9 +29,26 @@ public class AdminUserController {
     private final UserRepository userRepository;
 
     /**
+     * 사용자 관리 페이지
+     */
+    @GetMapping
+    public String usersPage() {
+        return "admin/users";
+    }
+
+    /**
+     * 차단된 사용자 목록 페이지
+     */
+    @GetMapping("/blocked")
+    public String blockedUsersPage() {
+        return "admin/users";
+    }
+
+    /**
      * 전체 유저 목록 조회 (테스트 및 관리자 페이지용)
      */
-    @GetMapping(produces = "application/json; charset=UTF-8")
+    @GetMapping(value = "/api/list", produces = "application/json; charset=UTF-8")
+    @ResponseBody
     public List<User> listUsers() {
         return userService.findAllUsers();
     }
@@ -37,6 +57,7 @@ public class AdminUserController {
      * 전체 유저 목록 조회 (페이지네이션)
      */
     @GetMapping("/api")
+    @ResponseBody
     public Page<User> listUsersApi(
             @PageableDefault(size = 20) Pageable pageable,
             @RequestParam(required = false) String search,
@@ -61,7 +82,8 @@ public class AdminUserController {
     /**
      * 유저 상세 정보 조회
      */
-    @GetMapping("/{id}")
+    @GetMapping("/api/{id}")
+    @ResponseBody
     public ResponseEntity<User> getUser(@PathVariable Long id) {
         return userRepository.findById(id)
                 .map(ResponseEntity::ok)
@@ -69,22 +91,28 @@ public class AdminUserController {
     }
 
     /**
-     * 유저 차단
+     * 사용자 차단
      */
-    @PostMapping(value = "/{id}/block", produces = "text/plain; charset=UTF-8")
-    public ResponseEntity<String> blockUser(@PathVariable Long id) {
+    @PostMapping("/api/{userId}/block")
+    @ResponseBody
+    public ResponseEntity<Map<String, String>> blockUser(@PathVariable Long userId) {
         try {
-            userService.blockUser(id);
-            return ResponseEntity.ok("유저가 차단되었습니다.");
+            String message = userService.blockUser(userId);
+            return ResponseEntity.ok(Map.of("message", message));
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        } catch (IllegalStateException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(Map.of("error", "차단 처리 중 오류가 발생했습니다."));
         }
     }
 
     /**
      * 유저 차단 해제
      */
-    @PostMapping(value = "/{id}/unblock", produces = "text/plain; charset=UTF-8")
+    @PostMapping(value = "/api/{id}/unblock", produces = "text/plain; charset=UTF-8")
+    @ResponseBody
     public ResponseEntity<String> unblockUser(@PathVariable Long id) {
         try {
             userService.unblockUser(id);
