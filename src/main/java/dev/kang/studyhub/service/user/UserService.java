@@ -63,6 +63,7 @@ public class UserService {
                 .major(form.getMajor())                  // 전공
                 .educationStatus(form.getEducationStatus()) // 학력 상태
                 .role("USER")                            // 기본 역할 (USER)
+                .isBlocked(false)                         // 차단 여부(기본값 false)
                 .build();
     
         // 생성된 사용자 정보를 데이터베이스에 저장

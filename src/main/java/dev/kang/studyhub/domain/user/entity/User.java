@@ -39,6 +39,13 @@ public class User {
     @Column(length = 20)
     private String role = "USER";
 
+    /**
+     * 차단 여부 (true: 차단됨, false: 정상)
+     */
+    @Column(name = "is_blocked", nullable = false)
+    @Builder.Default
+    private boolean isBlocked = false;
+
     @Column(name = "created_at")
     private LocalDateTime createdAt = LocalDateTime.now();
 }
