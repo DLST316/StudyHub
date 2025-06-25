@@ -34,11 +34,31 @@ public class StudyHubApplication {
     }
 
     /**
-     * 애플리케이션 시작 시 테스트 사용자를 자동으로 생성하는 CommandLineRunner
+     * 애플리케이션 시작 시 테스트 사용자와 어드민 계정을 자동으로 생성하는 CommandLineRunner
      */
     @Bean
     public CommandLineRunner createTestUsers() {
         return args -> {
+            // 어드민 계정 자동 생성
+            if (userService.findByEmail("admin@studyhub.com").isEmpty()) {
+                UserJoinForm adminForm = new UserJoinForm();
+                adminForm.setName("관리자");
+                adminForm.setEmail("admin@studyhub.com");
+                adminForm.setPassword("admin123");
+                adminForm.setUniversity("StudyHub");
+                adminForm.setMajor("시스템 관리");
+                adminForm.setEducationStatus(EducationStatus.GRADUATED);
+                
+                userService.join(adminForm);
+                
+                // 어드민 역할로 변경
+                var adminUser = userService.findByEmail("admin@studyhub.com").get();
+                adminUser.setRole("ADMIN");
+                userService.save(adminUser);
+                
+                System.out.println("어드민 계정 생성 완료: 관리자 (admin@studyhub.com / admin123)");
+            }
+
             // 테스트 사용자 1: 강인석
             if (userService.findByEmail("lolvslol66@gmail.com").isEmpty()) {
                 UserJoinForm form1 = new UserJoinForm();

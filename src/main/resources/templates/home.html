@@ -398,6 +398,13 @@
                 <a th:href="@{/studies/new}" class="action-btn">새 스터디 만들기</a>
                 <a th:href="@{/studies/my}" class="action-btn">내가 개설한 스터디</a>
                 <a th:href="@{/studies/applications/my}" class="action-btn">신청/참여 스터디</a>
+                <!-- 어드민 사용자를 위한 관리사이트 버튼 -->
+                <a th:if="${user != null && user.role == 'ADMIN'}" 
+                   th:href="@{/admin/dashboard}" 
+                   class="action-btn" 
+                   style="background: linear-gradient(135deg, #FF5C38 0%, #1E3A5F 100%);">
+                    🛠️ 관리사이트
+                </a>
             </div>
         </div>
 

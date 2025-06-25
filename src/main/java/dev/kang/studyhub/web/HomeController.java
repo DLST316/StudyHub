@@ -1,7 +1,9 @@
 package dev.kang.studyhub.web;
 
 import dev.kang.studyhub.domain.study.entity.Study;
+import dev.kang.studyhub.domain.user.entity.User;
 import dev.kang.studyhub.service.study.StudyService;
+import dev.kang.studyhub.service.user.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.Authentication;
@@ -22,6 +24,7 @@ import java.util.List;
 public class HomeController {
     
     private final StudyService studyService;
+    private final UserService userService;
     
     /**
      * 홈페이지 메인 화면을 처리하는 메서드
@@ -47,6 +50,11 @@ public class HomeController {
             
             model.addAttribute("isLoggedIn", true);  // 템플릿에서 로그인 상태를 확인할 수 있도록
             model.addAttribute("userEmail", authentication.getName());  // 사용자 이메일을 템플릿에 전달
+            
+            // 사용자 정보를 가져와서 전달
+            userService.findByEmail(authentication.getName()).ifPresent(user -> {
+                model.addAttribute("user", user);
+            });
         } else {
             // 로그인되지 않은 사용자인 경우
             model.addAttribute("isLoggedIn", false);
