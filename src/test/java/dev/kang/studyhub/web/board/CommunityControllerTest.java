@@ -176,6 +176,58 @@ class CommunityControllerTest {
 
     @Test
     @WithMockUser(username = "test@test.com")
+    @DisplayName("게시글 작성 - 내용이 비어있는 경우")
+    void writePost_EmptyContent() throws Exception {
+        createTestUser("test@test.com");
+        // when & then
+        mockMvc.perform(post("/community/write")
+                        .param("title", "제목")
+                        .param("content", ""))  // 내용이 비어있음
+                .andExpect(status().isOk())
+                .andExpect(view().name("community/post-form"));
+    }
+
+    @Test
+    @WithMockUser(username = "test@test.com")
+    @DisplayName("게시글 작성 - 내용이 공백만 있는 경우")
+    void writePost_WhitespaceOnlyContent() throws Exception {
+        createTestUser("test@test.com");
+        // when & then
+        mockMvc.perform(post("/community/write")
+                        .param("title", "제목")
+                        .param("content", "   "))  // 공백만 있음
+                .andExpect(status().isOk())
+                .andExpect(view().name("community/post-form"));
+    }
+
+    @Test
+    @WithMockUser(username = "test@test.com")
+    @DisplayName("게시글 작성 - HTML 태그만 있는 경우")
+    void writePost_HtmlTagsOnlyContent() throws Exception {
+        createTestUser("test@test.com");
+        // when & then
+        mockMvc.perform(post("/community/write")
+                        .param("title", "제목")
+                        .param("content", "<p></p><br><div></div>"))  // HTML 태그만 있음
+                .andExpect(status().isOk())
+                .andExpect(view().name("community/post-form"));
+    }
+
+    @Test
+    @WithMockUser(username = "test@test.com")
+    @DisplayName("게시글 작성 - 제목과 내용 모두 비어있는 경우")
+    void writePost_BothTitleAndContentEmpty() throws Exception {
+        createTestUser("test@test.com");
+        // when & then
+        mockMvc.perform(post("/community/write")
+                        .param("title", "")
+                        .param("content", ""))
+                .andExpect(status().isOk())
+                .andExpect(view().name("community/post-form"));
+    }
+
+    @Test
+    @WithMockUser(username = "test@test.com")
     @DisplayName("게시글 추천 - 성공")
     void toggleLike_Success() throws Exception {
         createTestUser("test@test.com");

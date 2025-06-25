@@ -236,7 +236,26 @@ function uploadImage(file) {
 
 // 폼 제출 시 에디터 내용을 textarea에 복사
 document.querySelector('form').addEventListener('submit', function(e) {
+    // Quill 에디터의 내용을 가져옴 (HTML 형식)
     const content = quill.root.innerHTML;
+    
+    // HTML 태그를 제거하고 순수 텍스트만 추출
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = content;
+    const plainText = tempDiv.textContent || tempDiv.innerText || '';
+    
+    // 공백만 있는 경우 빈 문자열로 처리
+    const trimmedText = plainText.trim();
+    
+    // 내용이 비어있거나 공백만 있는 경우
+    if (!trimmedText) {
+        e.preventDefault();
+        alert('내용을 입력해주세요.');
+        quill.focus();
+        return false;
+    }
+    
+    // textarea에 HTML 내용 설정
     document.getElementById('content').value = content;
 });
 
