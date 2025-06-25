@@ -11,6 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.util.Optional;
 
 /**
  * 게시글(Post) 서비스
@@ -155,5 +156,43 @@ public class PostService {
         public int getDislikeCount() {
             return dislikeCount;
         }
+    }
+
+    /**
+     * 게시판별 게시글 목록 조회 (페이징)
+     */
+    public Page<Post> findPostsByBoard(Board board, Pageable pageable) {
+        return postRepository.findByBoardId(board.getId(), pageable);
+    }
+
+    /**
+     * 게시글 ID로 조회
+     */
+    public Optional<Post> findById(Long postId) {
+        return postRepository.findById(postId);
+    }
+
+    /**
+     * 게시글 생성
+     */
+    @Transactional
+    public Post createPost(Board board, User user, String title, String content) {
+        Post post = new Post();
+        post.setBoard(board);
+        post.setUser(user);
+        post.setTitle(title);
+        post.setContent(content);
+        post.setViewCount(0);
+        post.setLikeCount(0);
+        post.setDislikeCount(0);
+        return postRepository.save(post);
+    }
+
+    /**
+     * 비추천 처리
+     */
+    @Transactional
+    public String toggleDislike(Long postId, User user, PostLike.LikeType likeType) {
+        return toggleLike(postId, user, PostLike.LikeType.DISLIKE);
     }
 } 

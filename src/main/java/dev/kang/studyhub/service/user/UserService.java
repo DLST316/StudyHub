@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -90,26 +91,38 @@ public class UserService {
     }
 
     /**
+     * 관리자: 모든 사용자 목록 조회
+     * @return 모든 사용자 목록
+     */
+    public List<User> findAllUsers() {
+        return userRepository.findAll();
+    }
+
+    /**
      * 관리자: 유저 차단
      * @param userId 차단할 유저의 ID
+     * @return 차단 완료 메시지
      * @throws IllegalArgumentException 유저가 존재하지 않을 때
      */
-    public void blockUser(Long userId) {
+    public String blockUser(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 유저입니다."));
         user.setBlocked(true);
         userRepository.save(user);
+        return "유저가 차단되었습니다.";
     }
 
     /**
      * 관리자: 유저 차단 해제
      * @param userId 차단 해제할 유저의 ID
+     * @return 차단 해제 완료 메시지
      * @throws IllegalArgumentException 유저가 존재하지 않을 때
      */
-    public void unblockUser(Long userId) {
+    public String unblockUser(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 유저입니다."));
         user.setBlocked(false);
         userRepository.save(user);
+        return "유저 차단이 해제되었습니다.";
     }
 }

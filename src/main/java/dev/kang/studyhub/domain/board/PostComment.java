@@ -25,7 +25,7 @@ public class PostComment {
 
     /** 게시글 */
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "post_id", nullable = false)
+    @JoinColumn(name = "post_id", nullable = false, foreignKey = @ForeignKey(name = "fk_postcomment_post", foreignKeyDefinition = "FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE"))
     private Post post;
 
     /** 작성자 */

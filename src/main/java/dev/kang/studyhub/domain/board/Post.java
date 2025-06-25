@@ -7,6 +7,8 @@ import lombok.Setter;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 
@@ -27,7 +29,7 @@ public class Post {
 
     /** 게시판(커뮤니티) */
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "board_id", nullable = false)
+    @JoinColumn(name = "board_id", nullable = false, foreignKey = @ForeignKey(name = "fk_post_board", foreignKeyDefinition = "FOREIGN KEY (board_id) REFERENCES boards(id) ON DELETE CASCADE"))
     private Board board;
 
     /** 작성자 */
@@ -66,6 +68,14 @@ public class Post {
     /** 수정일시 */
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    /** 추천/비추천 목록 (양방향 매핑) */
+    @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<PostLike> postLikes = new ArrayList<>();
+
+    /** 댓글 목록 (양방향 매핑) */
+    @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<PostComment> postComments = new ArrayList<>();
 
     /**
      * 생성/수정일시 자동 세팅

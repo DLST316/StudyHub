@@ -1,0 +1,370 @@
+<!-- templates/layout/admin-layout.html -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko" th:fragment="adminLayout (content)">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StudyHub 관리자</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #2C2E33;
+            color: #F4EFE9;
+            font-family: 'Pretendard', 'Noto Sans KR', sans-serif;
+            min-height: 100vh;
+        }
+
+        /* 관리자 레이아웃 */
+        .admin-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* 사이드바 */
+        .sidebar {
+            width: 280px;
+            background: rgba(44, 46, 51, 0.95);
+            backdrop-filter: blur(10px);
+            border-right: 2px solid #FF5C38;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 1000;
+        }
+
+        .sidebar-header {
+            padding: 2rem 1.5rem;
+            border-bottom: 1px solid rgba(255, 92, 56, 0.3);
+        }
+
+        .sidebar-logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #FF5C38;
+            text-decoration: none;
+        }
+
+        .sidebar-nav {
+            padding: 1rem 0;
+        }
+
+        .nav-section {
+            margin-bottom: 2rem;
+        }
+
+        .nav-section-title {
+            padding: 0.5rem 1.5rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #7FE7DC;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .nav-item {
+            list-style: none;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1.5rem;
+            color: #F4EFE9;
+            text-decoration: none;
+            transition: all 0.3s;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-link:hover {
+            background: rgba(255, 92, 56, 0.1);
+            color: #FF5C38;
+            border-left-color: #FF5C38;
+        }
+
+        .nav-link.active {
+            background: rgba(255, 92, 56, 0.15);
+            color: #FF5C38;
+            border-left-color: #FF5C38;
+        }
+
+        .nav-icon {
+            width: 20px;
+            height: 20px;
+            margin-right: 0.75rem;
+            opacity: 0.8;
+        }
+
+        /* 메인 콘텐츠 */
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            padding: 2rem;
+        }
+
+        .content-header {
+            margin-bottom: 2rem;
+        }
+
+        .page-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #F4EFE9;
+            margin-bottom: 0.5rem;
+        }
+
+        .page-subtitle {
+            color: #7FE7DC;
+            font-size: 1rem;
+        }
+
+        /* 대시보드 카드 */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: rgba(244, 239, 233, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 1.5rem;
+            border: 1px solid rgba(255, 92, 56, 0.2);
+            transition: transform 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-title {
+            font-size: 0.875rem;
+            color: #7FE7DC;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #FF5C38;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-change {
+            font-size: 0.875rem;
+            color: #F4EFE9;
+        }
+
+        /* 테이블 스타일 */
+        .admin-table {
+            width: 100%;
+            background: rgba(244, 239, 233, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 92, 56, 0.2);
+        }
+
+        .admin-table th {
+            background: rgba(255, 92, 56, 0.2);
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            color: #FF5C38;
+        }
+
+        .admin-table td {
+            padding: 1rem;
+            border-bottom: 1px solid rgba(255, 92, 56, 0.1);
+        }
+
+        .admin-table tr:hover {
+            background: rgba(255, 92, 56, 0.05);
+        }
+
+        /* 버튼 스타일 */
+        .btn {
+            background: linear-gradient(135deg, #1E3A5F 0%, #2C2E33 100%);
+            color: #F4EFE9;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn:hover {
+            background: linear-gradient(135deg, #FF5C38 0%, #1E3A5F 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 92, 56, 0.4);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #dc3545 0%, #2C2E33 100%);
+        }
+
+        .btn-danger:hover {
+            background: linear-gradient(135deg, #FF5C38 0%, #dc3545 100%);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #28a745 0%, #2C2E33 100%);
+        }
+
+        .btn-success:hover {
+            background: linear-gradient(135deg, #FF5C38 0%, #28a745 100%);
+        }
+
+        /* 상태 배지 */
+        .badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .badge-pending {
+            background: rgba(255, 193, 7, 0.2);
+            color: #ffc107;
+        }
+
+        .badge-approved {
+            background: rgba(40, 167, 69, 0.2);
+            color: #28a745;
+        }
+
+        .badge-rejected {
+            background: rgba(220, 53, 69, 0.2);
+            color: #dc3545;
+        }
+
+        .badge-blocked {
+            background: rgba(220, 53, 69, 0.2);
+            color: #dc3545;
+        }
+
+        .badge-active {
+            background: rgba(40, 167, 69, 0.2);
+            color: #28a745;
+        }
+
+        /* 반응형 */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s;
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 1rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <!-- 사이드바 -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="/admin" class="sidebar-logo">StudyHub 관리자</a>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">대시보드</div>
+                    <ul class="nav-item">
+                        <li><a href="/admin" class="nav-link active">
+                            <span class="nav-icon">📊</span>
+                            대시보드
+                        </a></li>
+                    </ul>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-section-title">사용자 관리</div>
+                    <ul class="nav-item">
+                        <li><a href="/admin/users" class="nav-link">
+                            <span class="nav-icon">👥</span>
+                            사용자 목록
+                        </a></li>
+                        <li><a href="/admin/users/blocked" class="nav-link">
+                            <span class="nav-icon">🚫</span>
+                            차단된 사용자
+                        </a></li>
+                    </ul>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-section-title">컨텐츠 관리</div>
+                    <ul class="nav-item">
+                        <li><a href="/admin/posts" class="nav-link">
+                            <span class="nav-icon">📝</span>
+                            게시글 관리
+                        </a></li>
+                        <li><a href="/admin/comments" class="nav-link">
+                            <span class="nav-icon">💬</span>
+                            댓글 관리
+                        </a></li>
+                        <li><a href="/admin/studies" class="nav-link">
+                            <span class="nav-icon">📚</span>
+                            스터디 관리
+                        </a></li>
+                    </ul>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-section-title">신고 관리</div>
+                    <ul class="nav-item">
+                        <li><a href="/admin/reports" class="nav-link">
+                            <span class="nav-icon">🚨</span>
+                            신고 내역
+                        </a></li>
+                        <li><a href="/admin/reports/pending" class="nav-link">
+                            <span class="nav-icon">⏳</span>
+                            대기중인 신고
+                        </a></li>
+                    </ul>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-section-title">시스템</div>
+                    <ul class="nav-item">
+                        <li><a href="/admin/settings" class="nav-link">
+                            <span class="nav-icon">⚙️</span>
+                            시스템 설정
+                        </a></li>
+                        <li><a href="/" class="nav-link">
+                            <span class="nav-icon">🏠</span>
+                            사이트로 돌아가기
+                        </a></li>
+                    </ul>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- 메인 콘텐츠 -->
+        <main class="main-content">
+            <div th:insert="${content}"></div>
+        </main>
+    </div>
+</body>
+</html> 

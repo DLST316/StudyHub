@@ -1,0 +1,412 @@
+<!-- templates/admin/reports.html -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/admin-layout :: adminLayout(~{::content})}">
+<head>
+    <title>StudyHub 관리자 - 신고 관리</title>
+</head>
+<body>
+    <div th:fragment="content">
+        <!-- 페이지 헤더 -->
+        <div class="content-header">
+            <h1 class="page-title">
+                <span th:if="${isPendingList}">대기중인 신고</span>
+                <span th:unless="${isPendingList}">신고 관리</span>
+            </h1>
+            <p class="page-subtitle">
+                <span th:if="${isPendingList}">처리 대기중인 신고를 관리합니다</span>
+                <span th:unless="${isPendingList}">전체 신고 내역을 관리합니다</span>
+            </p>
+        </div>
+
+        <!-- 통계 카드 -->
+        <div class="stats-grid" style="margin-bottom: 2rem;">
+            <div class="stat-card">
+                <div class="stat-title">대기중인 신고</div>
+                <div class="stat-value" id="pendingCount">-</div>
+                <div class="stat-change">처리 필요</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-title">전체 신고</div>
+                <div class="stat-value" id="totalCount">-</div>
+                <div class="stat-change">누적 신고</div>
+            </div>
+        </div>
+
+        <!-- 검색 및 필터 -->
+        <div class="stat-card" style="margin-bottom: 2rem;">
+            <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+                <select id="statusFilter" style="padding: 0.75rem; border: 1px solid rgba(255, 92, 56, 0.3); 
+                                               border-radius: 8px; background: rgba(244, 239, 233, 0.1); color: #F4EFE9;">
+                    <option value="">전체 상태</option>
+                    <option value="PENDING">대기중</option>
+                    <option value="APPROVED">승인</option>
+                    <option value="REJECTED">거부</option>
+                    <option value="RESOLVED">처리완료</option>
+                </select>
+                <select id="targetTypeFilter" style="padding: 0.75rem; border: 1px solid rgba(255, 92, 56, 0.3); 
+                                                   border-radius: 8px; background: rgba(244, 239, 233, 0.1); color: #F4EFE9;">
+                    <option value="">전체 타입</option>
+                    <option value="POST">게시글</option>
+                    <option value="COMMENT">댓글</option>
+                    <option value="USER">사용자</option>
+                </select>
+                <button class="btn" onclick="searchReports()">검색</button>
+                <button class="btn" onclick="resetSearch()">초기화</button>
+            </div>
+        </div>
+
+        <!-- 신고 목록 -->
+        <div class="stat-card">
+            <div style="display: flex; justify-content: between; align-items: center; margin-bottom: 1rem;">
+                <h3 style="color: #FF5C38;">신고 목록</h3>
+                <div style="display: flex; gap: 0.5rem;">
+                    <button class="btn" onclick="refreshReports()">🔄 새로고침</button>
+                </div>
+            </div>
+
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>신고자</th>
+                        <th>대상 타입</th>
+                        <th>대상 ID</th>
+                        <th>사유</th>
+                        <th>신고일</th>
+                        <th>상태</th>
+                        <th>액션</th>
+                    </tr>
+                </thead>
+                <tbody id="reportsTableBody">
+                    <tr>
+                        <td colspan="8" style="text-align: center; padding: 2rem;">
+                            <p style="color: #7FE7DC;">로딩 중...</p>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- 페이지네이션 -->
+            <div id="pagination" style="display: flex; justify-content: center; margin-top: 2rem; gap: 0.5rem;">
+                <!-- 페이지네이션은 JavaScript로 동적 생성 -->
+            </div>
+        </div>
+
+        <!-- 신고 처리 모달 -->
+        <div id="reportModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+                                    background: rgba(0, 0, 0, 0.5); z-index: 2000;">
+            <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); 
+                        background: #2C2E33; border-radius: 15px; padding: 2rem; min-width: 500px; 
+                        border: 1px solid rgba(255, 92, 56, 0.3);">
+                <h3 style="color: #FF5C38; margin-bottom: 1rem;">신고 처리</h3>
+                <div id="reportDetailContent">
+                    <!-- 신고 상세 정보가 여기에 표시됩니다 -->
+                </div>
+                <div style="margin-top: 1rem;">
+                    <label style="display: block; margin-bottom: 0.5rem; color: #F4EFE9;">처리 결과:</label>
+                    <select id="resolutionStatus" style="width: 100%; padding: 0.75rem; border: 1px solid rgba(255, 92, 56, 0.3); 
+                                                         border-radius: 8px; background: rgba(244, 239, 233, 0.1); color: #F4EFE9; margin-bottom: 1rem;">
+                        <option value="APPROVED">승인</option>
+                        <option value="REJECTED">거부</option>
+                        <option value="RESOLVED">처리완료</option>
+                    </select>
+                    <label style="display: block; margin-bottom: 0.5rem; color: #F4EFE9;">처리 메모:</label>
+                    <textarea id="resolutionNote" rows="3" style="width: 100%; padding: 0.75rem; border: 1px solid rgba(255, 92, 56, 0.3); 
+                                                                 border-radius: 8px; background: rgba(244, 239, 233, 0.1); color: #F4EFE9; resize: vertical;"></textarea>
+                </div>
+                <div style="display: flex; gap: 1rem; margin-top: 2rem; justify-content: flex-end;">
+                    <button class="btn" onclick="closeReportModal()">취소</button>
+                    <button class="btn btn-success" onclick="resolveReport()">처리 완료</button>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            let currentPage = 0;
+            let currentStatus = '';
+            let currentTargetType = '';
+            let currentReportId = null;
+
+            // 신고 목록 로드
+            async function loadReports(page = 0, status = '', targetType = '') {
+                try {
+                    let url = `/admin/reports/api?page=${page}&size=20`;
+                    if (status) url += `&status=${status}`;
+                    if (targetType) url += `&targetType=${targetType}`;
+                    
+                    const response = await fetch(url);
+                    const data = await response.json();
+                    
+                    renderReportsTable(data.content);
+                    renderPagination(data);
+                    
+                } catch (error) {
+                    console.error('신고 목록 로드 실패:', error);
+                    document.getElementById('reportsTableBody').innerHTML = 
+                        '<tr><td colspan="8" style="text-align: center; color: #dc3545;">로딩 실패</td></tr>';
+                }
+            }
+
+            // 신고 통계 로드
+            async function loadReportStats() {
+                try {
+                    const response = await fetch('/admin/reports/stats');
+                    const stats = await response.json();
+                    
+                    document.getElementById('pendingCount').textContent = stats.pending || 0;
+                    document.getElementById('totalCount').textContent = stats.total || 0;
+                } catch (error) {
+                    console.error('신고 통계 로드 실패:', error);
+                }
+            }
+
+            // 신고 테이블 렌더링
+            function renderReportsTable(reports) {
+                const tbody = document.getElementById('reportsTableBody');
+                
+                if (!reports || reports.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; color: #7FE7DC;">신고가 없습니다.</td></tr>';
+                    return;
+                }
+
+                const rows = reports.map(report => `
+                    <tr>
+                        <td>${report.id}</td>
+                        <td>${report.reporter ? report.reporter.email : '알 수 없음'}</td>
+                        <td>${getTargetTypeText(report.targetType)}</td>
+                        <td>${report.targetId}</td>
+                        <td>${getReasonText(report.reason)}</td>
+                        <td>${new Date(report.reportedAt).toLocaleDateString()}</td>
+                        <td>
+                            <span class="badge ${getStatusBadgeClass(report.status)}">
+                                ${getStatusText(report.status)}
+                            </span>
+                        </td>
+                        <td>
+                            <div style="display: flex; gap: 0.5rem;">
+                                <button class="btn" onclick="viewReportDetail(${report.id})" style="padding: 0.5rem 1rem; font-size: 0.875rem;">
+                                    👁️ 상세
+                                </button>
+                                ${report.status === 'PENDING' ? 
+                                    `<button class="btn btn-success" onclick="openReportModal(${report.id})" style="padding: 0.5rem 1rem; font-size: 0.875rem;">
+                                        ⚡ 처리
+                                    </button>` : ''
+                                }
+                            </div>
+                        </td>
+                    </tr>
+                `).join('');
+                
+                tbody.innerHTML = rows;
+            }
+
+            // 페이지네이션 렌더링
+            function renderPagination(data) {
+                const pagination = document.getElementById('pagination');
+                const totalPages = data.totalPages;
+                const currentPageNum = data.number;
+                
+                let paginationHtml = '';
+                
+                // 이전 페이지
+                if (currentPageNum > 0) {
+                    paginationHtml += `<button class="btn" onclick="loadReports(${currentPageNum - 1}, '${currentStatus}', '${currentTargetType}')">이전</button>`;
+                }
+                
+                // 페이지 번호
+                for (let i = Math.max(0, currentPageNum - 2); i <= Math.min(totalPages - 1, currentPageNum + 2); i++) {
+                    paginationHtml += `<button class="btn ${i === currentPageNum ? 'btn-success' : ''}" 
+                                               onclick="loadReports(${i}, '${currentStatus}', '${currentTargetType}')">${i + 1}</button>`;
+                }
+                
+                // 다음 페이지
+                if (currentPageNum < totalPages - 1) {
+                    paginationHtml += `<button class="btn" onclick="loadReports(${currentPageNum + 1}, '${currentStatus}', '${currentTargetType}')">다음</button>`;
+                }
+                
+                pagination.innerHTML = paginationHtml;
+            }
+
+            // 신고 검색
+            function searchReports() {
+                const status = document.getElementById('statusFilter').value;
+                const targetType = document.getElementById('targetTypeFilter').value;
+                
+                currentStatus = status;
+                currentTargetType = targetType;
+                currentPage = 0;
+                
+                loadReports(currentPage, status, targetType);
+            }
+
+            // 검색 초기화
+            function resetSearch() {
+                document.getElementById('statusFilter').value = '';
+                document.getElementById('targetTypeFilter').value = '';
+                
+                currentStatus = '';
+                currentTargetType = '';
+                currentPage = 0;
+                
+                loadReports(currentPage, '', '');
+            }
+
+            // 신고 처리 모달 열기
+            async function openReportModal(reportId) {
+                try {
+                    const response = await fetch(`/admin/reports/${reportId}`);
+                    const report = await response.json();
+                    
+                    currentReportId = reportId;
+                    const modal = document.getElementById('reportModal');
+                    const content = document.getElementById('reportDetailContent');
+                    
+                    content.innerHTML = `
+                        <div style="margin-bottom: 1rem;">
+                            <strong>신고자:</strong> ${report.reporter ? report.reporter.email : '알 수 없음'}
+                        </div>
+                        <div style="margin-bottom: 1rem;">
+                            <strong>대상:</strong> ${getTargetTypeText(report.targetType)} (ID: ${report.targetId})
+                        </div>
+                        <div style="margin-bottom: 1rem;">
+                            <strong>사유:</strong> ${getReasonText(report.reason)}
+                        </div>
+                        <div style="margin-bottom: 1rem;">
+                            <strong>상세 내용:</strong><br>
+                            <div style="background: rgba(244, 239, 233, 0.1); padding: 1rem; border-radius: 8px; margin-top: 0.5rem;">
+                                ${report.description || '상세 내용 없음'}
+                            </div>
+                        </div>
+                        <div style="margin-bottom: 1rem;">
+                            <strong>신고일:</strong> ${new Date(report.reportedAt).toLocaleString()}
+                        </div>
+                    `;
+                    
+                    modal.style.display = 'block';
+                } catch (error) {
+                    console.error('신고 상세 정보 로드 실패:', error);
+                    alert('신고 정보를 불러올 수 없습니다.');
+                }
+            }
+
+            // 신고 처리
+            async function resolveReport() {
+                if (!currentReportId) return;
+                
+                const status = document.getElementById('resolutionStatus').value;
+                const note = document.getElementById('resolutionNote').value;
+                
+                try {
+                    const response = await fetch(`/admin/reports/${currentReportId}/resolve`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ status, resolutionNote: note })
+                    });
+                    
+                    if (response.ok) {
+                        alert('신고가 처리되었습니다.');
+                        closeReportModal();
+                        loadReports(currentPage, currentStatus, currentTargetType);
+                        loadReportStats();
+                    } else {
+                        alert('신고 처리에 실패했습니다.');
+                    }
+                } catch (error) {
+                    console.error('신고 처리 실패:', error);
+                    alert('신고 처리 중 오류가 발생했습니다.');
+                }
+            }
+
+            // 신고 상세 정보 보기
+            async function viewReportDetail(reportId) {
+                try {
+                    const response = await fetch(`/admin/reports/${reportId}`);
+                    const report = await response.json();
+                    
+                    alert(`
+신고 상세 정보:
+- ID: ${report.id}
+- 신고자: ${report.reporter ? report.reporter.email : '알 수 없음'}
+- 대상: ${getTargetTypeText(report.targetType)} (ID: ${report.targetId})
+- 사유: ${getReasonText(report.reason)}
+- 상태: ${getStatusText(report.status)}
+- 신고일: ${new Date(report.reportedAt).toLocaleString()}
+- 상세 내용: ${report.description || '없음'}
+                    `);
+                } catch (error) {
+                    console.error('신고 상세 정보 로드 실패:', error);
+                    alert('신고 정보를 불러올 수 없습니다.');
+                }
+            }
+
+            // 모달 닫기
+            function closeReportModal() {
+                document.getElementById('reportModal').style.display = 'none';
+                currentReportId = null;
+                document.getElementById('resolutionNote').value = '';
+            }
+
+            // 새로고침
+            function refreshReports() {
+                loadReports(currentPage, currentStatus, currentTargetType);
+                loadReportStats();
+            }
+
+            // 유틸리티 함수들
+            function getTargetTypeText(targetType) {
+                const types = {
+                    'POST': '게시글',
+                    'COMMENT': '댓글',
+                    'USER': '사용자'
+                };
+                return types[targetType] || targetType;
+            }
+
+            function getReasonText(reason) {
+                const reasons = {
+                    'SPAM': '스팸',
+                    'INAPPROPRIATE_CONTENT': '부적절한 내용',
+                    'HARASSMENT': '괴롭힘',
+                    'COPYRIGHT_VIOLATION': '저작권 침해',
+                    'OTHER': '기타'
+                };
+                return reasons[reason] || reason;
+            }
+
+            function getStatusText(status) {
+                const statuses = {
+                    'PENDING': '대기중',
+                    'APPROVED': '승인',
+                    'REJECTED': '거부',
+                    'RESOLVED': '처리완료'
+                };
+                return statuses[status] || status;
+            }
+
+            function getStatusBadgeClass(status) {
+                const classes = {
+                    'PENDING': 'badge-pending',
+                    'APPROVED': 'badge-approved',
+                    'REJECTED': 'badge-rejected',
+                    'RESOLVED': 'badge-approved'
+                };
+                return classes[status] || 'badge-pending';
+            }
+
+            // 페이지 로드 시 데이터 로드
+            document.addEventListener('DOMContentLoaded', () => {
+                loadReports();
+                loadReportStats();
+            });
+
+            // 모달 외부 클릭 시 닫기
+            document.getElementById('reportModal').addEventListener('click', (e) => {
+                if (e.target.id === 'reportModal') {
+                    closeReportModal();
+                }
+            });
+        </script>
+    </div>
+</body>
+</html> 

@@ -1,0 +1,317 @@
+<!-- templates/admin/users.html -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/admin-layout :: adminLayout(~{::content})}">
+<head>
+    <title>StudyHub 관리자 - 사용자 관리</title>
+</head>
+<body>
+    <div th:fragment="content">
+        <!-- 페이지 헤더 -->
+        <div class="content-header">
+            <h1 class="page-title">
+                <span th:if="${isBlockedList}">차단된 사용자</span>
+                <span th:unless="${isBlockedList}">사용자 관리</span>
+            </h1>
+            <p class="page-subtitle">
+                <span th:if="${isBlockedList}">차단된 사용자 목록을 관리합니다</span>
+                <span th:unless="${isBlockedList}">전체 사용자 목록을 관리합니다</span>
+            </p>
+        </div>
+
+        <!-- 검색 및 필터 -->
+        <div class="stat-card" style="margin-bottom: 2rem;">
+            <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+                <input type="text" id="searchInput" placeholder="이메일 또는 이름으로 검색..." 
+                       style="flex: 1; min-width: 200px; padding: 0.75rem; border: 1px solid rgba(255, 92, 56, 0.3); 
+                              border-radius: 8px; background: rgba(244, 239, 233, 0.1); color: #F4EFE9;">
+                <select id="statusFilter" style="padding: 0.75rem; border: 1px solid rgba(255, 92, 56, 0.3); 
+                                               border-radius: 8px; background: rgba(244, 239, 233, 0.1); color: #F4EFE9;">
+                    <option value="">전체 상태</option>
+                    <option value="active">활성</option>
+                    <option value="blocked">차단</option>
+                </select>
+                <button class="btn" onclick="searchUsers()">검색</button>
+                <button class="btn" onclick="resetSearch()">초기화</button>
+            </div>
+        </div>
+
+        <!-- 사용자 목록 -->
+        <div class="stat-card">
+            <div style="display: flex; justify-content: between; align-items: center; margin-bottom: 1rem;">
+                <h3 style="color: #FF5C38;">사용자 목록</h3>
+                <div style="display: flex; gap: 0.5rem;">
+                    <button class="btn" onclick="exportUsers()">📊 내보내기</button>
+                    <button class="btn" onclick="refreshUsers()">🔄 새로고침</button>
+                </div>
+            </div>
+
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>이메일</th>
+                        <th>이름</th>
+                        <th>가입일</th>
+                        <th>상태</th>
+                        <th>액션</th>
+                    </tr>
+                </thead>
+                <tbody id="usersTableBody">
+                    <tr>
+                        <td colspan="6" style="text-align: center; padding: 2rem;">
+                            <p style="color: #7FE7DC;">로딩 중...</p>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- 페이지네이션 -->
+            <div id="pagination" style="display: flex; justify-content: center; margin-top: 2rem; gap: 0.5rem;">
+                <!-- 페이지네이션은 JavaScript로 동적 생성 -->
+            </div>
+        </div>
+
+        <!-- 사용자 상세 모달 -->
+        <div id="userModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+                                  background: rgba(0, 0, 0, 0.5); z-index: 2000;">
+            <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); 
+                        background: #2C2E33; border-radius: 15px; padding: 2rem; min-width: 400px; 
+                        border: 1px solid rgba(255, 92, 56, 0.3);">
+                <h3 style="color: #FF5C38; margin-bottom: 1rem;">사용자 상세 정보</h3>
+                <div id="userDetailContent">
+                    <!-- 사용자 상세 정보가 여기에 표시됩니다 -->
+                </div>
+                <div style="display: flex; gap: 1rem; margin-top: 2rem; justify-content: flex-end;">
+                    <button class="btn" onclick="closeUserModal()">닫기</button>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            let currentPage = 0;
+            let currentSearch = '';
+            let currentStatus = '';
+
+            // 사용자 목록 로드
+            async function loadUsers(page = 0, search = '', status = '') {
+                try {
+                    let url = `/admin/users/api?page=${page}&size=20`;
+                    if (search) url += `&search=${encodeURIComponent(search)}`;
+                    if (status) url += `&status=${status}`;
+                    
+                    const response = await fetch(url);
+                    const data = await response.json();
+                    
+                    renderUsersTable(data.content);
+                    renderPagination(data);
+                    
+                } catch (error) {
+                    console.error('사용자 목록 로드 실패:', error);
+                    document.getElementById('usersTableBody').innerHTML = 
+                        '<tr><td colspan="6" style="text-align: center; color: #dc3545;">로딩 실패</td></tr>';
+                }
+            }
+
+            // 사용자 테이블 렌더링
+            function renderUsersTable(users) {
+                const tbody = document.getElementById('usersTableBody');
+                
+                if (!users || users.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #7FE7DC;">사용자가 없습니다.</td></tr>';
+                    return;
+                }
+
+                const rows = users.map(user => `
+                    <tr>
+                        <td>${user.id}</td>
+                        <td>${user.email}</td>
+                        <td>${user.name || '-'}</td>
+                        <td>${new Date(user.createdAt).toLocaleDateString()}</td>
+                        <td>
+                            <span class="badge ${user.isBlocked ? 'badge-blocked' : 'badge-active'}">
+                                ${user.isBlocked ? '차단' : '활성'}
+                            </span>
+                        </td>
+                        <td>
+                            <div style="display: flex; gap: 0.5rem;">
+                                <button class="btn" onclick="viewUserDetail(${user.id})" style="padding: 0.5rem 1rem; font-size: 0.875rem;">
+                                    👁️ 상세
+                                </button>
+                                ${user.isBlocked ? 
+                                    `<button class="btn btn-success" onclick="unblockUser(${user.id})" style="padding: 0.5rem 1rem; font-size: 0.875rem;">
+                                        ✅ 해제
+                                    </button>` :
+                                    `<button class="btn btn-danger" onclick="blockUser(${user.id})" style="padding: 0.5rem 1rem; font-size: 0.875rem;">
+                                        🚫 차단
+                                    </button>`
+                                }
+                            </div>
+                        </td>
+                    </tr>
+                `).join('');
+                
+                tbody.innerHTML = rows;
+            }
+
+            // 페이지네이션 렌더링
+            function renderPagination(data) {
+                const pagination = document.getElementById('pagination');
+                const totalPages = data.totalPages;
+                const currentPageNum = data.number;
+                
+                let paginationHtml = '';
+                
+                // 이전 페이지
+                if (currentPageNum > 0) {
+                    paginationHtml += `<button class="btn" onclick="loadUsers(${currentPageNum - 1}, '${currentSearch}', '${currentStatus}')">이전</button>`;
+                }
+                
+                // 페이지 번호
+                for (let i = Math.max(0, currentPageNum - 2); i <= Math.min(totalPages - 1, currentPageNum + 2); i++) {
+                    paginationHtml += `<button class="btn ${i === currentPageNum ? 'btn-success' : ''}" 
+                                               onclick="loadUsers(${i}, '${currentSearch}', '${currentStatus}')">${i + 1}</button>`;
+                }
+                
+                // 다음 페이지
+                if (currentPageNum < totalPages - 1) {
+                    paginationHtml += `<button class="btn" onclick="loadUsers(${currentPageNum + 1}, '${currentSearch}', '${currentStatus}')">다음</button>`;
+                }
+                
+                pagination.innerHTML = paginationHtml;
+            }
+
+            // 사용자 검색
+            function searchUsers() {
+                const search = document.getElementById('searchInput').value;
+                const status = document.getElementById('statusFilter').value;
+                
+                currentSearch = search;
+                currentStatus = status;
+                currentPage = 0;
+                
+                loadUsers(currentPage, search, status);
+            }
+
+            // 검색 초기화
+            function resetSearch() {
+                document.getElementById('searchInput').value = '';
+                document.getElementById('statusFilter').value = '';
+                
+                currentSearch = '';
+                currentStatus = '';
+                currentPage = 0;
+                
+                loadUsers(currentPage, '', '');
+            }
+
+            // 사용자 차단
+            async function blockUser(userId) {
+                if (!confirm('이 사용자를 차단하시겠습니까?')) return;
+                
+                try {
+                    const response = await fetch(`/admin/users/${userId}/block`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' }
+                    });
+                    
+                    if (response.ok) {
+                        alert('사용자가 차단되었습니다.');
+                        loadUsers(currentPage, currentSearch, currentStatus);
+                    } else {
+                        alert('차단 처리에 실패했습니다.');
+                    }
+                } catch (error) {
+                    console.error('사용자 차단 실패:', error);
+                    alert('차단 처리 중 오류가 발생했습니다.');
+                }
+            }
+
+            // 사용자 차단 해제
+            async function unblockUser(userId) {
+                if (!confirm('이 사용자의 차단을 해제하시겠습니까?')) return;
+                
+                try {
+                    const response = await fetch(`/admin/users/${userId}/unblock`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' }
+                    });
+                    
+                    if (response.ok) {
+                        alert('사용자 차단이 해제되었습니다.');
+                        loadUsers(currentPage, currentSearch, currentStatus);
+                    } else {
+                        alert('차단 해제에 실패했습니다.');
+                    }
+                } catch (error) {
+                    console.error('사용자 차단 해제 실패:', error);
+                    alert('차단 해제 중 오류가 발생했습니다.');
+                }
+            }
+
+            // 사용자 상세 정보 보기
+            async function viewUserDetail(userId) {
+                try {
+                    const response = await fetch(`/admin/users/${userId}`);
+                    const user = await response.json();
+                    
+                    const modal = document.getElementById('userModal');
+                    const content = document.getElementById('userDetailContent');
+                    
+                    content.innerHTML = `
+                        <div style="margin-bottom: 1rem;">
+                            <strong>ID:</strong> ${user.id}
+                        </div>
+                        <div style="margin-bottom: 1rem;">
+                            <strong>이메일:</strong> ${user.email}
+                        </div>
+                        <div style="margin-bottom: 1rem;">
+                            <strong>이름:</strong> ${user.name || '-'}
+                        </div>
+                        <div style="margin-bottom: 1rem;">
+                            <strong>가입일:</strong> ${new Date(user.createdAt).toLocaleString()}
+                        </div>
+                        <div style="margin-bottom: 1rem;">
+                            <strong>상태:</strong> 
+                            <span class="badge ${user.isBlocked ? 'badge-blocked' : 'badge-active'}">
+                                ${user.isBlocked ? '차단' : '활성'}
+                            </span>
+                        </div>
+                    `;
+                    
+                    modal.style.display = 'block';
+                } catch (error) {
+                    console.error('사용자 상세 정보 로드 실패:', error);
+                    alert('사용자 정보를 불러올 수 없습니다.');
+                }
+            }
+
+            // 모달 닫기
+            function closeUserModal() {
+                document.getElementById('userModal').style.display = 'none';
+            }
+
+            // 새로고침
+            function refreshUsers() {
+                loadUsers(currentPage, currentSearch, currentStatus);
+            }
+
+            // 사용자 내보내기
+            function exportUsers() {
+                alert('사용자 데이터 내보내기 기능은 추후 구현 예정입니다.');
+            }
+
+            // 페이지 로드 시 사용자 목록 로드
+            document.addEventListener('DOMContentLoaded', () => {
+                loadUsers();
+            });
+
+            // 모달 외부 클릭 시 닫기
+            document.getElementById('userModal').addEventListener('click', (e) => {
+                if (e.target.id === 'userModal') {
+                    closeUserModal();
+                }
+            });
+        </script>
+    </div>
+</body>
+</html> 

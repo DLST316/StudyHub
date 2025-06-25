@@ -109,4 +109,12 @@ public class StudyService {
     public long countByLeader(User leader) {
         return studyRepository.countByLeader(leader);
     }
+
+    /**
+     * 최근 스터디 목록 조회 (홈페이지용)
+     * 최신순으로 정렬된 최근 스터디들을 반환합니다.
+     */
+    public List<Study> findRecentStudies() {
+        return studyRepository.findAllOrderByCreatedAtDesc();
+    }
 } 

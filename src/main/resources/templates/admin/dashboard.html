@@ -1,0 +1,134 @@
+<!-- templates/admin/dashboard.html -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/admin-layout :: adminLayout(~{::content})}">
+<head>
+    <title>StudyHub 관리자 - 대시보드</title>
+</head>
+<body>
+    <div th:fragment="content">
+        <!-- 페이지 헤더 -->
+        <div class="content-header">
+            <h1 class="page-title">관리자 대시보드</h1>
+            <p class="page-subtitle">StudyHub 플랫폼 현황을 한눈에 확인하세요</p>
+        </div>
+
+        <!-- 통계 카드 -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-title">전체 사용자</div>
+                <div class="stat-value" id="totalUsers">-</div>
+                <div class="stat-change">활성 사용자</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-title">전체 게시글</div>
+                <div class="stat-value" id="totalPosts">-</div>
+                <div class="stat-change">커뮤니티 활동</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-title">전체 스터디</div>
+                <div class="stat-value" id="totalStudies">-</div>
+                <div class="stat-change">진행중인 스터디</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-title">대기중인 신고</div>
+                <div class="stat-value" id="pendingReports">-</div>
+                <div class="stat-change">처리 필요</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-title">차단된 사용자</div>
+                <div class="stat-value" id="blockedUsers">-</div>
+                <div class="stat-change">관리 대상</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-title">전체 댓글</div>
+                <div class="stat-value" id="totalComments">-</div>
+                <div class="stat-change">커뮤니티 참여</div>
+            </div>
+        </div>
+
+        <!-- 최근 활동 섹션 -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 2rem;">
+            <!-- 최근 신고 -->
+            <div class="stat-card">
+                <h3 style="margin-bottom: 1rem; color: #FF5C38;">🚨 최근 신고</h3>
+                <div id="recentReports">
+                    <p style="text-align: center; color: #7FE7DC;">로딩 중...</p>
+                </div>
+            </div>
+
+            <!-- 빠른 액션 -->
+            <div class="stat-card">
+                <h3 style="margin-bottom: 1rem; color: #FF5C38;">⚡ 빠른 액션</h3>
+                <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                    <a href="/admin/users" class="btn">
+                        👥 사용자 관리
+                    </a>
+                    <a href="/admin/reports" class="btn">
+                        🚨 신고 처리
+                    </a>
+                    <a href="/admin/posts" class="btn">
+                        📝 게시글 관리
+                    </a>
+                    <a href="/admin/settings" class="btn">
+                        ⚙️ 시스템 설정
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            // 대시보드 데이터 로드
+            async function loadDashboardData() {
+                try {
+                    // 통계 데이터 로드
+                    const statsResponse = await fetch('/admin/dashboard/stats');
+                    const stats = await statsResponse.json();
+                    
+                    // 통계 카드 업데이트
+                    document.getElementById('totalUsers').textContent = stats.totalUsers || 0;
+                    document.getElementById('totalPosts').textContent = stats.totalPosts || 0;
+                    document.getElementById('totalStudies').textContent = stats.totalStudies || 0;
+                    document.getElementById('pendingReports').textContent = stats.pendingReports || 0;
+                    document.getElementById('blockedUsers').textContent = stats.blockedUsers || 0;
+                    document.getElementById('totalComments').textContent = stats.totalComments || 0;
+                    
+                    // 최근 신고 로드
+                    const reportsResponse = await fetch('/admin/dashboard/recent-reports');
+                    const reports = await reportsResponse.json();
+                    
+                    const reportsContainer = document.getElementById('recentReports');
+                    if (reports && reports.length > 0) {
+                        const reportsHtml = reports.slice(0, 5).map(report => `
+                            <div style="padding: 0.5rem 0; border-bottom: 1px solid rgba(255, 92, 56, 0.1);">
+                                <div style="font-size: 0.875rem; color: #F4EFE9;">
+                                    ${report.targetType} 신고
+                                </div>
+                                <div style="font-size: 0.75rem; color: #7FE7DC;">
+                                    ${new Date(report.reportedAt).toLocaleDateString()}
+                                </div>
+                            </div>
+                        `).join('');
+                        reportsContainer.innerHTML = reportsHtml;
+                    } else {
+                        reportsContainer.innerHTML = '<p style="text-align: center; color: #7FE7DC;">신고 내역이 없습니다.</p>';
+                    }
+                    
+                } catch (error) {
+                    console.error('대시보드 데이터 로드 실패:', error);
+                }
+            }
+
+            // 페이지 로드 시 데이터 로드
+            document.addEventListener('DOMContentLoaded', loadDashboardData);
+            
+            // 5분마다 데이터 새로고침
+            setInterval(loadDashboardData, 5 * 60 * 1000);
+        </script>
+    </div>
+</body>
+</html> 
