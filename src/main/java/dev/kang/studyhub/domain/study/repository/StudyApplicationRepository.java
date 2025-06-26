@@ -100,4 +100,9 @@ public interface StudyApplicationRepository extends JpaRepository<StudyApplicati
     List<StudyApplication> findByStudy(Study study);
 
     List<StudyApplication> findByUserAndStatus(User user, ApplicationStatus status);
+
+    /**
+     * 특정 스터디의 모든 신청 내역 삭제
+     */
+    void deleteByStudy(Study study);
 } 

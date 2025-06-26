@@ -28,6 +28,7 @@ public class StudyService {
 
     private final StudyRepository studyRepository;
     private final StudyApplicationService studyApplicationService;
+    private final StudyCommentService studyCommentService;
 
     /**
      * 스터디 생성
@@ -48,9 +49,20 @@ public class StudyService {
 
     /**
      * 스터디 삭제
+     * 스터디와 관련된 댓글들과 신청 내역을 먼저 삭제한 후 스터디를 삭제합니다.
      */
     @Transactional
     public void deleteStudy(Study study) {
+        // 스터디와 관련된 신청 내역들을 먼저 삭제
+        studyApplicationService.deleteAllByStudy(study);
+        
+        // 스터디와 관련된 댓글들을 먼저 삭제
+        List<dev.kang.studyhub.domain.study.entity.StudyComment> comments = studyCommentService.getCommentsByStudy(study);
+        for (dev.kang.studyhub.domain.study.entity.StudyComment comment : comments) {
+            studyCommentService.deleteComment(comment.getId(), comment.getUser());
+        }
+        
+        // 스터디 삭제
         studyRepository.delete(study);
     }
 

@@ -197,8 +197,8 @@ public class StudyController {
                 .orElseThrow(() -> new IllegalArgumentException("스터디를 찾을 수 없습니다."));
         
         User currentUser = getCurrentUser();
-        if (!study.isLeader(currentUser)) {
-            throw new IllegalStateException("스터디 개설자만 수정할 수 있습니다.");
+        if (!study.isLeader(currentUser) && !"ADMIN".equals(currentUser.getRole())) {
+            throw new IllegalStateException("스터디 개설자 또는 관리자만 수정할 수 있습니다.");
         }
         
         StudyForm studyForm = new StudyForm();
@@ -224,8 +224,8 @@ public class StudyController {
                 .orElseThrow(() -> new IllegalArgumentException("스터디를 찾을 수 없습니다."));
         
         User currentUser = getCurrentUser();
-        if (!study.isLeader(currentUser)) {
-            throw new IllegalStateException("스터디 개설자만 수정할 수 있습니다.");
+        if (!study.isLeader(currentUser) && !"ADMIN".equals(currentUser.getRole())) {
+            throw new IllegalStateException("스터디 개설자 또는 관리자만 수정할 수 있습니다.");
         }
         
         studyService.updateStudy(
@@ -250,8 +250,8 @@ public class StudyController {
                 .orElseThrow(() -> new IllegalArgumentException("스터디를 찾을 수 없습니다."));
         
         User currentUser = getCurrentUser();
-        if (!study.isLeader(currentUser)) {
-            throw new IllegalStateException("스터디 개설자만 삭제할 수 있습니다.");
+        if (!study.isLeader(currentUser) && !"ADMIN".equals(currentUser.getRole())) {
+            throw new IllegalStateException("스터디 개설자 또는 관리자만 삭제할 수 있습니다.");
         }
         
         studyService.deleteStudy(study);

@@ -161,4 +161,13 @@ public class StudyApplicationService {
                 .map(StudyApplication::getStudy)
                 .toList();
     }
+
+    /**
+     * 특정 스터디의 모든 신청 내역 삭제
+     * 스터디 삭제 시 호출됩니다.
+     */
+    @Transactional
+    public void deleteAllByStudy(Study study) {
+        studyApplicationRepository.deleteByStudy(study);
+    }
 } 

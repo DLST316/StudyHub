@@ -218,7 +218,19 @@ class StudyControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(view().name("error/400"))
-                .andExpect(model().attribute("message", "스터디 개설자만 수정할 수 있습니다."));
+                .andExpect(model().attribute("message", "스터디 개설자 또는 관리자만 수정할 수 있습니다."));
+    }
+
+    @Test
+    @WithMockUser(username = "admin@test.com")
+    @DisplayName("스터디 수정 폼 페이지 접근 - 어드민")
+    void showEditForm_AsAdmin() throws Exception {
+        // when & then
+        mockMvc.perform(get("/studies/edit/" + testStudy.getId()))
+                .andExpect(status().isOk())
+                .andExpect(view().name("study/form"))
+                .andExpect(model().attributeExists("studyForm"))
+                .andExpect(model().attribute("studyId", testStudy.getId()));
     }
 
     @Test
@@ -252,10 +264,19 @@ class StudyControllerTest {
     void deleteStudy_AsNonLeader() throws Exception {
         // when & then
         mockMvc.perform(post("/studies/delete/" + testStudy.getId()))
-                .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(view().name("error/400"))
-                .andExpect(model().attribute("message", "스터디 개설자만 삭제할 수 있습니다."));
+                .andExpect(model().attribute("message", "스터디 개설자 또는 관리자만 삭제할 수 있습니다."));
+    }
+
+    @Test
+    @WithMockUser(username = "admin@test.com")
+    @DisplayName("스터디 삭제 - 어드민")
+    void deleteStudy_AsAdmin() throws Exception {
+        // when & then
+        mockMvc.perform(post("/studies/delete/" + testStudy.getId()))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/studies"));
     }
 
     @Test
@@ -271,6 +292,29 @@ class StudyControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(view().name("study/my-studies"))
                 .andExpect(model().attributeExists("studies"));
+    }
+
+    @Test
+    @WithMockUser(username = "admin@test.com")
+    @DisplayName("스터디 수정 처리 - 어드민")
+    void updateStudy_AsAdmin() throws Exception {
+        // given
+        StudyForm studyForm = new StudyForm();
+        studyForm.setTitle("수정된 스터디 제목");
+        studyForm.setDescription("수정된 스터디 설명");
+        studyForm.setRecruitmentLimit(5);
+        studyForm.setRequirement("수정된 요구사항");
+        studyForm.setDeadline(LocalDate.now().plusDays(30));
+        
+        // when & then
+        mockMvc.perform(post("/studies/edit/" + testStudy.getId())
+                        .param("title", studyForm.getTitle())
+                        .param("description", studyForm.getDescription())
+                        .param("recruitmentLimit", String.valueOf(studyForm.getRecruitmentLimit()))
+                        .param("requirement", studyForm.getRequirement())
+                        .param("deadline", studyForm.getDeadline().toString()))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/studies/" + testStudy.getId()));
     }
 
     /**
