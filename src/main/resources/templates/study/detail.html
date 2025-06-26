@@ -594,6 +594,13 @@
 
             <!-- 스터디원인 경우 댓글 섹션 표시 -->
             <div th:if="${isMember}">
+                <!-- 어드민에게 특별 안내 메시지 -->
+                <div th:if="${isAdminNotMember}" 
+                     class="alert alert-info" role="alert">
+                    <strong>관리자 권한으로 댓글을 확인하고 있습니다.</strong> 
+                    이 스터디의 모든 댓글을 관리할 수 있습니다.
+                </div>
+
                 <!-- 댓글 작성 폼 -->
                 <div class="comment-form">
                     <form th:action="@{'/studies/' + ${study.id} + '/comments'}" method="post">

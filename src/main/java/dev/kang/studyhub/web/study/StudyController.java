@@ -130,7 +130,16 @@ public class StudyController {
             
             // 스터디 멤버인지 확인 (댓글 작성 권한)
             boolean isMember = studyApplicationService.isApprovedMember(currentUser, study);
+            // 어드민은 항상 댓글을 볼 수 있음
+            if ("ADMIN".equals(currentUser.getRole())) {
+                isMember = true;
+            }
             model.addAttribute("isMember", isMember);
+            
+            // 어드민이 스터디 멤버가 아닌 경우를 구분하기 위한 속성
+            boolean isAdminNotMember = "ADMIN".equals(currentUser.getRole()) && 
+                                     !studyApplicationService.isApprovedMember(currentUser, study);
+            model.addAttribute("isAdminNotMember", isAdminNotMember);
         } catch (IllegalStateException e) {
             model.addAttribute("currentUser", null);
             model.addAttribute("isLeader", false);

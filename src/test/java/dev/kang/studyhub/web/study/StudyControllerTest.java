@@ -2,6 +2,7 @@ package dev.kang.studyhub.web.study;
 
 import dev.kang.studyhub.domain.study.entity.Study;
 import dev.kang.studyhub.domain.user.entity.User;
+import dev.kang.studyhub.domain.user.repository.UserRepository;
 import dev.kang.studyhub.service.study.StudyApplicationService;
 import dev.kang.studyhub.service.study.StudyCommentService;
 import dev.kang.studyhub.service.study.StudyService;
@@ -52,9 +53,13 @@ class StudyControllerTest {
     @Autowired
     private StudyCommentService studyCommentService;
 
+    @Autowired
+    private UserRepository userRepository;
+
     private MockMvc mockMvc;
     private User testUser;
     private User otherUser;
+    private User adminUser;
     private Study testStudy;
 
     @BeforeEach
@@ -67,6 +72,7 @@ class StudyControllerTest {
         // 테스트 데이터 준비
         testUser = createTestUser("test@test.com", "테스트 사용자");
         otherUser = createTestUser("other@test.com", "다른 사용자");
+        adminUser = createTestAdminUser("admin@test.com", "관리자");
         testStudy = createTestStudy();
     }
 
@@ -139,6 +145,19 @@ class StudyControllerTest {
                 .andExpect(view().name("study/detail"))
                 .andExpect(model().attribute("study", testStudy))
                 .andExpect(model().attribute("isLeader", true));
+    }
+
+    @Test
+    @WithMockUser(username = "admin@test.com")
+    @DisplayName("스터디 상세 페이지 - 어드민 접근")
+    void viewStudy_AsAdmin() throws Exception {
+        // when & then
+        mockMvc.perform(get("/studies/" + testStudy.getId()))
+                .andExpect(status().isOk())
+                .andExpect(view().name("study/detail"))
+                .andExpect(model().attribute("study", testStudy))
+                .andExpect(model().attribute("isMember", true)) // 어드민은 댓글을 볼 수 있어야 함
+                .andExpect(model().attribute("isLeader", false)); // 스터디장은 아님
     }
 
     @Test
@@ -290,5 +309,15 @@ class StudyControllerTest {
                 .deadline(LocalDate.now().plusDays(30))
                 .build();
         return studyService.createStudy(study);
+    }
+
+    private User createTestAdminUser(String email, String name) {
+        User user = User.builder()
+                .email(email)
+                .name(name)
+                .password("password123")
+                .role("ADMIN")
+                .build();
+        return userRepository.save(user);
     }
 } 
