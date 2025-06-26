@@ -176,6 +176,22 @@ class StudyCommentControllerTest {
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("error:")));
     }
 
+    @Test
+    @WithMockUser(username = "admin@test.com", roles = "ADMIN")
+    @DisplayName("댓글 삭제 - 어드민 성공")
+    void deleteComment_AdminSuccess() throws Exception {
+        // given
+        User admin = createTestUser("admin@test.com");
+        User user = createTestUser("test@test.com");
+        Study study = createTestStudy(user, "테스트 스터디", "테스트 스터디입니다.");
+        StudyComment comment = createTestComment(user, study);
+
+        // when & then
+        mockMvc.perform(delete("/studies/" + study.getId() + "/comments/" + comment.getId()))
+                .andExpect(status().isOk())
+                .andExpect(content().string("success"));
+    }
+
     /**
      * 테스트용 사용자 생성
      */
@@ -193,7 +209,13 @@ class StudyCommentControllerTest {
         form.setMajor("컴퓨터공학과");
         form.setEducationStatus(dev.kang.studyhub.domain.user.model.EducationStatus.ENROLLED);
         userService.join(form);
-        return userService.findByEmail(email).orElseThrow();
+        User user = userService.findByEmail(email).orElseThrow();
+        // 어드민 계정이면 role을 ADMIN으로 변경
+        if (email.equals("admin@test.com")) {
+            user.setRole("ADMIN");
+            userRepository.save(user);
+        }
+        return user;
     }
 
     /**
