@@ -52,6 +52,8 @@ public class SecurityConfig {
                         .requestMatchers("/", "/join", "/login", "/css/**", "/js/**", "/images/**","/h2-console/**").permitAll()
                         // 이미지 업로드 API는 인증된 사용자만 접근 가능
                         .requestMatchers("/api/images/**").authenticated()
+                        // 어드민 페이지는 ADMIN 권한만 접근 가능
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
                         // 그 외 모든 요청은 인증이 필요 (authenticated)
                         .anyRequest().authenticated()
                 )
