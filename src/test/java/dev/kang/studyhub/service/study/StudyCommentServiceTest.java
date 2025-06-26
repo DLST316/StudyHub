@@ -41,6 +41,7 @@ class StudyCommentServiceTest {
 
     private User user;
     private User leader;
+    private User admin;
     private Study study;
     private StudyComment comment;
 
@@ -51,6 +52,8 @@ class StudyCommentServiceTest {
         user.setId(1L);
         leader = User.builder().name("스터디장").build();
         leader.setId(2L);
+        admin = User.builder().name("관리자").role("ADMIN").build();
+        admin.setId(3L);
         study = Study.builder().title("테스트 스터디").leader(leader).build();
         // Study 엔티티에 setId가 없으면 reflection 등으로 주입 필요
         try {
@@ -107,6 +110,24 @@ class StudyCommentServiceTest {
     }
 
     @Test
+    @DisplayName("어드민은 승인 여부와 관계없이 댓글을 작성할 수 있다")
+    void createComment_Admin_Success() {
+        // 저장 요청한 객체를 그대로 반환
+        when(studyCommentRepository.save(any(StudyComment.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        
+        // 어드민이 승인되지 않은 스터디에서도 댓글 작성 가능
+        when(studyApplicationService.isApprovedMember(admin, study)).thenReturn(false);
+        StudyComment result = studyCommentService.createComment("어드민 댓글", admin, study);
+        
+        assertThat(result.getContent()).isEqualTo("어드민 댓글");
+        assertThat(result.getUser()).isEqualTo(admin);
+        assertThat(result.getStudy()).isEqualTo(study);
+        
+        // studyApplicationService.isApprovedMember가 호출되지 않았는지 확인
+        verify(studyApplicationService, never()).isApprovedMember(admin, study);
+    }
+
+    @Test
     @DisplayName("승인되지 않은 사용자는 댓글 작성 시 예외가 발생한다")
     void createComment_NotApproved_ThrowsException() {
         when(studyApplicationService.isApprovedMember(user, study)).thenReturn(false);
@@ -129,7 +150,7 @@ class StudyCommentServiceTest {
         when(studyCommentRepository.findById(1L)).thenReturn(Optional.of(comment));
         assertThatThrownBy(() -> studyCommentService.updateComment(1L, "수정", other))
                 .isInstanceOf(IllegalStateException.class)
-                .hasMessageContaining("댓글 작성자만");
+                .hasMessageContaining("댓글 작성자 또는 관리자만");
     }
 
     @Test
@@ -138,6 +159,14 @@ class StudyCommentServiceTest {
         when(studyCommentRepository.findById(1L)).thenReturn(Optional.of(comment));
         StudyComment updated = studyCommentService.updateComment(1L, "수정된 내용", user);
         assertThat(updated.getContent()).isEqualTo("수정된 내용");
+    }
+
+    @Test
+    @DisplayName("어드민은 다른 사용자의 댓글을 수정할 수 있다")
+    void updateComment_Admin_Success() {
+        when(studyCommentRepository.findById(1L)).thenReturn(Optional.of(comment));
+        StudyComment updated = studyCommentService.updateComment(1L, "어드민이 수정한 내용", admin);
+        assertThat(updated.getContent()).isEqualTo("어드민이 수정한 내용");
     }
 
     @Test
@@ -154,13 +183,21 @@ class StudyCommentServiceTest {
     }
 
     @Test
+    @DisplayName("어드민은 모든 댓글을 삭제할 수 있다")
+    void deleteComment_Admin_Success() {
+        when(studyCommentRepository.findById(1L)).thenReturn(Optional.of(comment));
+        studyCommentService.deleteComment(1L, admin);
+        verify(studyCommentRepository).delete(comment);
+    }
+
+    @Test
     @DisplayName("댓글 작성자/스터디장이 아니면 댓글 삭제 시 예외가 발생한다")
     void deleteComment_NotAllowed_ThrowsException() {
         User stranger = User.builder().id(99L).build();
         when(studyCommentRepository.findById(1L)).thenReturn(Optional.of(comment));
         assertThatThrownBy(() -> studyCommentService.deleteComment(1L, stranger))
                 .isInstanceOf(IllegalStateException.class)
-                .hasMessageContaining("댓글 작성자 또는 스터디 개설자만");
+                .hasMessageContaining("댓글 작성자, 스터디 개설자 또는 관리자만");
     }
 
     @Test
