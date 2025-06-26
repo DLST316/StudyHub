@@ -686,8 +686,9 @@ body.post-detail-page .comment-submit {
     box-shadow: 0 1px 4px rgba(44,46,51,0.07) !important;
 }
 body.post-detail-page .comment-submit:hover {
-    background: var(--action-color) !important;
-    color: var(--primary-color) !important;
+    background: linear-gradient(135deg, #FF7A5A, #FF5C38);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 92, 56, 0.3);
 }
 
 body.post-detail-page .post-detail-main {
@@ -699,4 +700,119 @@ body.post-detail-page .post-detail-main {
     width: 100% !important;
     padding-top: 0 !important;
     padding-bottom: 0 !important;
+}
+
+/* 댓글 수정 폼 스타일 */
+.comment-edit-form {
+    display: none;
+    margin-top: 1rem;
+    padding: 1rem;
+    background: rgba(244, 239, 233, 0.1);
+    border-radius: 10px;
+    border: 1px solid rgba(255, 92, 56, 0.2);
+}
+
+.comment-edit-textarea {
+    width: 100%;
+    min-height: 80px;
+    padding: 0.75rem;
+    border: 1px solid rgba(255, 92, 56, 0.3);
+    border-radius: 8px;
+    background: rgba(244, 239, 233, 0.9);
+    color: var(--primary-color);
+    font-size: 0.95rem;
+    line-height: 1.5;
+    resize: vertical;
+    margin-bottom: 0.75rem;
+}
+
+.comment-edit-textarea:focus {
+    outline: none;
+    border-color: var(--brand-color);
+    box-shadow: 0 0 0 3px rgba(255, 92, 56, 0.1);
+}
+
+.comment-edit-actions {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: flex-end;
+}
+
+.comment-save-btn,
+.comment-cancel-btn {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.comment-save-btn {
+    background: linear-gradient(135deg, var(--brand-color), #FF7A5A);
+    color: white;
+}
+
+.comment-save-btn:hover {
+    background: linear-gradient(135deg, #FF7A5A, var(--brand-color));
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(255, 92, 56, 0.3);
+}
+
+.comment-cancel-btn {
+    background: rgba(244, 239, 233, 0.2);
+    color: var(--text-primary);
+    border: 1px solid rgba(244, 239, 233, 0.3);
+}
+
+.comment-cancel-btn:hover {
+    background: rgba(244, 239, 233, 0.3);
+    transform: translateY(-1px);
+}
+
+/* 스터디 상세 페이지용 댓글 수정 폼 스타일 */
+body.post-detail-page .comment-edit-form {
+    background: rgba(244, 239, 233, 0.1) !important;
+    border: 1px solid rgba(255, 92, 56, 0.2) !important;
+    border-radius: 10px !important;
+    padding: 1rem !important;
+    margin-top: 1rem !important;
+}
+
+body.post-detail-page .comment-edit-textarea {
+    background: rgba(244, 239, 233, 0.9) !important;
+    color: var(--primary-color) !important;
+    border: 1px solid rgba(255, 92, 56, 0.3) !important;
+    border-radius: 8px !important;
+    padding: 0.75rem !important;
+    font-size: 0.95rem !important;
+    line-height: 1.5 !important;
+}
+
+body.post-detail-page .comment-edit-textarea:focus {
+    border-color: var(--brand-color) !important;
+    box-shadow: 0 0 0 3px rgba(255, 92, 56, 0.1) !important;
+}
+
+body.post-detail-page .comment-save-btn {
+    background: linear-gradient(135deg, var(--brand-color), #FF7A5A) !important;
+    color: white !important;
+}
+
+body.post-detail-page .comment-save-btn:hover {
+    background: linear-gradient(135deg, #FF7A5A, var(--brand-color)) !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 12px rgba(255, 92, 56, 0.3) !important;
+}
+
+body.post-detail-page .comment-cancel-btn {
+    background: rgba(244, 239, 233, 0.2) !important;
+    color: var(--text-primary) !important;
+    border: 1px solid rgba(244, 239, 233, 0.3) !important;
+}
+
+body.post-detail-page .comment-cancel-btn:hover {
+    background: rgba(244, 239, 233, 0.3) !important;
+    transform: translateY(-1px) !important;
 } 

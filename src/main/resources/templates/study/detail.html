@@ -630,8 +630,8 @@
                         </div>
                         
                         <!-- 댓글 수정 폼 -->
-                        <div class="comment-edit-form" th:attr="id='edit-form-' + ${comment.id}">
-                            <textarea class="comment-edit-textarea" th:attr="id='edit-textarea-${comment.id}'"></textarea>
+                        <div class="comment-edit-form" th:attr="id='edit-form-' + ${comment.id}" style="display: none;">
+                            <textarea class="comment-edit-textarea" th:attr="id='edit-textarea-' + ${comment.id}" th:text="${comment.content}"></textarea>
                             <div class="comment-edit-actions">
                                 <button class="comment-save-btn" th:attr="onclick='saveComment(' + ${comment.id} + ')'">저장</button>
                                 <button class="comment-cancel-btn" th:attr="onclick='cancelEdit(' + ${comment.id} + ')'">취소</button>
@@ -649,39 +649,36 @@
         function editComment(commentId) {
             const commentItem = document.querySelector(`[data-comment-id="${commentId}"]`);
             const contentDiv = commentItem.querySelector('.comment-content');
-            const editForm = commentItem.querySelector(`#edit-form-${commentId}`);
-            const editTextarea = commentItem.querySelector(`#edit-textarea-${commentId}`);
-            
-            // 현재 내용을 textarea에 설정
-            editTextarea.value = contentDiv.textContent.trim();
-            
-            // 수정 폼 표시
-            editForm.style.display = 'block';
+            const editForm = document.getElementById('edit-form-' + commentId);
+            const editTextarea = document.getElementById('edit-textarea-' + commentId);
+            if (!editTextarea.value) {
+                editTextarea.value = contentDiv.textContent.trim();
+            }
+            // !important로 강제 적용
+            editForm.style.setProperty('display', 'block', 'important');
             contentDiv.style.display = 'none';
+            editTextarea.focus();
         }
 
         // 댓글 수정 취소
         function cancelEdit(commentId) {
             const commentItem = document.querySelector(`[data-comment-id="${commentId}"]`);
             const contentDiv = commentItem.querySelector('.comment-content');
-            const editForm = commentItem.querySelector(`#edit-form-${commentId}`);
-            
-            // 수정 폼 숨김
-            editForm.style.display = 'none';
+            const editForm = document.getElementById('edit-form-' + commentId);
+            // !important로 강제 적용
+            editForm.style.setProperty('display', 'none', 'important');
             contentDiv.style.display = 'block';
         }
 
         // 댓글 수정 저장
         function saveComment(commentId) {
             const commentItem = document.querySelector(`[data-comment-id="${commentId}"]`);
-            const editTextarea = commentItem.querySelector(`#edit-textarea-${commentId}`);
+            const editTextarea = document.getElementById('edit-textarea-' + commentId);
             const content = editTextarea.value.trim();
-            
             if (!content) {
                 alert('댓글 내용을 입력해주세요.');
                 return;
             }
-
             fetch(`/studies/[[${study.id}]]/comments/${commentId}`, {
                 method: 'PUT',
                 headers: {
@@ -692,7 +689,6 @@
             .then(response => response.text())
             .then(result => {
                 if (result === 'success') {
-                    // 성공 시 페이지 새로고침
                     location.reload();
                 } else {
                     alert('댓글 수정에 실패했습니다.');
