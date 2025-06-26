@@ -75,7 +75,6 @@ class CommunityControllerTest {
     void setUp() {
         mockMvc = MockMvcBuilders
                 .standaloneSetup(communityController)
-                .apply(springSecurity())
                 .build();
 
         // 테스트 데이터 준비
@@ -86,12 +85,11 @@ class CommunityControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "test@test.com")
     @DisplayName("커뮤니티 목록 페이지 접근")
     void communityList() throws Exception {
         // given
         Page<Post> postPage = new PageImpl<>(List.of(testPost));
-        when(postService.findPostsByBoard(any(), any(PageRequest.class))).thenReturn(postPage);
+        when(postService.getPosts(any(), any(PageRequest.class))).thenReturn(postPage);
         when(boardService.getCommunityBoard()).thenReturn(communityBoard);
 
         // when & then
@@ -100,16 +98,15 @@ class CommunityControllerTest {
                 .andExpect(view().name("community/community"))
                 .andExpect(model().attributeExists("posts"));
 
-        verify(postService, times(1)).findPostsByBoard(any(), any(PageRequest.class));
+        verify(postService, times(1)).getPosts(any(), any(PageRequest.class));
     }
 
     @Test
-    @WithMockUser(username = "test@test.com")
     @DisplayName("커뮤니티 목록 페이지 - 페이징")
     void communityList_WithPaging() throws Exception {
         // given
         Page<Post> postPage = new PageImpl<>(List.of(testPost));
-        when(postService.findPostsByBoard(any(), any(PageRequest.class))).thenReturn(postPage);
+        when(postService.getPosts(any(), any(PageRequest.class))).thenReturn(postPage);
         when(boardService.getCommunityBoard()).thenReturn(communityBoard);
 
         // when & then
@@ -118,7 +115,7 @@ class CommunityControllerTest {
                 .andExpect(view().name("community/community"))
                 .andExpect(model().attributeExists("posts"));
 
-        verify(postService, times(1)).findPostsByBoard(any(), any(PageRequest.class));
+        verify(postService, times(1)).getPosts(any(), any(PageRequest.class));
     }
 
     @Test
@@ -285,8 +282,7 @@ class CommunityControllerTest {
     void deleteComment_Success() throws Exception {
         // given
         when(userService.findByEmail("test@test.com")).thenReturn(Optional.of(testUser));
-        when(commentService.findById(testComment.getId())).thenReturn(Optional.of(testComment));
-        when(commentService.deleteComment(any(), any())).thenReturn("댓글이 삭제되었습니다.");
+        when(commentService.getComment(testComment.getId())).thenReturn(testComment);
 
         // when & then
         mockMvc.perform(post("/community/comment/" + testComment.getId() + "/delete"))
@@ -294,8 +290,83 @@ class CommunityControllerTest {
                 .andExpect(content().string("댓글이 삭제되었습니다."));
 
         verify(userService, times(1)).findByEmail("test@test.com");
-        verify(commentService, times(1)).findById(testComment.getId());
-        verify(commentService, times(1)).deleteComment(any(), any());
+        verify(commentService, times(1)).getComment(testComment.getId());
+        verify(commentService, times(1)).deleteComment(testComment.getId());
+    }
+
+    @Test
+    @WithMockUser(username = "test@test.com")
+    @DisplayName("게시글 삭제 - 작성자 성공")
+    void deletePost_Success() throws Exception {
+        // given
+        when(userService.findByEmail("test@test.com")).thenReturn(Optional.of(testUser));
+        when(postService.getPost(testPost.getId())).thenReturn(testPost);
+
+        // when & then
+        mockMvc.perform(post("/community/post/" + testPost.getId() + "/delete"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/community?success=deleted"));
+
+        verify(userService, times(1)).findByEmail("test@test.com");
+        verify(postService, times(1)).getPost(testPost.getId());
+        verify(postService, times(1)).deletePost(testPost.getId());
+    }
+
+    @Test
+    @WithMockUser(username = "admin@test.com")
+    @DisplayName("게시글 삭제 - 어드민 성공")
+    void deletePost_AdminSuccess() throws Exception {
+        // given
+        User adminUser = createMockAdminUser();
+        when(userService.findByEmail("admin@test.com")).thenReturn(Optional.of(adminUser));
+        when(postService.getPost(testPost.getId())).thenReturn(testPost);
+
+        // when & then
+        mockMvc.perform(post("/community/post/" + testPost.getId() + "/delete"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/community?success=deleted"));
+
+        verify(userService, times(1)).findByEmail("admin@test.com");
+        verify(postService, times(1)).getPost(testPost.getId());
+        verify(postService, times(1)).deletePost(testPost.getId());
+    }
+
+    @Test
+    @WithMockUser(username = "other@test.com")
+    @DisplayName("게시글 삭제 - 권한 없음")
+    void deletePost_NoPermission() throws Exception {
+        // given
+        User otherUser = createMockOtherUser();
+        when(userService.findByEmail("other@test.com")).thenReturn(Optional.of(otherUser));
+        when(postService.getPost(testPost.getId())).thenReturn(testPost);
+
+        // when & then
+        mockMvc.perform(post("/community/post/" + testPost.getId() + "/delete"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/community/post/" + testPost.getId() + "?error=permission"));
+
+        verify(userService, times(1)).findByEmail("other@test.com");
+        verify(postService, times(1)).getPost(testPost.getId());
+        verify(postService, never()).deletePost(any());
+    }
+
+    @Test
+    @WithMockUser(username = "admin@test.com")
+    @DisplayName("댓글 삭제 - 어드민 성공")
+    void deleteComment_AdminSuccess() throws Exception {
+        // given
+        User adminUser = createMockAdminUser();
+        when(userService.findByEmail("admin@test.com")).thenReturn(Optional.of(adminUser));
+        when(commentService.getComment(testComment.getId())).thenReturn(testComment);
+
+        // when & then
+        mockMvc.perform(post("/community/comment/" + testComment.getId() + "/delete"))
+                .andExpect(status().isOk())
+                .andExpect(content().string("댓글이 삭제되었습니다."));
+
+        verify(userService, times(1)).findByEmail("admin@test.com");
+        verify(commentService, times(1)).getComment(testComment.getId());
+        verify(commentService, times(1)).deleteComment(testComment.getId());
     }
 
     /**
@@ -345,10 +416,28 @@ class CommunityControllerTest {
     private PostComment createMockComment() {
         PostComment comment = new PostComment();
         comment.setId(1L);
-        comment.setContent("테스트 댓글");
-        comment.setUser(testUser);
         comment.setPost(testPost);
+        comment.setUser(testUser);
+        comment.setContent("테스트 댓글");
         comment.setCreatedAt(LocalDateTime.now());
         return comment;
+    }
+
+    private User createMockAdminUser() {
+        User adminUser = new User();
+        adminUser.setId(2L);
+        adminUser.setEmail("admin@test.com");
+        adminUser.setName("관리자");
+        adminUser.setRole("ADMIN");
+        return adminUser;
+    }
+
+    private User createMockOtherUser() {
+        User otherUser = new User();
+        otherUser.setId(3L);
+        otherUser.setEmail("other@test.com");
+        otherUser.setName("다른사용자");
+        otherUser.setRole("USER");
+        return otherUser;
     }
 } 

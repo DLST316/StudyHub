@@ -20,6 +20,16 @@
 <div th:replace="~{layout/layout :: layout(~{::section})}">
     <section>
         <main class="container post-detail-main">
+            <!-- 에러/성공 메시지 표시 -->
+            <div th:if="${param.error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                <div th:switch="${param.error}">
+                    <span th:case="'permission'">게시글 삭제 권한이 없습니다.</span>
+                    <span th:case="'delete_failed'">게시글 삭제에 실패했습니다.</span>
+                    <span th:case="*">오류가 발생했습니다.</span>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            
             <section class="post-detail-container">
                 <header class="post-header">
                     <h1 class="post-title-detail" th:text="${post.title}">게시글 제목</h1>

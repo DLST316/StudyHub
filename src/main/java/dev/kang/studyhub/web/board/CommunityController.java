@@ -154,9 +154,9 @@ public class CommunityController {
             User user = userService.findByEmail(userDetails.getUsername()).orElseThrow();
             PostComment comment = commentService.getComment(commentId);
             
-            // 댓글 작성자만 삭제 가능
-            if (!comment.getUser().getId().equals(user.getId())) {
-                return ResponseEntity.status(403).body("댓글 작성자만 삭제할 수 있습니다.");
+            // 댓글 작성자이거나 어드민인 경우에만 삭제 가능
+            if (!comment.getUser().getId().equals(user.getId()) && !"ADMIN".equals(user.getRole())) {
+                return ResponseEntity.status(403).body("댓글 작성자 또는 관리자만 삭제할 수 있습니다.");
             }
             
             commentService.deleteComment(commentId);
@@ -164,6 +164,30 @@ public class CommunityController {
             
         } catch (Exception e) {
             return ResponseEntity.status(500).body("댓글 삭제 중 오류가 발생했습니다.");
+        }
+    }
+
+    /** 게시글 삭제 */
+    @PostMapping("/post/{id}/delete")
+    public String deletePost(@PathVariable Long id, @AuthenticationPrincipal UserDetails userDetails) {
+        if (userDetails == null) {
+            return "redirect:/login";
+        }
+        
+        try {
+            User user = userService.findByEmail(userDetails.getUsername()).orElseThrow();
+            Post post = postService.getPost(id);
+            
+            // 게시글 작성자이거나 어드민인 경우에만 삭제 가능
+            if (!post.getUser().getId().equals(user.getId()) && !"ADMIN".equals(user.getRole())) {
+                return "redirect:/community/post/" + id + "?error=permission";
+            }
+            
+            postService.deletePost(id);
+            return "redirect:/community?success=deleted";
+            
+        } catch (Exception e) {
+            return "redirect:/community/post/" + id + "?error=delete_failed";
         }
     }
 } 

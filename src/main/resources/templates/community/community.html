@@ -18,6 +18,15 @@
 <div th:replace="~{layout/layout :: layout(~{::section})}">
     <section>
         <div class="container">
+            <!-- 성공 메시지 표시 -->
+            <div th:if="${param.success}" class="alert alert-success alert-dismissible fade show" role="alert">
+                <div th:switch="${param.success}">
+                    <span th:case="'deleted'">게시글이 성공적으로 삭제되었습니다.</span>
+                    <span th:case="*">작업이 완료되었습니다.</span>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            
             <!-- 커뮤니티 헤더 -->
             <div class="community-container">
                 <div class="community-header">
