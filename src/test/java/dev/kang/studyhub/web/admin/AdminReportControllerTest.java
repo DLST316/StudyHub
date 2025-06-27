@@ -52,12 +52,14 @@ class AdminReportControllerTest {
 
     @BeforeEach
     void setUp() {
-        // 테스트 데이터 준비
+        // 테스트용 사용자 생성
         testUser = User.builder()
-                .id(1L)
                 .name("테스트 사용자")
-                .email("test@example.com")
+                .username("admin_report_test_user")
+                .email("test@test.com")
+                .password("password")
                 .role("USER")
+                .isBlocked(false)
                 .build();
 
         testReport = Report.createReport(

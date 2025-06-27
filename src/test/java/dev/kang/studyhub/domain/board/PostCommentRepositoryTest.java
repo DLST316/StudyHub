@@ -53,8 +53,9 @@ class PostCommentRepositoryTest {
         userRepository.deleteAll();
 
         user = User.builder()
-                .name("댓글작성자")
-                .email("commenter@test.com")
+                .name("테스트 사용자")
+                .username("post_comment_test_user")
+                .email("test@test.com")
                 .password("password")
                 .role("USER")
                 .isBlocked(false)

@@ -1,8 +1,9 @@
-// StudyHub ERD - MVP 확정 버전(V4, 추천 시스템 변경)
+// StudyHub ERD - MVP 확정 버전(V5, 아이디 기반 인증 시스템)
 
 Table users {
   id int [pk, increment]
-  email varchar [unique, not null]
+  username varchar(50) [unique, not null, note: '로그인용 아이디']
+  email varchar(100) [unique, note: '연락처용 이메일 (선택사항)']
   password varchar(60) [not null, note: 'bcrypt 대응']
   name varchar [not null]
   education_status varchar [not null, note: '재학, 졸업, 중퇴, 휴학 등']

@@ -201,6 +201,12 @@
             </div>
 
             <div class="form-group">
+                <label for="username">아이디</label>
+                <input type="text" th:field="*{username}" id="username" placeholder="아이디를 입력하세요" />
+                <div th:if="${#fields.hasErrors('username')}" class="error-message" th:errors="*{username}"></div>
+            </div>
+
+            <div class="form-group">
                 <label for="email">이메일</label>
                 <input type="email" th:field="*{email}" id="email" placeholder="이메일을 입력하세요" />
                 <div th:if="${#fields.hasErrors('email')}" class="error-message" th:errors="*{email}"></div>

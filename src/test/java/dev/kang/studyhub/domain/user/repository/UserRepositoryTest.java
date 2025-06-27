@@ -41,6 +41,7 @@ class UserRepositoryTest {
         // 테스트용 사용자 생성
         user1 = User.builder()
                 .name("테스트 사용자1")
+                .username("testuser1")
                 .email("test1@example.com")
                 .password("password123")
                 .role("USER")
@@ -53,6 +54,7 @@ class UserRepositoryTest {
 
         user2 = User.builder()
                 .name("테스트 사용자2")
+                .username("testuser2")
                 .email("test2@example.com")
                 .password("password456")
                 .role("USER")
@@ -65,6 +67,7 @@ class UserRepositoryTest {
 
         blockedUser = User.builder()
                 .name("차단된 사용자")
+                .username("blockeduser")
                 .email("blocked@example.com")
                 .password("password789")
                 .role("USER")
@@ -77,6 +80,7 @@ class UserRepositoryTest {
 
         adminUser = User.builder()
                 .name("관리자")
+                .username("admin")
                 .email("admin@example.com")
                 .password("admin123")
                 .role("ADMIN")
@@ -151,6 +155,7 @@ class UserRepositoryTest {
         // given
         User newUser = User.builder()
                 .name("새로운 사용자")
+                .username("newuser")
                 .email("new@example.com")
                 .password("newpassword")
                 .role("USER")

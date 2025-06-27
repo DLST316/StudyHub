@@ -52,6 +52,7 @@ class CustomUserDetailsServiceTest {
         testUser = User.builder()
                 .id(1L)
                 .name("테스트 사용자")
+                .username("testuser")
                 .email("test@example.com")
                 .password("encodedPassword123")
                 .university("테스트 대학교")
@@ -63,33 +64,65 @@ class CustomUserDetailsServiceTest {
 
     @Test
     @DisplayName("이메일로 사용자를 찾아 UserDetails를 반환해야 한다")
-    void loadUserByUsername_Success() {
+    void loadUserByUsername_ValidEmail_ReturnsUserDetails() {
         // given
-        String email = "test@example.com";
-        when(userRepository.findByEmail(email)).thenReturn(Optional.of(testUser));
+        when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(testUser));
 
         // when
-        UserDetails userDetails = customUserDetailsService.loadUserByUsername(email);
+        UserDetails userDetails = customUserDetailsService.loadUserByUsername("testuser");
 
         // then
         assertThat(userDetails).isNotNull();
-        assertThat(userDetails.getUsername()).isEqualTo(email);
-        assertThat(userDetails.getPassword()).isEqualTo(testUser.getPassword());
+        assertThat(userDetails.getUsername()).isEqualTo("testuser");
+        assertThat(userDetails.getPassword()).isEqualTo("encodedPassword123");
         assertThat(userDetails.getAuthorities()).hasSize(1);
         assertThat(userDetails.getAuthorities().iterator().next().getAuthority()).isEqualTo("ROLE_USER");
     }
 
     @Test
     @DisplayName("존재하지 않는 이메일로 조회 시 UsernameNotFoundException이 발생해야 한다")
-    void loadUserByUsername_UserNotFound_ThrowsException() {
+    void loadUserByUsername_InvalidEmail_ThrowsException() {
         // given
-        String email = "nonexistent@example.com";
-        when(userRepository.findByEmail(email)).thenReturn(Optional.empty());
+        when(userRepository.findByUsername("nonexistent@example.com")).thenReturn(Optional.empty());
 
         // when & then
-        assertThatThrownBy(() -> customUserDetailsService.loadUserByUsername(email))
+        assertThatThrownBy(() -> customUserDetailsService.loadUserByUsername("nonexistent@example.com"))
                 .isInstanceOf(UsernameNotFoundException.class)
-                .hasMessage("User not found: " + email);
+                .hasMessage("사용자를 찾을 수 없습니다: nonexistent@example.com");
+    }
+
+    @Test
+    @DisplayName("null로 조회 시에도 예외가 발생해야 한다")
+    void loadUserByUsername_NullEmail_ThrowsException() {
+        // when & then
+        assertThatThrownBy(() -> customUserDetailsService.loadUserByUsername(null))
+                .isInstanceOf(UsernameNotFoundException.class)
+                .hasMessage("사용자를 찾을 수 없습니다: null");
+    }
+
+    @Test
+    @DisplayName("빈 문자열로 조회 시에도 예외가 발생해야 한다")
+    void loadUserByUsername_EmptyEmail_ThrowsException() {
+        // when & then
+        assertThatThrownBy(() -> customUserDetailsService.loadUserByUsername(""))
+                .isInstanceOf(UsernameNotFoundException.class)
+                .hasMessage("사용자를 찾을 수 없습니다: ");
+    }
+
+    @Test
+    @DisplayName("UserDetails 객체가 Spring Security에서 사용할 수 있는 형태로 생성되어야 한다")
+    void loadUserByUsername_ValidUser_ReturnsProperUserDetails() {
+        // given
+        when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(testUser));
+
+        // when
+        UserDetails userDetails = customUserDetailsService.loadUserByUsername("testuser");
+
+        // then
+        assertThat(userDetails.isEnabled()).isTrue();
+        assertThat(userDetails.isAccountNonExpired()).isTrue();
+        assertThat(userDetails.isCredentialsNonExpired()).isTrue();
+        assertThat(userDetails.isAccountNonLocked()).isTrue();
     }
 
     @Test
@@ -99,60 +132,19 @@ class CustomUserDetailsServiceTest {
         User adminUser = User.builder()
                 .id(2L)
                 .name("관리자")
+                .username("admin")
                 .email("admin@example.com")
                 .password("adminPassword123")
                 .role("ADMIN")
                 .build();
         
-        when(userRepository.findByEmail("admin@example.com")).thenReturn(Optional.of(adminUser));
+        when(userRepository.findByUsername("admin")).thenReturn(Optional.of(adminUser));
 
         // when
-        UserDetails userDetails = customUserDetailsService.loadUserByUsername("admin@example.com");
+        UserDetails userDetails = customUserDetailsService.loadUserByUsername("admin");
 
         // then
         assertThat(userDetails.getAuthorities()).hasSize(1);
         assertThat(userDetails.getAuthorities().iterator().next().getAuthority()).isEqualTo("ROLE_ADMIN");
-    }
-
-    @Test
-    @DisplayName("UserDetails 객체가 Spring Security에서 사용할 수 있는 형태로 생성되어야 한다")
-    void loadUserByUsername_CreatesValidUserDetails() {
-        // given
-        String email = "test@example.com";
-        when(userRepository.findByEmail(email)).thenReturn(Optional.of(testUser));
-
-        // when
-        UserDetails userDetails = customUserDetailsService.loadUserByUsername(email);
-
-        // then
-        assertThat(userDetails.isAccountNonExpired()).isTrue();
-        assertThat(userDetails.isAccountNonLocked()).isTrue();
-        assertThat(userDetails.isCredentialsNonExpired()).isTrue();
-        assertThat(userDetails.isEnabled()).isTrue();
-    }
-
-    @Test
-    @DisplayName("빈 문자열로 조회 시에도 예외가 발생해야 한다")
-    void loadUserByUsername_EmptyEmail_ThrowsException() {
-        // given
-        String email = "";
-        when(userRepository.findByEmail(email)).thenReturn(Optional.empty());
-
-        // when & then
-        assertThatThrownBy(() -> customUserDetailsService.loadUserByUsername(email))
-                .isInstanceOf(UsernameNotFoundException.class)
-                .hasMessage("User not found: " + email);
-    }
-
-    @Test
-    @DisplayName("null로 조회 시에도 예외가 발생해야 한다")
-    void loadUserByUsername_NullEmail_ThrowsException() {
-        // given
-        when(userRepository.findByEmail(null)).thenReturn(Optional.empty());
-
-        // when & then
-        assertThatThrownBy(() -> customUserDetailsService.loadUserByUsername(null))
-                .isInstanceOf(UsernameNotFoundException.class)
-                .hasMessage("User not found: null");
     }
 } 

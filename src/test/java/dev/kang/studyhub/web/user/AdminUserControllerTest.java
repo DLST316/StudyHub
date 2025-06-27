@@ -312,6 +312,7 @@ class AdminUserControllerTest {
     private User createAdminUser() {
         return User.builder()
                 .name("관리자")
+                .username("admin")
                 .email("admin@test.com")
                 .password("password")
                 .university("테스트 대학교")
@@ -328,6 +329,7 @@ class AdminUserControllerTest {
     private User createRegularUser() {
         return User.builder()
                 .name("일반 사용자")
+                .username("user")
                 .email("user@test.com")
                 .password("password")
                 .university("테스트 대학교")
@@ -344,6 +346,7 @@ class AdminUserControllerTest {
     private User createBlockedUser() {
         return User.builder()
                 .name("차단된 사용자")
+                .username("blocked")
                 .email("blocked@test.com")
                 .password("password")
                 .university("테스트 대학교")

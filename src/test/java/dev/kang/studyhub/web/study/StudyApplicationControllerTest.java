@@ -67,13 +67,13 @@ class StudyApplicationControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "other@test.com")
+    @WithMockUser(username = "otheruser")
     @DisplayName("스터디 신청 - 성공")
     void applyForStudy_Success() throws Exception {
         // given
-        User leader = createTestUser("test@test.com", "테스트 사용자");
-        User applicant = createTestUser("other@test.com", "다른 사용자");
-        Study study = createTestStudy("test@test.com", "테스트 스터디", "테스트 스터디입니다.");
+        User leader = createTestUser("testuser", "테스트 사용자");
+        User applicant = createTestUser("otheruser", "다른 사용자");
+        Study study = createTestStudy("testuser", "테스트 스터디", "테스트 스터디입니다.");
         
         // when & then
         mockMvc.perform(post("/studies/" + study.getId() + "/apply"))
@@ -82,12 +82,12 @@ class StudyApplicationControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "test@test.com")
+    @WithMockUser(username = "testuser")
     @DisplayName("스터디 신청 - 스터디장이 신청 시도")
     void applyForStudy_AsLeader() throws Exception {
         // given
-        User leader = createTestUser("test@test.com", "테스트 사용자");
-        Study study = createTestStudy("test@test.com", "테스트 스터디", "테스트 스터디입니다.");
+        User leader = createTestUser("testuser", "테스트 사용자");
+        Study study = createTestStudy("testuser", "테스트 스터디", "테스트 스터디입니다.");
         
         // when & then
         mockMvc.perform(post("/studies/" + study.getId() + "/apply"))
@@ -96,13 +96,13 @@ class StudyApplicationControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "other@test.com")
+    @WithMockUser(username = "otheruser")
     @DisplayName("스터디 신청 취소 - 성공")
     void cancelApplication_Success() throws Exception {
         // given
-        User leader = createTestUser("test@test.com", "테스트 사용자");
-        User applicant = createTestUser("other@test.com", "다른 사용자");
-        Study study = createTestStudy("test@test.com", "테스트 스터디", "테스트 스터디입니다.");
+        User leader = createTestUser("testuser", "테스트 사용자");
+        User applicant = createTestUser("otheruser", "다른 사용자");
+        Study study = createTestStudy("testuser", "테스트 스터디", "테스트 스터디입니다.");
         studyApplicationService.apply(applicant, study);
 
         // when & then
@@ -112,13 +112,13 @@ class StudyApplicationControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "test@test.com")
+    @WithMockUser(username = "testuser")
     @DisplayName("스터디 신청자 목록 조회 - 스터디장")
     void listApplications_AsLeader() throws Exception {
         // given
-        User leader = createTestUser("test@test.com", "테스트 사용자");
-        User applicant = createTestUser("other@test.com", "다른 사용자");
-        Study study = createTestStudy("test@test.com", "테스트 스터디", "테스트 스터디입니다.");
+        User leader = createTestUser("testuser", "테스트 사용자");
+        User applicant = createTestUser("otheruser", "다른 사용자");
+        Study study = createTestStudy("testuser", "테스트 스터디", "테스트 스터디입니다.");
         studyApplicationService.apply(applicant, study);
 
         // when & then
@@ -130,13 +130,13 @@ class StudyApplicationControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "other@test.com")
+    @WithMockUser(username = "otheruser")
     @DisplayName("스터디 신청자 목록 조회 - 일반 사용자")
     void listApplications_AsNonLeader() throws Exception {
         // given
-        User leader = createTestUser("test@test.com", "테스트 사용자");
-        User applicant = createTestUser("other@test.com", "다른 사용자");
-        Study study = createTestStudy("test@test.com", "테스트 스터디", "테스트 스터디입니다.");
+        User leader = createTestUser("testuser", "테스트 사용자");
+        User applicant = createTestUser("otheruser", "다른 사용자");
+        Study study = createTestStudy("testuser", "테스트 스터디", "테스트 스터디입니다.");
         
         // when & then
         mockMvc.perform(get("/studies/" + study.getId() + "/applications"))
@@ -145,13 +145,13 @@ class StudyApplicationControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "test@test.com")
+    @WithMockUser(username = "testuser")
     @DisplayName("스터디 신청 수락 - 성공")
     void acceptApplication_Success() throws Exception {
         // given
-        User leader = createTestUser("test@test.com", "테스트 사용자");
-        User applicant = createTestUser("other@test.com", "다른 사용자");
-        Study study = createTestStudy("test@test.com", "테스트 스터디", "테스트 스터디입니다.");
+        User leader = createTestUser("testuser", "테스트 사용자");
+        User applicant = createTestUser("otheruser", "다른 사용자");
+        Study study = createTestStudy("testuser", "테스트 스터디", "테스트 스터디입니다.");
         StudyApplication application = studyApplicationService.apply(applicant, study);
 
         // when & then
@@ -161,13 +161,13 @@ class StudyApplicationControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "other@test.com")
+    @WithMockUser(username = "otheruser")
     @DisplayName("스터디 신청 수락 - 일반 사용자")
     void acceptApplication_AsNonLeader() throws Exception {
         // given
-        User leader = createTestUser("test@test.com", "테스트 사용자");
-        User applicant = createTestUser("other@test.com", "다른 사용자");
-        Study study = createTestStudy("test@test.com", "테스트 스터디", "테스트 스터디입니다.");
+        User leader = createTestUser("testuser", "테스트 사용자");
+        User applicant = createTestUser("otheruser", "다른 사용자");
+        Study study = createTestStudy("testuser", "테스트 스터디", "테스트 스터디입니다.");
         StudyApplication application = studyApplicationService.apply(applicant, study);
 
         // when & then
@@ -177,13 +177,13 @@ class StudyApplicationControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "test@test.com")
+    @WithMockUser(username = "testuser")
     @DisplayName("스터디 신청 거절 - 성공")
     void rejectApplication_Success() throws Exception {
         // given
-        User leader = createTestUser("test@test.com", "테스트 사용자");
-        User applicant = createTestUser("other@test.com", "다른 사용자");
-        Study study = createTestStudy("test@test.com", "테스트 스터디", "테스트 스터디입니다.");
+        User leader = createTestUser("testuser", "테스트 사용자");
+        User applicant = createTestUser("otheruser", "다른 사용자");
+        Study study = createTestStudy("testuser", "테스트 스터디", "테스트 스터디입니다.");
         StudyApplication application = studyApplicationService.apply(applicant, study);
 
         // when & then
@@ -193,13 +193,13 @@ class StudyApplicationControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "other@test.com")
+    @WithMockUser(username = "otheruser")
     @DisplayName("내가 신청한 스터디 목록")
     void myApplications() throws Exception {
         // given
-        User leader = createTestUser("test@test.com", "테스트 사용자");
-        User applicant = createTestUser("other@test.com", "다른 사용자");
-        Study study = createTestStudy("test@test.com", "테스트 스터디", "테스트 스터디입니다.");
+        User leader = createTestUser("testuser", "테스트 사용자");
+        User applicant = createTestUser("otheruser", "다른 사용자");
+        Study study = createTestStudy("testuser", "테스트 스터디", "테스트 스터디입니다.");
         studyApplicationService.apply(applicant, study);
 
         // when & then
@@ -212,10 +212,11 @@ class StudyApplicationControllerTest {
     /**
      * 테스트용 사용자 생성
      */
-    private User createTestUser(String email, String name) {
-        userRepository.deleteByEmail(email);
+    private User createTestUser(String username, String name) {
+        userRepository.deleteByUsername(username);
         UserJoinForm form = new UserJoinForm();
-        form.setEmail(email);
+        form.setUsername(username);
+        form.setEmail(username + "@test.com");
         form.setPassword("password123");
         form.setName(name);
         form.setUniversity("테스트 대학교");
@@ -223,18 +224,18 @@ class StudyApplicationControllerTest {
         form.setEducationStatus(dev.kang.studyhub.domain.user.model.EducationStatus.ENROLLED);
         
         userService.join(form);
-        return userService.findByEmail(email).orElseThrow();
+        return userService.findByUsername(username).orElseThrow();
     }
 
     /**
      * 테스트용 스터디 생성
      */
     private Study createTestStudy() {
-        return createTestStudy("test@test.com", "테스트 스터디", "테스트 스터디입니다.");
+        return createTestStudy("testuser", "테스트 스터디", "테스트 스터디입니다.");
     }
 
-    private Study createTestStudy(String email, String title, String description) {
-        User leader = createTestUser(email, "테스트 사용자");
+    private Study createTestStudy(String username, String title, String description) {
+        User leader = createTestUser(username, "테스트 사용자");
         Study study = Study.builder()
                 .title(title)
                 .description(description)

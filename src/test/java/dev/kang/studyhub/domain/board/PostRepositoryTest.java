@@ -48,9 +48,11 @@ class PostRepositoryTest {
         boardRepository.deleteAll();
         userRepository.deleteAll();
 
+        // 테스트용 사용자 생성
         user = User.builder()
-                .name("게시글작성자")
-                .email("postuser@test.com")
+                .name("테스트 사용자")
+                .username("post_test_user")
+                .email("test@test.com")
                 .password("password")
                 .role("USER")
                 .isBlocked(false)

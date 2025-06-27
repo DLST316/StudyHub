@@ -9,8 +9,34 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<User, Long> {
-    Optional<User> findByEmail(String email);   // 로그인 등에 사용
+    /**
+     * 사용자명(아이디)으로 사용자 조회 (로그인용)
+     */
+    Optional<User> findByUsername(String username);
+    
+    /**
+     * 사용자명(아이디) 존재 여부 확인
+     */
+    boolean existsByUsername(String username);
+    
+    /**
+     * 사용자명(아이디)으로 사용자 삭제
+     */
+    void deleteByUsername(String username);
+    
+    /**
+     * 이메일로 사용자 조회 (연락처용)
+     */
+    Optional<User> findByEmail(String email);
+    
+    /**
+     * 이메일 존재 여부 확인
+     */
     boolean existsByEmail(String email);
+    
+    /**
+     * 이메일로 사용자 삭제
+     */
     void deleteByEmail(String email);
     
     /**
@@ -18,6 +44,12 @@ public interface UserRepository extends JpaRepository<User, Long> {
      */
     @Query("SELECT COUNT(u) FROM User u WHERE u.isBlocked = true")
     long countByIsBlockedTrue();
+    
+    /**
+     * 사용자명 또는 이름으로 검색 (대소문자 무시)
+     */
+    Page<User> findByUsernameContainingIgnoreCaseOrNameContainingIgnoreCase(
+        String username, String name, Pageable pageable);
     
     /**
      * 이메일 또는 이름으로 검색 (대소문자 무시)

@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Bean;
 import dev.kang.studyhub.domain.board.Board;
 import dev.kang.studyhub.domain.board.BoardRepository;
 import java.time.LocalDateTime;
+import org.springframework.context.annotation.Profile;
 
 /**
  * StudyHub 애플리케이션의 메인 클래스
@@ -37,12 +38,14 @@ public class StudyHubApplication {
      * 애플리케이션 시작 시 테스트 사용자와 어드민 계정을 자동으로 생성하는 CommandLineRunner
      */
     @Bean
+    @Profile("!test")
     public CommandLineRunner createTestUsers() {
         return args -> {
             // 어드민 계정 자동 생성
-            if (userService.findByEmail("admin@studyhub.com").isEmpty()) {
+            if (userService.findByUsername("admin").isEmpty()) {
                 UserJoinForm adminForm = new UserJoinForm();
                 adminForm.setName("관리자");
+                adminForm.setUsername("admin");
                 adminForm.setEmail("admin@studyhub.com");
                 adminForm.setPassword("admin123");
                 adminForm.setUniversity("StudyHub");
@@ -52,17 +55,18 @@ public class StudyHubApplication {
                 userService.join(adminForm);
                 
                 // 어드민 역할로 변경
-                var adminUser = userService.findByEmail("admin@studyhub.com").get();
+                var adminUser = userService.findByUsername("admin").get();
                 adminUser.setRole("ADMIN");
                 userService.save(adminUser);
                 
-                System.out.println("어드민 계정 생성 완료: 관리자 (admin@studyhub.com / admin123)");
+                System.out.println("어드민 계정 생성 완료: 관리자 (admin / admin123)");
             }
 
             // 테스트 사용자 1: 강인석
-            if (userService.findByEmail("lolvslol66@gmail.com").isEmpty()) {
+            if (userService.findByUsername("kangin").isEmpty()) {
                 UserJoinForm form1 = new UserJoinForm();
                 form1.setName("강인석");
+                form1.setUsername("kangin");
                 form1.setEmail("lolvslol66@gmail.com");
                 form1.setPassword("123456");
                 form1.setUniversity("부산대");
@@ -70,13 +74,14 @@ public class StudyHubApplication {
                 form1.setEducationStatus(EducationStatus.ENROLLED);
                 
                 userService.join(form1);
-                System.out.println("테스트 사용자 1 생성 완료: 강인석 (lolvslol66@gmail.com)");
+                System.out.println("테스트 사용자 1 생성 완료: 강인석 (kangin / 123456)");
             }
 
             // 테스트 사용자 2: 강인석2
-            if (userService.findByEmail("lolvslol66@icloud.com").isEmpty()) {
+            if (userService.findByUsername("kangin2").isEmpty()) {
                 UserJoinForm form2 = new UserJoinForm();
                 form2.setName("강인석2");
+                form2.setUsername("kangin2");
                 form2.setEmail("lolvslol66@icloud.com");
                 form2.setPassword("123456");
                 form2.setUniversity("부산대");
@@ -84,7 +89,7 @@ public class StudyHubApplication {
                 form2.setEducationStatus(EducationStatus.ENROLLED);
                 
                 userService.join(form2);
-                System.out.println("테스트 사용자 2 생성 완료: 강인석2 (lolvslol66@icloud.com)");
+                System.out.println("테스트 사용자 2 생성 완료: 강인석2 (kangin2 / 123456)");
             }
 
             // 커뮤니티 Board row 자동 생성

@@ -56,13 +56,14 @@ class StudyServiceTest {
 
     @BeforeEach
     void setUp() {
+        // 테스트용 스터디장 생성
         leader = User.builder()
-                .id(1L)
-                .name("테스트 리더")
-                .email("leader@example.com")
+                .name("스터디장")
+                .username("study_service_leader")
+                .email("leader@test.com")
                 .password("password")
-                .educationStatus(EducationStatus.ENROLLED)
                 .role("USER")
+                .isBlocked(false)
                 .build();
         
         study = Study.builder()

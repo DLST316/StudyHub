@@ -47,9 +47,10 @@ class ReportRepositoryTest {
 
     @BeforeEach
     void setUp() {
-        // 테스트 데이터 생성
+        // 테스트용 사용자들 생성
         reporter1 = User.builder()
                 .name("신고자1")
+                .username("reporter1")
                 .email("reporter1@test.com")
                 .password("password")
                 .role("USER")
@@ -59,6 +60,7 @@ class ReportRepositoryTest {
 
         reporter2 = User.builder()
                 .name("신고자2")
+                .username("reporter2")
                 .email("reporter2@test.com")
                 .password("password")
                 .role("USER")
@@ -67,7 +69,8 @@ class ReportRepositoryTest {
         userRepository.save(reporter2);
 
         resolver = User.builder()
-                .name("처리자")
+                .name("해결자")
+                .username("resolver")
                 .email("resolver@test.com")
                 .password("password")
                 .role("ADMIN")

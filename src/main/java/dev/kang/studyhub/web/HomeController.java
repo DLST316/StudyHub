@@ -45,14 +45,14 @@ public class HomeController {
             !authentication.getName().equals("anonymousUser")) {
             // 로그인된 사용자인 경우
             // authentication.isAuthenticated(): 사용자가 인증되었는지 확인
-            // authentication.getName(): 사용자의 식별자(이메일)를 가져옴
+            // authentication.getName(): 사용자의 식별자(사용자명)를 가져옴
             // "anonymousUser"는 Spring Security가 로그인하지 않은 사용자에게 부여하는 기본값
             
             model.addAttribute("isLoggedIn", true);  // 템플릿에서 로그인 상태를 확인할 수 있도록
-            model.addAttribute("userEmail", authentication.getName());  // 사용자 이메일을 템플릿에 전달
+            model.addAttribute("username", authentication.getName());  // 사용자명을 템플릿에 전달
             
             // 사용자 정보를 가져와서 전달
-            userService.findByEmail(authentication.getName()).ifPresent(user -> {
+            userService.findByUsername(authentication.getName()).ifPresent(user -> {
                 model.addAttribute("user", user);
             });
         } else {

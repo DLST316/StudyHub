@@ -45,9 +45,10 @@ class StudyRepositoryTest {
 
     @BeforeEach
     void setUp() {
-        // 테스트용 사용자 생성
+        // 테스트용 사용자들 생성
         leader1 = User.builder()
-                .name("스터디장1")
+                .name("리더1")
+                .username("study_leader1")
                 .email("leader1@test.com")
                 .password("password")
                 .role("USER")
@@ -56,7 +57,8 @@ class StudyRepositoryTest {
         userRepository.save(leader1);
 
         leader2 = User.builder()
-                .name("스터디장2")
+                .name("리더2")
+                .username("study_leader2")
                 .email("leader2@test.com")
                 .password("password")
                 .role("USER")

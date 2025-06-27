@@ -61,6 +61,7 @@ class PostLikeRepositoryTest {
         // 테스트 데이터 생성
         user1 = User.builder()
                 .name("사용자1")
+                .username("post_like_user1")
                 .email("user1@test.com")
                 .password("password")
                 .role("USER")
@@ -70,6 +71,7 @@ class PostLikeRepositoryTest {
 
         user2 = User.builder()
                 .name("사용자2")
+                .username("post_like_user2")
                 .email("user2@test.com")
                 .password("password")
                 .role("USER")

@@ -43,16 +43,22 @@ class StudyApplicationServiceTest {
     private StudyApplication application;
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws Exception {
         MockitoAnnotations.openMocks(this);
         user = User.builder()
-                .id(1L)
-                .name("테스트 유저")
-                .email("user@example.com")
+                .name("신청자")
+                .username("study_app_service_user")
+                .email("user@test.com")
                 .password("password")
-                .educationStatus(EducationStatus.ENROLLED)
                 .role("USER")
+                .isBlocked(false)
                 .build();
+        
+        // Reflection을 사용하여 id 설정
+        java.lang.reflect.Field idField = User.class.getDeclaredField("id");
+        idField.setAccessible(true);
+        idField.set(user, 1L);
+        
         study = Study.builder()
                 .title("테스트 스터디")
                 .description("설명")
@@ -60,11 +66,22 @@ class StudyApplicationServiceTest {
                 .recruitmentLimit(5)
                 .requirement("조건")
                 .build();
+        
+        // Reflection을 사용하여 study의 id 설정
+        java.lang.reflect.Field studyIdField = Study.class.getDeclaredField("id");
+        studyIdField.setAccessible(true);
+        studyIdField.set(study, 1L);
+        
         application = StudyApplication.builder()
                 .user(user)
                 .study(study)
                 .status(ApplicationStatus.PENDING)
                 .build();
+        
+        // Reflection을 사용하여 application의 id 설정
+        java.lang.reflect.Field appIdField = StudyApplication.class.getDeclaredField("id");
+        appIdField.setAccessible(true);
+        appIdField.set(application, 1L);
     }
 
     @Test
@@ -112,7 +129,15 @@ class StudyApplicationServiceTest {
     @DisplayName("본인이 아닌 사용자는 신청을 취소할 수 없다")
     void cancel_NotOwner_ThrowsException() {
         // given
-        User otherUser = User.builder().id(2L).name("다른 유저").build();
+        User otherUser = User.builder()
+                .id(2L)
+                .name("다른 유저")
+                .username("study_app_service_other")
+                .email("other@test.com")
+                .password("password")
+                .role("USER")
+                .isBlocked(false)
+                .build();
         when(studyApplicationRepository.findById(anyLong())).thenReturn(Optional.of(application));
 
         // when & then

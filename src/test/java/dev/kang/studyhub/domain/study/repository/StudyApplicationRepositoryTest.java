@@ -51,10 +51,11 @@ class StudyApplicationRepositoryTest {
 
     @BeforeEach
     void setUp() {
-        // 테스트용 사용자 생성
+        // 테스트용 사용자들 생성
         user1 = User.builder()
                 .name("신청자1")
-                .email("applicant1@test.com")
+                .username("study_app_user1")
+                .email("user1@test.com")
                 .password("password")
                 .role("USER")
                 .isBlocked(false)
@@ -63,7 +64,8 @@ class StudyApplicationRepositoryTest {
 
         user2 = User.builder()
                 .name("신청자2")
-                .email("applicant2@test.com")
+                .username("study_app_user2")
+                .email("user2@test.com")
                 .password("password")
                 .role("USER")
                 .isBlocked(false)
@@ -72,6 +74,7 @@ class StudyApplicationRepositoryTest {
 
         leader = User.builder()
                 .name("스터디장")
+                .username("study_app_leader")
                 .email("leader@test.com")
                 .password("password")
                 .role("USER")

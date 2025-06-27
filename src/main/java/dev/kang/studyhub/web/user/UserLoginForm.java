@@ -1,6 +1,5 @@
 package dev.kang.studyhub.web.user;
 
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
@@ -18,12 +17,11 @@ import lombok.Setter;
 public class UserLoginForm {
 
     /**
-     * 사용자 이메일 (로그인 ID)
-     * 필수 입력 항목이며, 올바른 이메일 형식이어야 합니다.
+     * 사용자 아이디 (로그인용)
+     * 필수 입력 항목입니다.
      */
-    @NotBlank(message = "이메일을 입력하세요.")
-    @Email(message = "올바른 이메일 형식이어야 합니다.")
-    private String email;
+    @NotBlank(message = "아이디를 입력하세요.")
+    private String username;
 
     /**
      * 사용자 비밀번호

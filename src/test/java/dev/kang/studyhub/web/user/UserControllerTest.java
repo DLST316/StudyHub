@@ -60,6 +60,7 @@ class UserControllerTest {
         // when & then
         mockMvc.perform(post("/join")
                         .param("name", "테스트 사용자")
+                        .param("username", "testuser")
                         .param("email", "test@test.com")
                         .param("password", "password123")
                         .param("university", "테스트 대학교")
@@ -75,6 +76,7 @@ class UserControllerTest {
         // when & then
         mockMvc.perform(post("/join")
                         .param("name", "")  // 이름이 비어있음
+                        .param("username", "testuser")
                         .param("email", "test@test.com")
                         .param("password", "password123")
                         .param("university", "테스트 대학교")
@@ -85,12 +87,13 @@ class UserControllerTest {
     }
 
     @Test
-    @DisplayName("회원가입 - 유효성 검사 실패 (이메일 누락)")
-    void processJoin_ValidationError_Email() throws Exception {
+    @DisplayName("회원가입 - 유효성 검사 실패 (아이디 누락)")
+    void processJoin_ValidationError_Username() throws Exception {
         // when & then
         mockMvc.perform(post("/join")
                         .param("name", "테스트 사용자")
-                        .param("email", "")  // 이메일이 비어있음
+                        .param("username", "")  // 아이디가 비어있음
+                        .param("email", "test@test.com")
                         .param("password", "password123")
                         .param("university", "테스트 대학교")
                         .param("major", "컴퓨터공학과")
@@ -105,6 +108,7 @@ class UserControllerTest {
         // when & then
         mockMvc.perform(post("/join")
                         .param("name", "테스트 사용자")
+                        .param("username", "testuser")
                         .param("email", "test@test.com")
                         .param("password", "")  // 비밀번호가 비어있음
                         .param("university", "테스트 대학교")
@@ -123,6 +127,7 @@ class UserControllerTest {
         // when & then
         mockMvc.perform(post("/join")
                         .param("name", "다른 사용자")
+                        .param("username", "differentuser")
                         .param("email", "test@test.com")  // 이미 존재하는 이메일
                         .param("password", "password123")
                         .param("university", "다른 대학교")
@@ -147,6 +152,7 @@ class UserControllerTest {
     private void createTestUser() {
         UserJoinForm form = new UserJoinForm();
         form.setName("테스트 사용자");
+        form.setUsername("testuser");
         form.setEmail("test@test.com");
         form.setPassword("password123");
         form.setUniversity("테스트 대학교");

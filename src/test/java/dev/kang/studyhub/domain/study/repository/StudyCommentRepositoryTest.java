@@ -52,10 +52,11 @@ class StudyCommentRepositoryTest {
 
     @BeforeEach
     void setUp() {
-        // 테스트용 사용자 생성
+        // 테스트용 사용자들 생성
         user1 = User.builder()
-                .name("댓글작성자1")
-                .email("commenter1@test.com")
+                .name("사용자1")
+                .username("study_comment_user1")
+                .email("user1@test.com")
                 .password("password")
                 .role("USER")
                 .isBlocked(false)
@@ -63,8 +64,9 @@ class StudyCommentRepositoryTest {
         userRepository.save(user1);
 
         user2 = User.builder()
-                .name("댓글작성자2")
-                .email("commenter2@test.com")
+                .name("사용자2")
+                .username("study_comment_user2")
+                .email("user2@test.com")
                 .password("password")
                 .role("USER")
                 .isBlocked(false)
@@ -73,6 +75,7 @@ class StudyCommentRepositoryTest {
 
         leader = User.builder()
                 .name("스터디장")
+                .username("study_comment_leader")
                 .email("leader@test.com")
                 .password("password")
                 .role("USER")

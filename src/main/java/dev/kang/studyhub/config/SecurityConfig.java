@@ -63,9 +63,9 @@ public class SecurityConfig {
                         // 커스텀 로그인 페이지 설정
                         .loginPage("/login")
                         .loginProcessingUrl("/login")
-                        // 로그인 시 사용할 username 파라미터 이름을 "email"로 설정
-                        // 기본값은 "username"이지만, 우리는 이메일을 사용자 식별자로 사용
-                        .usernameParameter("email")
+                        // 로그인 시 사용할 username 파라미터 이름을 "username"으로 설정
+                        // 기본값은 "username"이며, 우리는 사용자명(아이디)을 사용자 식별자로 사용
+                        .usernameParameter("username")
                         .passwordParameter("password")
                         // 로그인 성공 시 리다이렉트할 URL
                         .defaultSuccessUrl("/?success=login")

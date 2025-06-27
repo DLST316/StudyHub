@@ -48,11 +48,32 @@ class StudyCommentServiceTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        user = User.builder().name("댓글작성자").build();
+        user = User.builder()
+                .name("댓글작성자")
+                .username("study_comment_service_user")
+                .email("user@test.com")
+                .password("password")
+                .role("USER")
+                .isBlocked(false)
+                .build();
         user.setId(1L);
-        leader = User.builder().name("스터디장").build();
+        leader = User.builder()
+                .name("스터디장")
+                .username("study_comment_service_leader")
+                .email("leader@test.com")
+                .password("password")
+                .role("USER")
+                .isBlocked(false)
+                .build();
         leader.setId(2L);
-        admin = User.builder().name("관리자").role("ADMIN").build();
+        admin = User.builder()
+                .name("관리자")
+                .username("study_comment_service_admin")
+                .email("admin@test.com")
+                .password("password")
+                .role("ADMIN")
+                .isBlocked(false)
+                .build();
         admin.setId(3L);
         study = Study.builder().title("테스트 스터디").leader(leader).build();
         // Study 엔티티에 setId가 없으면 reflection 등으로 주입 필요
@@ -146,7 +167,15 @@ class StudyCommentServiceTest {
     @Test
     @DisplayName("댓글 작성자가 아니면 댓글 수정 시 예외가 발생한다")
     void updateComment_NotAuthor_ThrowsException() {
-        User other = User.builder().id(99L).build();
+        User other = User.builder()
+                .id(99L)
+                .name("다른 사용자")
+                .username("study_comment_service_other")
+                .email("other@test.com")
+                .password("password")
+                .role("USER")
+                .isBlocked(false)
+                .build();
         when(studyCommentRepository.findById(1L)).thenReturn(Optional.of(comment));
         assertThatThrownBy(() -> studyCommentService.updateComment(1L, "수정", other))
                 .isInstanceOf(IllegalStateException.class)
@@ -193,7 +222,15 @@ class StudyCommentServiceTest {
     @Test
     @DisplayName("댓글 작성자/스터디장이 아니면 댓글 삭제 시 예외가 발생한다")
     void deleteComment_NotAllowed_ThrowsException() {
-        User stranger = User.builder().id(99L).build();
+        User stranger = User.builder()
+                .id(99L)
+                .name("모르는 사용자")
+                .username("study_comment_service_stranger")
+                .email("stranger@test.com")
+                .password("password")
+                .role("USER")
+                .isBlocked(false)
+                .build();
         when(studyCommentRepository.findById(1L)).thenReturn(Optional.of(comment));
         assertThatThrownBy(() -> studyCommentService.deleteComment(1L, stranger))
                 .isInstanceOf(IllegalStateException.class)

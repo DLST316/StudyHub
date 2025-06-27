@@ -92,7 +92,7 @@ class CommunityControllerTest {
                 .build();
 
         // 테스트 데이터 준비 - 실제 DB에 저장
-        testUser = userRepository.save(createTestUser());
+        testUser = userRepository.save(createTestUser("test@test.com", "테스트 사용자"));
         communityBoard = boardRepository.save(createTestBoard());
         testPost = postService.createPost(communityBoard, testUser, "테스트 게시글", "테스트 내용");
         testComment = commentService.createComment(testPost, testUser, "테스트 댓글");
@@ -120,7 +120,7 @@ class CommunityControllerTest {
 
         // when & then - 실제 로그인된 사용자로 테스트
         mockMvc.perform(get("/community")
-                        .with(user(testUser.getEmail()).password("password").roles("USER")))
+                        .with(user(testUser.getUsername()).password("password").roles("USER")))
                 .andExpect(status().isOk())
                 .andExpect(view().name("community/community"))
                 .andExpect(model().attributeExists("posts"));
@@ -144,7 +144,7 @@ class CommunityControllerTest {
 
         // when & then - 실제 로그인된 사용자로 테스트
         mockMvc.perform(get("/community").param("page", "0")
-                        .with(user(testUser.getEmail()).password("password").roles("USER")))
+                        .with(user(testUser.getUsername()).password("password").roles("USER")))
                 .andExpect(status().isOk())
                 .andExpect(view().name("community/community"))
                 .andExpect(model().attributeExists("posts"));
@@ -172,7 +172,7 @@ class CommunityControllerTest {
     @DisplayName("[회원] 게시글 상세 접근")
     void postDetail_LoggedIn() throws Exception {
         mockMvc.perform(get("/community/post/" + testPost.getId())
-                        .with(user(testUser.getEmail()).password("password").roles("USER")))
+                        .with(user(testUser.getUsername()).password("password").roles("USER")))
                 .andExpect(status().isOk())
                 .andExpect(view().name("community/post-detail"))
                 .andExpect(model().attributeExists("post"))
@@ -191,7 +191,7 @@ class CommunityControllerTest {
     @DisplayName("[회원] 글쓰기 폼 페이지 접근")
     void writeForm() throws Exception {
         mockMvc.perform(get("/community/write")
-                        .with(user(testUser.getEmail()).password("password").roles("USER")))
+                        .with(user(testUser.getUsername()).password("password").roles("USER")))
                 .andExpect(status().isOk())
                 .andExpect(view().name("community/post-form"))
                 .andExpect(model().attributeExists("postForm"));
@@ -207,7 +207,7 @@ class CommunityControllerTest {
         mockMvc.perform(post("/community/write")
                         .param("title", "새로운 게시글")
                         .param("content", "새로운 게시글 내용")
-                        .with(user(testUser.getEmail()).password("password").roles("USER")))
+                        .with(user(testUser.getUsername()).password("password").roles("USER")))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/community"));
 
@@ -233,7 +233,7 @@ class CommunityControllerTest {
         mockMvc.perform(post("/community/write")
                         .param("title", "")  // 제목 누락
                         .param("content", "내용")
-                        .with(user(testUser.getEmail()).password("password").roles("USER")))
+                        .with(user(testUser.getUsername()).password("password").roles("USER")))
                 .andExpect(status().isOk())
                 .andExpect(view().name("community/post-form"))
                 .andExpect(model().hasErrors());
@@ -248,7 +248,7 @@ class CommunityControllerTest {
         mockMvc.perform(post("/community/write")
                         .param("title", "제목")
                         .param("content", "")  // 내용 누락
-                        .with(user(testUser.getEmail()).password("password").roles("USER")))
+                        .with(user(testUser.getUsername()).password("password").roles("USER")))
                 .andExpect(status().isOk())
                 .andExpect(view().name("community/post-form"))
                 .andExpect(model().hasErrors());
@@ -265,7 +265,7 @@ class CommunityControllerTest {
 
         // when & then
         mockMvc.perform(post("/community/post/" + testPost.getId() + "/like")
-                        .with(user(testUser.getEmail()).password("password").roles("USER")))
+                        .with(user(testUser.getUsername()).password("password").roles("USER")))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/community/post/" + testPost.getId()));
 
@@ -285,7 +285,7 @@ class CommunityControllerTest {
 
         // when & then
         mockMvc.perform(post("/community/post/" + testPost.getId() + "/dislike")
-                        .with(user(testUser.getEmail()).password("password").roles("USER")))
+                        .with(user(testUser.getUsername()).password("password").roles("USER")))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/community/post/" + testPost.getId()));
 
@@ -306,7 +306,7 @@ class CommunityControllerTest {
         // when & then
         mockMvc.perform(post("/community/post/" + testPost.getId() + "/comment")
                         .param("content", "새로운 댓글")
-                        .with(user(testUser.getEmail()).password("password").roles("USER")))
+                        .with(user(testUser.getUsername()).password("password").roles("USER")))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/community/post/" + testPost.getId()));
 
@@ -328,7 +328,7 @@ class CommunityControllerTest {
 
         // when & then
         mockMvc.perform(post("/community/comment/" + additionalComment.getId() + "/delete")
-                        .with(user(testUser.getEmail()).password("password").roles("USER")))
+                        .with(user(testUser.getUsername()).password("password").roles("USER")))
                 .andExpect(status().isOk())
                 .andExpect(content().string("댓글이 삭제되었습니다."));
 
@@ -350,7 +350,7 @@ class CommunityControllerTest {
 
         // when & then
         mockMvc.perform(post("/community/post/" + postToDelete.getId() + "/delete")
-                        .with(user(testUser.getEmail()).password("password").roles("USER")))
+                        .with(user(testUser.getUsername()).password("password").roles("USER")))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/community?success=deleted"));
 
@@ -363,31 +363,31 @@ class CommunityControllerTest {
     /**
      * 테스트용 사용자 생성
      */
-    private User createTestUser() {
-        return User.builder()
-                .name("테스트 사용자")
-                .email("test@test.com")
-                .password("password")
-                .university("테스트 대학교")
-                .major("컴퓨터공학과")
-                .educationStatus(dev.kang.studyhub.domain.user.model.EducationStatus.ENROLLED)
+    private User createTestUser(String email, String name) {
+        User user = User.builder()
+                .name(name)
+                .username("community_controller_user_" + name.toLowerCase().replace(" ", "_"))
+                .email(email)
+                .password("password123")
                 .role("USER")
+                .isBlocked(false)
                 .build();
+        return userRepository.save(user);
     }
 
     /**
      * 테스트용 어드민 사용자 생성
      */
-    private User createAdminUser() {
-        return User.builder()
-                .name("어드민")
-                .email("admin@test.com")
-                .password("password")
-                .university("테스트 대학교")
-                .major("컴퓨터공학과")
-                .educationStatus(dev.kang.studyhub.domain.user.model.EducationStatus.ENROLLED)
+    private User createTestAdminUser(String email, String name) {
+        User user = User.builder()
+                .name(name)
+                .username("community_controller_admin_" + name.toLowerCase().replace(" ", "_"))
+                .email(email)
+                .password("password123")
                 .role("ADMIN")
+                .isBlocked(false)
                 .build();
+        return userRepository.save(user);
     }
 
     /**
@@ -414,5 +414,20 @@ class CommunityControllerTest {
         board.setDescription("자유로운 소통 공간");
         board.setCreatedAt(LocalDateTime.now());
         return board;
+    }
+
+    /**
+     * 테스트용 차단된 사용자 생성
+     */
+    private User createTestBlockedUser(String email, String name) {
+        User user = User.builder()
+                .name(name)
+                .username("community_controller_blocked_" + name.toLowerCase().replace(" ", "_"))
+                .email(email)
+                .password("password123")
+                .role("USER")
+                .isBlocked(true)
+                .build();
+        return userRepository.save(user);
     }
 } 

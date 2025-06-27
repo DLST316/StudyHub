@@ -70,12 +70,12 @@ class StudyCommentControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "test@test.com")
+    @WithMockUser(username = "testuser")
     @DisplayName("댓글 작성 - 성공")
     void createComment_Success() throws Exception {
         // given
-        User user = createTestUser("test@test.com");
-        Study study = createTestStudy("test@test.com", "테스트 스터디", "테스트 스터디입니다.");
+        User user = createTestUser("testuser");
+        Study study = createTestStudy("testuser", "테스트 스터디", "테스트 스터디입니다.");
         
         // when & then
         mockMvc.perform(post("/studies/" + study.getId() + "/comments")
@@ -85,11 +85,11 @@ class StudyCommentControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "test@test.com")
+    @WithMockUser(username = "testuser")
     @DisplayName("댓글 작성 - 존재하지 않는 스터디")
     void createComment_NonExistentStudy() throws Exception {
         // given
-        createTestUser("test@test.com");
+        createTestUser("testuser");
         
         // when & then
         mockMvc.perform(post("/studies/99999/comments")
@@ -99,11 +99,11 @@ class StudyCommentControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "test@test.com")
+    @WithMockUser(username = "testuser")
     @DisplayName("댓글 수정 - 성공")
     void updateComment_Success() throws Exception {
         // given
-        User user = createTestUser("test@test.com");
+        User user = createTestUser("testuser");
         Study study = createTestStudy(user, "테스트 스터디", "테스트 스터디입니다.");
         StudyComment comment = createTestComment(user, study);
 
@@ -115,12 +115,12 @@ class StudyCommentControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "other@test.com")
+    @WithMockUser(username = "otheruser")
     @DisplayName("댓글 수정 - 다른 사용자")
     void updateComment_OtherUser() throws Exception {
         // given
-        User user = createTestUser("test@test.com");
-        User otherUser = createTestUser("other@test.com");
+        User user = createTestUser("testuser");
+        User otherUser = createTestUser("otheruser");
         Study study = createTestStudy(user, "테스트 스터디", "테스트 스터디입니다.");
         StudyComment comment = createTestComment(user, study);
 
@@ -132,11 +132,11 @@ class StudyCommentControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "test@test.com")
+    @WithMockUser(username = "testuser")
     @DisplayName("댓글 삭제 - 성공")
     void deleteComment_Success() throws Exception {
         // given
-        User user = createTestUser("test@test.com");
+        User user = createTestUser("testuser");
         Study study = createTestStudy(user, "테스트 스터디", "테스트 스터디입니다.");
         StudyComment comment = createTestComment(user, study);
 
@@ -147,12 +147,12 @@ class StudyCommentControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "other@test.com")
+    @WithMockUser(username = "otheruser")
     @DisplayName("댓글 삭제 - 다른 사용자")
     void deleteComment_OtherUser() throws Exception {
         // given
-        User user = createTestUser("test@test.com");
-        User otherUser = createTestUser("other@test.com");
+        User user = createTestUser("testuser");
+        User otherUser = createTestUser("otheruser");
         Study study = createTestStudy(user, "테스트 스터디", "테스트 스터디입니다.");
         StudyComment comment = createTestComment(user, study);
 
@@ -163,12 +163,12 @@ class StudyCommentControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "test@test.com")
+    @WithMockUser(username = "testuser")
     @DisplayName("댓글 삭제 - 존재하지 않는 댓글")
     void deleteComment_NonExistentComment() throws Exception {
         // given
-        User user = createTestUser("test@test.com");
-        Study study = createTestStudy("test@test.com", "테스트 스터디", "테스트 스터디입니다.");
+        User user = createTestUser("testuser");
+        Study study = createTestStudy("testuser", "테스트 스터디", "테스트 스터디입니다.");
         
         // when & then
         mockMvc.perform(delete("/studies/" + study.getId() + "/comments/99999"))
@@ -177,12 +177,12 @@ class StudyCommentControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "admin@test.com", roles = "ADMIN")
+    @WithMockUser(username = "adminuser", roles = "ADMIN")
     @DisplayName("댓글 삭제 - 어드민 성공")
     void deleteComment_AdminSuccess() throws Exception {
         // given
-        User admin = createTestUser("admin@test.com");
-        User user = createTestUser("test@test.com");
+        User admin = createTestUser("adminuser");
+        User user = createTestUser("testuser");
         Study study = createTestStudy(user, "테스트 스터디", "테스트 스터디입니다.");
         StudyComment comment = createTestComment(user, study);
 
@@ -196,22 +196,23 @@ class StudyCommentControllerTest {
      * 테스트용 사용자 생성
      */
     private User createTestUser() {
-        return createTestUser("test@test.com");
+        return createTestUser("testuser");
     }
 
-    private User createTestUser(String email) {
-        userRepository.deleteByEmail(email);
+    private User createTestUser(String username) {
+        userRepository.deleteByUsername(username);
         UserJoinForm form = new UserJoinForm();
-        form.setEmail(email);
+        form.setUsername(username);
+        form.setEmail(username + "@test.com");
         form.setPassword("password123");
         form.setName("테스트 사용자");
         form.setUniversity("테스트 대학교");
         form.setMajor("컴퓨터공학과");
         form.setEducationStatus(dev.kang.studyhub.domain.user.model.EducationStatus.ENROLLED);
         userService.join(form);
-        User user = userService.findByEmail(email).orElseThrow();
+        User user = userService.findByUsername(username).orElseThrow();
         // 어드민 계정이면 role을 ADMIN으로 변경
-        if (email.equals("admin@test.com")) {
+        if (username.equals("adminuser")) {
             user.setRole("ADMIN");
             userRepository.save(user);
         }
@@ -222,11 +223,11 @@ class StudyCommentControllerTest {
      * 테스트용 스터디 생성
      */
     private Study createTestStudy() {
-        return createTestStudy("test@test.com", "테스트 스터디", "테스트 스터디입니다.");
+        return createTestStudy("testuser", "테스트 스터디", "테스트 스터디입니다.");
     }
 
-    private Study createTestStudy(String email, String title, String description) {
-        User leader = createTestUser(email);
+    private Study createTestStudy(String username, String title, String description) {
+        User leader = createTestUser(username);
         return createTestStudy(leader, title, description);
     }
 
@@ -246,16 +247,16 @@ class StudyCommentControllerTest {
      * 테스트용 댓글 생성
      */
     private StudyComment createTestComment() {
-        return createTestComment("test@test.com");
+        return createTestComment("testuser");
     }
 
-    private StudyComment createTestComment(String email) {
-        Study study = createTestStudy(email, "테스트 스터디", "테스트 스터디입니다.");
-        return createTestComment(email, study);
+    private StudyComment createTestComment(String username) {
+        Study study = createTestStudy(username, "테스트 스터디", "테스트 스터디입니다.");
+        return createTestComment(username, study);
     }
 
-    private StudyComment createTestComment(String email, Study study) {
-        User user = createTestUser(email);
+    private StudyComment createTestComment(String username, Study study) {
+        User user = createTestUser(username);
         return createTestComment(user, study);
     }
 

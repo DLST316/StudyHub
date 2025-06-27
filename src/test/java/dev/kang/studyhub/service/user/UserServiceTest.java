@@ -4,6 +4,7 @@ import dev.kang.studyhub.domain.user.entity.User;
 import dev.kang.studyhub.domain.user.model.EducationStatus;
 import dev.kang.studyhub.domain.user.repository.UserRepository;
 import dev.kang.studyhub.service.user.exception.AlreadyExistsEmailException;
+import dev.kang.studyhub.service.user.exception.AlreadyExistsUsernameException;
 import dev.kang.studyhub.web.user.UserJoinForm;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -59,6 +60,7 @@ class UserServiceTest {
         // 유효한 회원가입 폼 데이터 생성
         validJoinForm = new UserJoinForm();
         validJoinForm.setName("테스트 사용자");
+        validJoinForm.setUsername("testuser");
         validJoinForm.setEmail("test@example.com");
         validJoinForm.setPassword("password123");
         validJoinForm.setUniversity("테스트 대학교");
@@ -69,6 +71,7 @@ class UserServiceTest {
         savedUser = User.builder()
                 .id(1L)
                 .name("테스트 사용자")
+                .username("testuser")
                 .email("test@example.com")
                 .password("encodedPassword123")
                 .university("테스트 대학교")
@@ -82,7 +85,8 @@ class UserServiceTest {
     @DisplayName("정상적인 회원가입이 성공해야 한다")
     void join_Success() {
         // given
-        when(userRepository.findByEmail(anyString())).thenReturn(Optional.empty());
+        when(userRepository.existsByUsername(anyString())).thenReturn(false);
+        when(userRepository.existsByEmail(anyString())).thenReturn(false);
         when(passwordEncoder.encode(anyString())).thenReturn("encodedPassword123");
         when(userRepository.save(any(User.class))).thenReturn(savedUser);
 
@@ -90,7 +94,8 @@ class UserServiceTest {
         userService.join(validJoinForm);
 
         // then
-        verify(userRepository, times(1)).findByEmail(validJoinForm.getEmail());
+        verify(userRepository, times(1)).existsByUsername(validJoinForm.getUsername());
+        verify(userRepository, times(1)).existsByEmail(validJoinForm.getEmail());
         verify(passwordEncoder, times(1)).encode(validJoinForm.getPassword());
         verify(userRepository, times(1)).save(any(User.class));
     }
@@ -99,14 +104,33 @@ class UserServiceTest {
     @DisplayName("중복된 이메일로 회원가입 시 예외가 발생해야 한다")
     void join_DuplicateEmail_ThrowsException() {
         // given
-        when(userRepository.findByEmail(validJoinForm.getEmail())).thenReturn(Optional.of(savedUser));
+        when(userRepository.existsByUsername(anyString())).thenReturn(false);
+        when(userRepository.existsByEmail(validJoinForm.getEmail())).thenReturn(true);
 
         // when & then
         assertThatThrownBy(() -> userService.join(validJoinForm))
                 .isInstanceOf(AlreadyExistsEmailException.class)
                 .hasMessage("이미 사용 중인 이메일입니다.");
 
-        verify(userRepository, times(1)).findByEmail(validJoinForm.getEmail());
+        verify(userRepository, times(1)).existsByUsername(validJoinForm.getUsername());
+        verify(userRepository, times(1)).existsByEmail(validJoinForm.getEmail());
+        verify(passwordEncoder, never()).encode(anyString());
+        verify(userRepository, never()).save(any(User.class));
+    }
+
+    @Test
+    @DisplayName("중복된 사용자명으로 회원가입 시 예외가 발생해야 한다")
+    void join_DuplicateUsername_ThrowsException() {
+        // given
+        when(userRepository.existsByUsername(validJoinForm.getUsername())).thenReturn(true);
+
+        // when & then
+        assertThatThrownBy(() -> userService.join(validJoinForm))
+                .isInstanceOf(AlreadyExistsUsernameException.class)
+                .hasMessage("이미 사용 중인 아이디입니다.");
+
+        verify(userRepository, times(1)).existsByUsername(validJoinForm.getUsername());
+        verify(userRepository, never()).existsByEmail(anyString());
         verify(passwordEncoder, never()).encode(anyString());
         verify(userRepository, never()).save(any(User.class));
     }
@@ -115,7 +139,8 @@ class UserServiceTest {
     @DisplayName("비밀번호가 올바르게 암호화되어야 한다")
     void join_PasswordShouldBeEncoded() {
         // given
-        when(userRepository.findByEmail(anyString())).thenReturn(Optional.empty());
+        when(userRepository.existsByUsername(anyString())).thenReturn(false);
+        when(userRepository.existsByEmail(anyString())).thenReturn(false);
         when(passwordEncoder.encode(validJoinForm.getPassword())).thenReturn("encodedPassword123");
         when(userRepository.save(any(User.class))).thenReturn(savedUser);
 
@@ -131,54 +156,11 @@ class UserServiceTest {
     }
 
     @Test
-    @DisplayName("이메일로 사용자를 찾을 수 있어야 한다")
-    void findByEmail_Success() {
-        // given
-        String email = "test@example.com";
-        when(userRepository.findByEmail(email)).thenReturn(Optional.of(savedUser));
-
-        // when
-        Optional<User> result = userService.findByEmail(email);
-
-        // then
-        assertThat(result).isPresent();
-        assertThat(result.get().getEmail()).isEqualTo(email);
-        verify(userRepository, times(1)).findByEmail(email);
-    }
-
-    @Test
-    @DisplayName("존재하지 않는 이메일로 조회 시 빈 Optional을 반환해야 한다")
-    void findByEmail_NotFound_ReturnsEmptyOptional() {
-        // given
-        String email = "nonexistent@example.com";
-        when(userRepository.findByEmail(email)).thenReturn(Optional.empty());
-
-        // when
-        Optional<User> result = userService.findByEmail(email);
-
-        // then
-        assertThat(result).isEmpty();
-        verify(userRepository, times(1)).findByEmail(email);
-    }
-
-    @Test
-    @DisplayName("사용자 정보를 저장할 수 있어야 한다")
-    void save_Success() {
-        // given
-        when(userRepository.save(any(User.class))).thenReturn(savedUser);
-
-        // when
-        userService.save(savedUser);
-
-        // then
-        verify(userRepository, times(1)).save(savedUser);
-    }
-
-    @Test
     @DisplayName("회원가입 시 사용자 엔티티가 올바른 정보로 생성되어야 한다")
     void join_CreatesUserWithCorrectInformation() {
         // given
-        when(userRepository.findByEmail(anyString())).thenReturn(Optional.empty());
+        when(userRepository.existsByUsername(anyString())).thenReturn(false);
+        when(userRepository.existsByEmail(anyString())).thenReturn(false);
         when(passwordEncoder.encode(anyString())).thenReturn("encodedPassword123");
         when(userRepository.save(any(User.class))).thenReturn(savedUser);
 

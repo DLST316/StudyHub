@@ -142,6 +142,7 @@ class StudyHubIntegrationTest {
         // given
         UserJoinForm joinForm = new UserJoinForm();
         joinForm.setName("통합 테스트 사용자");
+        joinForm.setUsername("integration_user");
         joinForm.setEmail("integration@example.com");
         joinForm.setPassword("password123");
         joinForm.setUniversity("통합 테스트 대학교");
@@ -165,12 +166,14 @@ class StudyHubIntegrationTest {
         // given
         UserJoinForm joinForm1 = new UserJoinForm();
         joinForm1.setName("첫 번째 사용자");
+        joinForm1.setUsername("first_user");
         joinForm1.setEmail("duplicate@example.com");
         joinForm1.setPassword("password123");
         joinForm1.setEducationStatus(EducationStatus.ENROLLED);
 
         UserJoinForm joinForm2 = new UserJoinForm();
         joinForm2.setName("두 번째 사용자");
+        joinForm2.setUsername("second_user");
         joinForm2.setEmail("duplicate@example.com");
         joinForm2.setPassword("password456");
         joinForm2.setEducationStatus(EducationStatus.ENROLLED);
@@ -196,6 +199,7 @@ class StudyHubIntegrationTest {
         // given
         UserJoinForm joinForm = new UserJoinForm();
         joinForm.setName("암호화 테스트");
+        joinForm.setUsername("encode_user");
         joinForm.setEmail("encode@example.com");
         joinForm.setPassword("plainPassword");
         joinForm.setEducationStatus(EducationStatus.ENROLLED);
@@ -216,6 +220,7 @@ class StudyHubIntegrationTest {
         // 1. 스터디 개설자 회원가입
         UserJoinForm leaderForm = new UserJoinForm();
         leaderForm.setName("리더");
+        leaderForm.setUsername("study_leader");
         leaderForm.setEmail("leader@example.com");
         leaderForm.setPassword("leaderpass");
         leaderForm.setEducationStatus(EducationStatus.ENROLLED);
@@ -225,6 +230,7 @@ class StudyHubIntegrationTest {
         // 2. 신청자 회원가입
         UserJoinForm applicantForm = new UserJoinForm();
         applicantForm.setName("신청자");
+        applicantForm.setUsername("study_applicant");
         applicantForm.setEmail("applicant@example.com");
         applicantForm.setPassword("applicantpass");
         applicantForm.setEducationStatus(EducationStatus.ENROLLED);
@@ -270,6 +276,7 @@ class StudyHubIntegrationTest {
         // 2. 사용자 2명 회원가입
         UserJoinForm user1Form = new UserJoinForm();
         user1Form.setName("작성자");
+        user1Form.setUsername("post_author");
         user1Form.setEmail("author@ex.com");
         user1Form.setPassword("pw1");
         user1Form.setEducationStatus(EducationStatus.ENROLLED);
@@ -278,6 +285,7 @@ class StudyHubIntegrationTest {
 
         UserJoinForm user2Form = new UserJoinForm();
         user2Form.setName("추천자");
+        user2Form.setUsername("post_liker");
         user2Form.setEmail("liker@ex.com");
         user2Form.setPassword("pw2");
         user2Form.setEducationStatus(EducationStatus.ENROLLED);

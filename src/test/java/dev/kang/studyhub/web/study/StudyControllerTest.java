@@ -23,9 +23,9 @@ import org.springframework.web.context.WebApplicationContext;
 import java.time.LocalDate;
 
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 
 /**
  * StudyController 통합 테스트
@@ -77,7 +77,7 @@ class StudyControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "test@test.com")
+    @WithMockUser(username = "study_controller_user_테스트_사용자", roles = {"USER"})
     @DisplayName("스터디 목록 페이지 접근")
     void listStudies() throws Exception {
         // given
@@ -92,7 +92,7 @@ class StudyControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "test@test.com")
+    @WithMockUser(username = "study_controller_user_테스트_사용자", roles = {"USER"})
     @DisplayName("스터디 목록 페이지 - 페이징")
     void listStudies_WithPaging() throws Exception {
         // given
@@ -107,7 +107,7 @@ class StudyControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "test@test.com")
+    @WithMockUser(username = "study_controller_user_테스트_사용자", roles = {"USER"})
     @DisplayName("스터디 목록 페이지 - 키워드 검색")
     void listStudies_WithKeyword() throws Exception {
         // given
@@ -123,7 +123,7 @@ class StudyControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "test@test.com")
+    @WithMockUser(username = "study_controller_user_테스트_사용자", roles = {"USER"})
     @DisplayName("스터디 상세 페이지 접근 - 로그인한 사용자")
     void viewStudy_LoggedIn() throws Exception {
         // when & then
@@ -136,7 +136,7 @@ class StudyControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "test@test.com")
+    @WithMockUser(username = "study_controller_user_테스트_사용자", roles = {"USER"})
     @DisplayName("스터디 상세 페이지 - 스터디장 접근")
     void viewStudy_AsLeader() throws Exception {
         // when & then
@@ -148,7 +148,7 @@ class StudyControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "admin@test.com")
+    @WithMockUser(username = "study_controller_admin_관리자", roles = {"ADMIN"})
     @DisplayName("스터디 상세 페이지 - 어드민 접근")
     void viewStudy_AsAdmin() throws Exception {
         // when & then
@@ -161,7 +161,7 @@ class StudyControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "test@test.com")
+    @WithMockUser(username = "study_controller_user_테스트_사용자", roles = {"USER"})
     @DisplayName("스터디 상세 페이지 - 에러 메시지와 함께")
     void viewStudy_WithError() throws Exception {
         // when & then
@@ -172,7 +172,7 @@ class StudyControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "test@test.com")
+    @WithMockUser(username = "study_controller_user_테스트_사용자", roles = {"USER"})
     @DisplayName("스터디 생성 폼 페이지 접근")
     void showCreateForm() throws Exception {
         // when & then
@@ -183,7 +183,7 @@ class StudyControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "test@test.com")
+    @WithMockUser(username = "study_controller_user_테스트_사용자", roles = {"USER"})
     @DisplayName("스터디 생성 - 성공")
     void createStudy_Success() throws Exception {
         // when & then
@@ -198,7 +198,7 @@ class StudyControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "test@test.com")
+    @WithMockUser(username = "study_controller_user_테스트_사용자", roles = {"USER"})
     @DisplayName("스터디 수정 폼 페이지 접근 - 스터디장")
     void showEditForm_AsLeader() throws Exception {
         // when & then
@@ -210,19 +210,18 @@ class StudyControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "other@test.com")
+    @WithMockUser(username = "study_controller_user_다른_사용자", roles = {"USER"})
     @DisplayName("스터디 수정 폼 페이지 접근 - 일반 사용자")
     void showEditForm_AsNonLeader() throws Exception {
         // when & then
         mockMvc.perform(get("/studies/edit/" + testStudy.getId()))
-                .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(view().name("error/400"))
                 .andExpect(model().attribute("message", "스터디 개설자 또는 관리자만 수정할 수 있습니다."));
     }
 
     @Test
-    @WithMockUser(username = "admin@test.com")
+    @WithMockUser(username = "study_controller_admin_관리자", roles = {"ADMIN"})
     @DisplayName("스터디 수정 폼 페이지 접근 - 어드민")
     void showEditForm_AsAdmin() throws Exception {
         // when & then
@@ -234,7 +233,7 @@ class StudyControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "test@test.com")
+    @WithMockUser(username = "study_controller_user_테스트_사용자", roles = {"USER"})
     @DisplayName("스터디 수정 - 성공")
     void updateStudy_Success() throws Exception {
         // when & then
@@ -249,7 +248,7 @@ class StudyControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "test@test.com")
+    @WithMockUser(username = "study_controller_user_테스트_사용자", roles = {"USER"})
     @DisplayName("스터디 삭제 - 성공")
     void deleteStudy_Success() throws Exception {
         // when & then
@@ -259,7 +258,7 @@ class StudyControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "other@test.com")
+    @WithMockUser(username = "study_controller_user_다른_사용자", roles = {"USER"})
     @DisplayName("스터디 삭제 - 일반 사용자")
     void deleteStudy_AsNonLeader() throws Exception {
         // when & then
@@ -270,7 +269,7 @@ class StudyControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "admin@test.com")
+    @WithMockUser(username = "study_controller_admin_관리자", roles = {"ADMIN"})
     @DisplayName("스터디 삭제 - 어드민")
     void deleteStudy_AsAdmin() throws Exception {
         // when & then
@@ -280,7 +279,7 @@ class StudyControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "test@test.com")
+    @WithMockUser(username = "study_controller_user_테스트_사용자", roles = {"USER"})
     @DisplayName("내가 개설한 스터디 목록")
     void myStudies() throws Exception {
         // given
@@ -295,24 +294,23 @@ class StudyControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "admin@test.com")
+    @WithMockUser(username = "study_controller_admin_관리자", roles = {"ADMIN"})
     @DisplayName("스터디 수정 처리 - 어드민")
     void updateStudy_AsAdmin() throws Exception {
         // given
-        StudyForm studyForm = new StudyForm();
-        studyForm.setTitle("수정된 스터디 제목");
-        studyForm.setDescription("수정된 스터디 설명");
-        studyForm.setRecruitmentLimit(5);
-        studyForm.setRequirement("수정된 요구사항");
-        studyForm.setDeadline(LocalDate.now().plusDays(30));
+        String newTitle = "수정된 스터디 제목";
+        String newDescription = "수정된 스터디 설명";
+        int newRecruitmentLimit = 5;
+        String newRequirement = "수정된 요구사항";
+        LocalDate newDeadline = LocalDate.now().plusDays(30);
         
         // when & then
         mockMvc.perform(post("/studies/edit/" + testStudy.getId())
-                        .param("title", studyForm.getTitle())
-                        .param("description", studyForm.getDescription())
-                        .param("recruitmentLimit", String.valueOf(studyForm.getRecruitmentLimit()))
-                        .param("requirement", studyForm.getRequirement())
-                        .param("deadline", studyForm.getDeadline().toString()))
+                        .param("title", newTitle)
+                        .param("description", newDescription)
+                        .param("recruitmentLimit", String.valueOf(newRecruitmentLimit))
+                        .param("requirement", newRequirement)
+                        .param("deadline", newDeadline.toString()))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/studies/" + testStudy.getId()));
     }
@@ -323,6 +321,7 @@ class StudyControllerTest {
     private User createTestUser(String email, String name) {
         UserJoinForm form = new UserJoinForm();
         form.setEmail(email);
+        form.setUsername("study_controller_user_" + name.toLowerCase().replace(" ", "_"));
         form.setPassword("password123");
         form.setName(name);
         form.setUniversity("테스트 대학교");
@@ -357,10 +356,12 @@ class StudyControllerTest {
 
     private User createTestAdminUser(String email, String name) {
         User user = User.builder()
-                .email(email)
                 .name(name)
+                .username("study_controller_admin_" + name.toLowerCase().replace(" ", "_"))
+                .email(email)
                 .password("password123")
                 .role("ADMIN")
+                .isBlocked(false)
                 .build();
         return userRepository.save(user);
     }

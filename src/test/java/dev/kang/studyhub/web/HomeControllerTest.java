@@ -64,7 +64,7 @@ class HomeControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "test@test.com")
+    @WithMockUser(username = "testuser")
     @DisplayName("홈페이지 접근 - 로그인한 사용자")
     void homePage_LoggedIn() throws Exception {
         // when & then
@@ -72,7 +72,7 @@ class HomeControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(view().name("home"))
                 .andExpect(model().attribute("isLoggedIn", true))
-                .andExpect(model().attribute("userEmail", "test@test.com"));
+                .andExpect(model().attribute("username", "testuser"));
     }
 
     @Test

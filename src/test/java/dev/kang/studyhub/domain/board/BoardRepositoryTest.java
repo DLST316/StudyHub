@@ -58,6 +58,7 @@ class BoardRepositoryTest {
         // 테스트용 사용자 생성
         user = User.builder()
                 .name("테스트 사용자")
+                .username("board_test_user")
                 .email("test@test.com")
                 .password("password")
                 .role("USER")

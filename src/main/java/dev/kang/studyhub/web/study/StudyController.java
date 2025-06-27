@@ -48,7 +48,7 @@ public class StudyController {
             throw new IllegalStateException("로그인이 필요합니다.");
         }
         
-        return userService.findByEmail(authentication.getName())
+        return userService.findByUsername(authentication.getName())
                 .orElseThrow(() -> new IllegalStateException("사용자 정보를 찾을 수 없습니다."));
     }
 

@@ -53,7 +53,7 @@ public class CommunityController {
         PostLike.LikeType userLikeStatus = null;
         User currentUser = null;
         if (userDetails != null) {
-            currentUser = userService.findByEmail(userDetails.getUsername()).orElse(null);
+            currentUser = userService.findByUsername(userDetails.getUsername()).orElse(null);
             if (currentUser != null) {
                 userLikeStatus = postService.getUserLikeStatus(id, currentUser);
             }
@@ -94,7 +94,7 @@ public class CommunityController {
         Board board = boardService.getCommunityBoard();
         // 인증 사용자 조회
         if (userDetails == null) return "redirect:/login";
-        User user = userService.findByEmail(userDetails.getUsername()).orElseThrow();
+        User user = userService.findByUsername(userDetails.getUsername()).orElseThrow();
         Post post = new Post();
         post.setBoard(board);
         post.setUser(user);
@@ -108,7 +108,7 @@ public class CommunityController {
     @PostMapping("/post/{id}/like")
     public String toggleLike(@PathVariable Long id, @AuthenticationPrincipal UserDetails userDetails) {
         if (userDetails == null) return "redirect:/login";
-        User user = userService.findByEmail(userDetails.getUsername()).orElseThrow();
+        User user = userService.findByUsername(userDetails.getUsername()).orElseThrow();
         
         String result = postService.toggleLike(id, user, PostLike.LikeType.LIKE);
         // TODO: 결과 메시지를 세션에 저장하여 표시할 수 있도록 개선
@@ -120,7 +120,7 @@ public class CommunityController {
     @PostMapping("/post/{id}/dislike")
     public String toggleDislike(@PathVariable Long id, @AuthenticationPrincipal UserDetails userDetails) {
         if (userDetails == null) return "redirect:/login";
-        User user = userService.findByEmail(userDetails.getUsername()).orElseThrow();
+        User user = userService.findByUsername(userDetails.getUsername()).orElseThrow();
         
         String result = postService.toggleLike(id, user, PostLike.LikeType.DISLIKE);
         // TODO: 결과 메시지를 세션에 저장하여 표시할 수 있도록 개선
@@ -133,7 +133,7 @@ public class CommunityController {
     public String comment(@PathVariable Long id, @RequestParam String content, @AuthenticationPrincipal UserDetails userDetails) {
         Post post = postService.getPost(id);
         if (userDetails == null) return "redirect:/login";
-        User user = userService.findByEmail(userDetails.getUsername()).orElseThrow();
+        User user = userService.findByUsername(userDetails.getUsername()).orElseThrow();
         PostComment comment = new PostComment();
         comment.setPost(post);
         comment.setUser(user);
@@ -151,7 +151,7 @@ public class CommunityController {
         }
         
         try {
-            User user = userService.findByEmail(userDetails.getUsername()).orElseThrow();
+            User user = userService.findByUsername(userDetails.getUsername()).orElseThrow();
             PostComment comment = commentService.getComment(commentId);
             
             // 댓글 작성자이거나 어드민인 경우에만 삭제 가능
@@ -175,7 +175,7 @@ public class CommunityController {
         }
         
         try {
-            User user = userService.findByEmail(userDetails.getUsername()).orElseThrow();
+            User user = userService.findByUsername(userDetails.getUsername()).orElseThrow();
             Post post = postService.getPost(id);
             
             // 게시글 작성자이거나 어드민인 경우에만 삭제 가능
