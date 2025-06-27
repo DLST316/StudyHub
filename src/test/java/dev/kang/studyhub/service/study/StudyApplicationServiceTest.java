@@ -55,6 +55,7 @@ class StudyApplicationServiceTest {
                 .build();
         
         // Reflection을 사용하여 id 설정
+        // TODO: 오버엔지니어링 아닌가?
         java.lang.reflect.Field idField = User.class.getDeclaredField("id");
         idField.setAccessible(true);
         idField.set(user, 1L);
