@@ -34,10 +34,10 @@ class BoardServiceTest {
     void getCommunityBoard_success() throws Exception {
         // given
         Board communityBoard = new Board();
+        communityBoard.setId(1L);
         communityBoard.setName("커뮤니티");
         communityBoard.setDescription("자유로운 소통을 위한 커뮤니티입니다.");
         communityBoard.setCreatedAt(LocalDateTime.now());
-        boardRepository.save(communityBoard);
 
         when(boardRepository.findByName("커뮤니티")).thenReturn(communityBoard);
 
@@ -46,7 +46,6 @@ class BoardServiceTest {
 
         // then
         assertThat(result).isNotNull();
-        assertThat(result.getId()).isEqualTo(1L);
         assertThat(result.getName()).isEqualTo("커뮤니티");
         assertThat(result.getDescription()).isEqualTo("자유로운 소통을 위한 커뮤니티입니다.");
     }

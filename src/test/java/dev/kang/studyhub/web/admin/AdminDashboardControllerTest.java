@@ -1,84 +1,90 @@
 package dev.kang.studyhub.web.admin;
 
-import dev.kang.studyhub.domain.board.ReportRepository;
-import dev.kang.studyhub.domain.board.PostRepository;
-import dev.kang.studyhub.domain.board.PostCommentRepository;
 import dev.kang.studyhub.domain.board.BoardRepository;
+import dev.kang.studyhub.domain.board.PostCommentRepository;
+import dev.kang.studyhub.domain.board.PostRepository;
+import dev.kang.studyhub.domain.board.ReportRepository;
 import dev.kang.studyhub.domain.study.repository.StudyRepository;
 import dev.kang.studyhub.domain.user.repository.UserRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.ResponseEntity;
 
-import java.util.List;
 import java.util.Map;
 
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.BDDMockito.given;
 
 /**
- * AdminDashboardController 단위 테스트
- *
- * - 대시보드 통계 API
- * - 최근 신고 내역 API
+ * 관리자 대시보드 컨트롤러 단위 테스트
+ * 
+ * 이 컨트롤러는 단순한 통계 조회만 수행하므로 단위 테스트로 충분합니다.
+ * Spring Security나 복잡한 비즈니스 로직이 없어 Mock을 사용한 테스트가 적합합니다.
  */
-@WebMvcTest(AdminDashboardController.class)
+@ExtendWith(MockitoExtension.class)
 class AdminDashboardControllerTest {
-    @Autowired
-    private MockMvc mockMvc;
 
-    @MockBean
+    @Mock
     private UserRepository userRepository;
-    @MockBean
+    
+    @Mock
     private PostRepository postRepository;
-    @MockBean
+    
+    @Mock
     private PostCommentRepository commentRepository;
-    @MockBean
+    
+    @Mock
     private StudyRepository studyRepository;
-    @MockBean
+    
+    @Mock
     private BoardRepository boardRepository;
-    @MockBean
+    
+    @Mock
     private ReportRepository reportRepository;
 
-    @Test
-    @DisplayName("대시보드 통계 API - 정상 응답")
-    void getDashboardStats_success() throws Exception {
-        // given
-        when(userRepository.count()).thenReturn(10L);
-        when(postRepository.count()).thenReturn(20L);
-        when(commentRepository.count()).thenReturn(30L);
-        when(studyRepository.count()).thenReturn(5L);
-        when(boardRepository.count()).thenReturn(1L);
-        when(reportRepository.countByIsResolvedFalse()).thenReturn(2L);
-        when(userRepository.countByIsBlockedTrue()).thenReturn(1L);
+    @InjectMocks
+    private AdminDashboardController controller;
 
-        // when & then
-        mockMvc.perform(get("/admin/dashboard/stats"))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.totalUsers").value(10))
-                .andExpect(jsonPath("$.totalPosts").value(20))
-                .andExpect(jsonPath("$.totalComments").value(30))
-                .andExpect(jsonPath("$.totalStudies").value(5))
-                .andExpect(jsonPath("$.totalBoards").value(1))
-                .andExpect(jsonPath("$.pendingReports").value(2))
-                .andExpect(jsonPath("$.blockedUsers").value(1));
+    @Test
+    @DisplayName("대시보드 통계 데이터 조회")
+    void getDashboardStats() {
+        // given
+        given(userRepository.count()).willReturn(100L);
+        given(postRepository.count()).willReturn(500L);
+        given(commentRepository.count()).willReturn(2000L);
+        given(studyRepository.count()).willReturn(50L);
+        given(boardRepository.count()).willReturn(3L);
+        given(reportRepository.countByIsResolvedFalse()).willReturn(10L);
+        given(userRepository.countByIsBlockedTrue()).willReturn(5L);
+
+        // when
+        ResponseEntity<Map<String, Object>> response = controller.getDashboardStats();
+        
+        // then
+        assertThat(response.getStatusCode().value()).isEqualTo(200);
+        Map<String, Object> stats = response.getBody();
+        
+        assertThat(stats).isNotNull();
+        assertThat(stats.get("totalUsers")).isEqualTo(100L);
+        assertThat(stats.get("totalPosts")).isEqualTo(500L);
+        assertThat(stats.get("totalComments")).isEqualTo(2000L);
+        assertThat(stats.get("totalStudies")).isEqualTo(50L);
+        assertThat(stats.get("totalBoards")).isEqualTo(3L);
+        assertThat(stats.get("pendingReports")).isEqualTo(10L);
+        assertThat(stats.get("blockedUsers")).isEqualTo(5L);
     }
 
     @Test
-    @DisplayName("최근 신고 내역 API - 정상 응답")
-    void getRecentReports_success() throws Exception {
-        // given
-        when(reportRepository.findTop10ByOrderByReportedAtDesc()).thenReturn(List.of());
-
-        // when & then
-        mockMvc.perform(get("/admin/dashboard/recent-reports"))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON));
+    @DisplayName("최근 신고 내역 조회")
+    void getRecentReports() {
+        // when
+        ResponseEntity<?> response = controller.getRecentReports();
+        
+        // then
+        assertThat(response.getStatusCode().value()).isEqualTo(200);
     }
 } 

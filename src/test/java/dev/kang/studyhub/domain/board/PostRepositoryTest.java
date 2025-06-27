@@ -13,6 +13,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -42,6 +43,11 @@ class PostRepositoryTest {
 
     @BeforeEach
     void setUp() {
+        // 테스트 데이터 정리 (중복/무결성 에러 방지)
+        postRepository.deleteAll();
+        boardRepository.deleteAll();
+        userRepository.deleteAll();
+
         user = User.builder()
                 .name("게시글작성자")
                 .email("postuser@test.com")
@@ -52,7 +58,8 @@ class PostRepositoryTest {
         userRepository.save(user);
 
         board = new Board();
-        board.setName("커뮤니티");
+        // board name을 매번 다르게 생성하여 중복 방지
+        board.setName("커뮤니티_" + UUID.randomUUID());
         board.setDescription("자유로운 소통을 위한 커뮤니티입니다.");
         board.setCreatedAt(LocalDateTime.now());
         boardRepository.save(board);

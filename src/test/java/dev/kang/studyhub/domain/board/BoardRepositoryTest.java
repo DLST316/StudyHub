@@ -11,6 +11,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -47,6 +48,13 @@ class BoardRepositoryTest {
 
     @BeforeEach
     void setUp() {
+        // 테스트 데이터 정리 (중복/무결성 에러 방지)
+        postCommentRepository.deleteAll();
+        postLikeRepository.deleteAll();
+        postRepository.deleteAll();
+        boardRepository.deleteAll();
+        userRepository.deleteAll();
+
         // 테스트용 사용자 생성
         user = User.builder()
                 .name("테스트 사용자")
@@ -59,7 +67,7 @@ class BoardRepositoryTest {
 
         // 게시판 생성
         board = new Board();
-        board.setName("커뮤니티");
+        board.setName("커뮤니티_" + UUID.randomUUID());
         board.setDescription("자유로운 소통을 위한 커뮤니티입니다.");
         board.setCreatedAt(LocalDateTime.now());
         boardRepository.save(board);
@@ -98,11 +106,11 @@ class BoardRepositoryTest {
     @DisplayName("게시판명으로 게시판 조회")
     void findByName() {
         // when
-        Board found = boardRepository.findByName("커뮤니티");
+        Board found = boardRepository.findByName(board.getName());
 
         // then
         assertThat(found).isNotNull();
-        assertThat(found.getName()).isEqualTo("커뮤니티");
+        assertThat(found.getName()).isEqualTo(board.getName());
         assertThat(found.getDescription()).isEqualTo("자유로운 소통을 위한 커뮤니티입니다.");
     }
 
@@ -114,7 +122,7 @@ class BoardRepositoryTest {
 
         // then
         assertThat(found).isNotNull();
-        assertThat(found.getName()).isEqualTo("커뮤니티");
+        assertThat(found.getName()).isEqualTo(board.getName());
     }
 
     // H2 데이터베이스에서는 cascade 삭제가 작동하지 않음
