@@ -26,6 +26,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
+@org.springframework.context.annotation.Import(dev.kang.studyhub.config.TestSecurityConfig.class)
 class UserControllerTest {
 
     @Autowired
@@ -140,7 +141,13 @@ class UserControllerTest {
     @Test
     @DisplayName("로그아웃")
     void logout() throws Exception {
-        // when & then
+        // given - 먼저 로그인
+        mockMvc.perform(post("/login")
+                        .param("username", "testuser")
+                        .param("password", "password123"))
+                .andExpect(status().is3xxRedirection());
+
+        // when & then - 로그아웃
         mockMvc.perform(get("/logout"))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/"));

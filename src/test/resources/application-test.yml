@@ -23,6 +23,17 @@ spring:
       name: test
       password: test
 
+# 테스트 환경용 Cloudinary 설정 (실제 계정 정보)
+cloudinary:
+  cloud-name: inseokbase
+  api-key: 213214
+  api-secret: test-secret
+
+# 테스트 환경용 관리자 계정 설정
+admin:
+  username: admin
+  password: admin123
+
 logging:
   level:
     org.springframework.security: DEBUG

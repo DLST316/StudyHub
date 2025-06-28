@@ -9,5 +9,31 @@ out
 # application 설정 파일 (보안 중요)
 src/main/resources/application.yml
 src/main/resources/application.properties
+src/main/resources/application-prod.yml
+src/test/resources/application-test.yml
+# 보안 관련 파일들
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+*.jks
+*.keystore
+*.truststore
+
+# 로그 파일들
+logs/
+*.log.*
+
+# 임시 파일들
+*.tmp
+*.temp
+*.swp
+*.swo
+
+# 압축 파일들
+*.zip
+*.tar.gz
+*.rar
 
 .fake

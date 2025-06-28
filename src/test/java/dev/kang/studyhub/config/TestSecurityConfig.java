@@ -1,9 +1,12 @@
 package dev.kang.studyhub.config;
 
-import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
+import org.springframework.context.annotation.Profile;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -11,28 +14,42 @@ import org.springframework.security.web.SecurityFilterChain;
 /**
  * 테스트 환경을 위한 Spring Security 설정
  * 
- * 실제 운영 환경과 동일한 설정을 사용하여 테스트의 정확성을 높입니다.
- * - 실제 SecurityConfig와 동일한 URL별 접근 권한 설정
- * - CSRF 보호 비활성화 (테스트 편의)
- * - 폼 로그인 비활성화 (테스트에서는 @WithMockUser 사용)
+ * 테스트 편의를 위해 보안 설정을 완화하되, 실제 보안 동작도 테스트할 수 있도록 설정합니다.
+ * - CSRF 보호 완전 비활성화
+ * - 실제 URL별 접근 권한 설정 유지
+ * - 폼 로그인/로그아웃 활성화 (테스트에서 사용)
  */
-@TestConfiguration
+@Configuration
 @EnableWebSecurity
+@Profile("test")
 public class TestSecurityConfig {
 
     @Bean
+    @Primary
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
             .authorizeHttpRequests(authz -> authz
-                // 실제 SecurityConfig와 동일한 설정
-                .requestMatchers("/", "/join", "/login", "/css/**", "/js/**", "/images/**", "/h2-console/**").permitAll()
+                // 실제 SecurityConfig와 동일한 URL별 접근 권한 설정
+                .requestMatchers("/", "/join", "/login", "/css/**", "/js/**", "/images/**").permitAll()
                 .requestMatchers("/api/images/**").authenticated()
-                // 그 외 모든 요청은 인증이 필요 (실제 설정과 동일)
+                .requestMatchers("/admin/**").hasRole("ADMIN")
                 .anyRequest().authenticated()
             )
-            .csrf(csrf -> csrf.disable())  // CSRF 비활성화 (테스트 편의)
-            .formLogin(form -> form.disable())  // 폼 로그인 비활성화 (테스트에서는 @WithMockUser 사용)
-            .logout(logout -> logout.disable());  // 로그아웃 비활성화
+            .csrf(AbstractHttpConfigurer::disable)  // CSRF 완전 비활성화
+            .formLogin(form -> form
+                .loginPage("/login")
+                .loginProcessingUrl("/login")
+                .defaultSuccessUrl("/?success=login")
+                .failureUrl("/login?error=true")
+                .permitAll()
+            )
+            .logout(logout -> logout
+                .logoutUrl("/logout")
+                .logoutSuccessUrl("/")
+            )
+            .headers(headers -> headers
+                .frameOptions().disable()  // H2 콘솔 사용을 위해
+            );
         
         return http.build();
     }

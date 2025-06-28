@@ -3,6 +3,7 @@ package dev.kang.studyhub.config;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -19,71 +20,171 @@ import org.springframework.security.crypto.password.PasswordEncoder;
  * - URL별 접근 권한 설정
  * - 로그인/로그아웃 설정
  * - 비밀번호 암호화 설정
+ * - CSRF 보호 및 보안 헤더 설정
  */
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
+@Profile("!test")
 public class SecurityConfig {
 
     /**
-     * Spring Security의 핵심 설정을 담당하는 메서드
-     * HTTP 요청에 대한 보안 규칙을 정의합니다.
+     * 개발 환경용 Spring Security 설정
+     * 개발 편의를 위해 일부 보안 기능을 완화합니다.
      * 
-     * @param http HttpSecurity 객체 (Spring Security 설정을 위한 빌더)
+     * @param http HttpSecurity 객체
      * @return SecurityFilterChain 객체
      * @throws Exception 설정 중 발생할 수 있는 예외
      */
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    @Profile("h2")  // H2 프로파일 (개발 환경)
+    public SecurityFilterChain h2SecurityFilterChain(HttpSecurity http) throws Exception {
         http
-                // CSRF(Cross-Site Request Forgery) 보호 기능을 비활성화
-                // 개발 환경에서는 편의를 위해 비활성화하지만, 운영 환경에서는 활성화해야 합니다
+                // 개발 환경에서는 CSRF 비활성화 (H2 콘솔 사용을 위해)
                 .csrf(AbstractHttpConfigurer::disable)
                 
                 // H2 콘솔의 iframe 사용을 허용
-                // H2 데이터베이스 콘솔이 iframe 내에서 정상 작동하도록 설정
                 .headers(headers -> headers
                         .frameOptions(HeadersConfigurer.FrameOptionsConfig::disable)
                 )
                 
                 // URL별 접근 권한 설정
                 .authorizeHttpRequests(auth -> auth
-                        // 다음 URL들은 인증 없이 접근 가능 (permitAll)
-                        .requestMatchers("/", "/join", "/login", "/css/**", "/js/**", "/images/**","/h2-console/**").permitAll()
-                        // 이미지 업로드 API는 인증된 사용자만 접근 가능
+                        .requestMatchers("/", "/join", "/login", "/css/**", "/js/**", "/images/**", "/h2-console/**").permitAll()
                         .requestMatchers("/api/images/**").authenticated()
-                        // 어드민 페이지는 ADMIN 권한만 접근 가능
                         .requestMatchers("/admin/**").hasRole("ADMIN")
-                        // 그 외 모든 요청은 인증이 필요 (authenticated)
                         .anyRequest().authenticated()
                 )
                 
                 // 폼 로그인 설정
                 .formLogin(form -> form
-                        // 커스텀 로그인 페이지 설정
                         .loginPage("/login")
                         .loginProcessingUrl("/login")
-                        // 로그인 시 사용할 username 파라미터 이름을 "username"으로 설정
-                        // 기본값은 "username"이며, 우리는 사용자명(아이디)을 사용자 식별자로 사용
                         .usernameParameter("username")
                         .passwordParameter("password")
-                        // 로그인 성공 시 리다이렉트할 URL
                         .defaultSuccessUrl("/?success=login")
-                        // 로그인 실패 시 리다이렉트할 URL
                         .failureUrl("/login?error=true")
-                        // 로그인 페이지 접근을 모든 사용자에게 허용
                         .permitAll()
                 )
                 
                 // 로그아웃 설정
                 .logout(logout -> logout
-                        // 로그아웃 요청을 처리할 URL
                         .logoutUrl("/logout")
-                        // 로그아웃 성공 시 리다이렉트할 URL
                         .logoutSuccessUrl("/")
                 );
 
-        // 설정된 SecurityFilterChain을 반환
+        return http.build();
+    }
+
+    /**
+     * 운영 환경용 Spring Security 설정
+     * 강화된 보안 설정을 적용합니다.
+     * 
+     * @param http HttpSecurity 객체
+     * @return SecurityFilterChain 객체
+     * @throws Exception 설정 중 발생할 수 있는 예외
+     */
+    @Bean
+    @Profile("prod")  // 운영 환경 프로파일
+    public SecurityFilterChain productionSecurityFilterChain(HttpSecurity http) throws Exception {
+        http
+                // CSRF 보호 활성화
+                .csrf(csrf -> csrf.ignoringRequestMatchers("/api/images/upload"))
+                
+                // 보안 헤더 설정
+                .headers(headers -> headers
+                        // Clickjacking 방지
+                        .frameOptions(HeadersConfigurer.FrameOptionsConfig::deny)
+                        // XSS 방지
+                        .xssProtection(xss -> xss.disable())
+                        // Content Type Sniffing 방지
+                        .contentTypeOptions(contentType -> contentType.disable())
+                        // HSTS 헤더 설정
+                        .httpStrictTransportSecurity(hsts -> hsts
+                                .maxAgeInSeconds(31536000)
+                        )
+                        // Content Security Policy 설정
+                        .contentSecurityPolicy(csp -> csp
+                                .policyDirectives("default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self'; connect-src 'self'")
+                        )
+                )
+                
+                // URL별 접근 권한 설정
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/", "/join", "/login", "/css/**", "/js/**", "/images/**").permitAll()
+                        .requestMatchers("/api/images/**").authenticated()
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .anyRequest().authenticated()
+                )
+                
+                // 폼 로그인 설정
+                .formLogin(form -> form
+                        .loginPage("/login")
+                        .loginProcessingUrl("/login")
+                        .usernameParameter("username")
+                        .passwordParameter("password")
+                        .defaultSuccessUrl("/?success=login")
+                        .failureUrl("/login?error=true")
+                        .permitAll()
+                )
+                
+                // 로그아웃 설정
+                .logout(logout -> logout
+                        .logoutUrl("/logout")
+                        .logoutSuccessUrl("/")
+                        .invalidateHttpSession(true)
+                        .deleteCookies("JSESSIONID")
+                );
+
+        return http.build();
+    }
+
+    /**
+     * 기본 Spring Security 설정 (프로파일이 지정되지 않은 경우)
+     * 
+     * @param http HttpSecurity 객체
+     * @return SecurityFilterChain 객체
+     * @throws Exception 설정 중 발생할 수 있는 예외
+     */
+    @Bean
+    @Profile("!h2 && !prod")  // h2, prod 프로파일이 아닌 경우
+    public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
+        http
+                // CSRF 보호 활성화
+                .csrf(csrf -> csrf.ignoringRequestMatchers("/api/images/upload"))
+                
+                // 기본 보안 헤더 설정
+                .headers(headers -> headers
+                        .frameOptions(HeadersConfigurer.FrameOptionsConfig::deny)
+                        .xssProtection(xss -> xss.disable())
+                        .contentTypeOptions(contentType -> contentType.disable())
+                )
+                
+                // URL별 접근 권한 설정
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/", "/join", "/login", "/css/**", "/js/**", "/images/**").permitAll()
+                        .requestMatchers("/api/images/**").authenticated()
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .anyRequest().authenticated()
+                )
+                
+                // 폼 로그인 설정
+                .formLogin(form -> form
+                        .loginPage("/login")
+                        .loginProcessingUrl("/login")
+                        .usernameParameter("username")
+                        .passwordParameter("password")
+                        .defaultSuccessUrl("/?success=login")
+                        .failureUrl("/login?error=true")
+                        .permitAll()
+                )
+                
+                // 로그아웃 설정
+                .logout(logout -> logout
+                        .logoutUrl("/logout")
+                        .logoutSuccessUrl("/")
+                );
+
         return http.build();
     }
 

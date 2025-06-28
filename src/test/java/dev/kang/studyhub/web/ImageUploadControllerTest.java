@@ -62,7 +62,7 @@ class ImageUploadControllerTest {
                         .file(file))
                 .andExpect(status().isInternalServerError())
                 .andExpect(jsonPath("$.success").value(false))
-                .andExpect(jsonPath("$.message").value(org.hamcrest.Matchers.containsString("이미지 업로드에 실패했습니다")));
+                .andExpect(jsonPath("$.message").value(org.hamcrest.Matchers.containsString("이미지 업로드 기능을 사용하려면 Cloudinary 설정이 필요합니다")));
     }
 
     @Test
