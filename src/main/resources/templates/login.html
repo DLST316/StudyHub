@@ -233,7 +233,7 @@
             <ul class="nav-menu">
                 <li><a href="/studies">스터디 찾기</a></li>
                 <li><a href="/posts">커뮤니티</a></li>
-                <li><a href="/about">소개</a></li>
+                <li><a href="https://github.com/DLST316/StudyHub" target="_blank" rel="noopener">소개</a></li>
             </ul>
         </div>
     </nav>
@@ -253,6 +253,7 @@
 
         <!-- 로그인 폼 -->
         <form action="/login" method="post">
+            <input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
             <div class="form-group">
                 <label for="username">아이디</label>
                 <input type="text" id="username" name="username" required placeholder="아이디를 입력하세요">

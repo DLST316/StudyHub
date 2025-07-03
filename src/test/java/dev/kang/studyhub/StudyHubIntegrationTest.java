@@ -269,7 +269,7 @@ class StudyHubIntegrationTest {
     void communityFullFlow_CompleteSuccess() throws Exception {
         // 1. 게시판(Board) 생성
         Board board = new Board();
-        board.setName("자유게시판");
+        board.setName("테스트게시판_" + java.util.UUID.randomUUID());
         board.setCreatedAt(LocalDateTime.now());
         boardRepository.save(board);
 

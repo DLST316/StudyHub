@@ -41,6 +41,8 @@ dependencies {
     // Cloudinary 의존성 추가
     implementation 'com.cloudinary:cloudinary-http44:1.36.0'
     implementation 'com.cloudinary:cloudinary-taglib:1.36.0'
+    
+    
 
 }
 

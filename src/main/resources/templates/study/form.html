@@ -217,7 +217,7 @@
             <ul class="nav-menu">
                 <li><a href="/studies">스터디 찾기</a></li>
                 <li><a href="/community">커뮤니티</a></li>
-                <li><a href="/about">소개</a></li>
+                <li><a href="https://github.com/DLST316/StudyHub" target="_blank" rel="noopener">소개</a></li>
             </ul>
         </div>
     </nav>
@@ -232,6 +232,7 @@
 
         <!-- 폼 컨테이너 -->
         <form th:action="${studyId != null} ? @{'/studies/edit/' + ${studyId}} : @{/studies/new}" method="post" class="form-container">
+            <input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
             <div class="form-group">
                 <label for="title" class="form-label">스터디명 *</label>
                 <input type="text" id="title" name="title" th:value="${studyForm.title}" required 

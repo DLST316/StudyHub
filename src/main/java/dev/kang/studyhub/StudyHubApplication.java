@@ -45,7 +45,6 @@ public class StudyHubApplication {
      * 개발 환경에서만 테스트 사용자와 어드민 계정을 자동으로 생성하는 CommandLineRunner
      */
     @Bean
-    @Profile("h2")  // H2 프로파일 (개발 환경)에서만 실행
     public CommandLineRunner createTestUsers() {
         return args -> {
             // 어드민 계정 자동 생성 (개발 환경에서만)
@@ -121,19 +120,6 @@ public class StudyHubApplication {
                 freeBoard.setDescription("자유롭게 이야기를 나누는 공간입니다.");
                 freeBoard.setCreatedAt(LocalDateTime.now());
                 boardRepository.save(freeBoard);
-
-                Board studyBoard = new Board();
-                studyBoard.setName("스터디게시판");
-                studyBoard.setDescription("스터디 관련 정보를 공유하는 공간입니다.");
-                studyBoard.setCreatedAt(LocalDateTime.now());
-                boardRepository.save(studyBoard);
-
-                Board qnaBoard = new Board();
-                qnaBoard.setName("질문과답변");
-                qnaBoard.setDescription("궁금한 점을 물어보고 답변을 받는 공간입니다.");
-                qnaBoard.setCreatedAt(LocalDateTime.now());
-                boardRepository.save(qnaBoard);
-
                 System.out.println("기본 게시판 생성 완료");
             }
         };

@@ -13,6 +13,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -36,72 +37,61 @@ class UserRepositoryTest {
     private User blockedUser;
     private User adminUser;
 
+    private String user1Username;
+    private String user1Email;
+    private String user2Username;
+    private String user2Email;
+    private String blockedUsername;
+    private String blockedEmail;
+    private String adminUsername;
+    private String adminEmail;
+
     @BeforeEach
     void setUp() {
-        // 테스트용 사용자 생성
-        user1 = User.builder()
-                .name("테스트 사용자1")
-                .username("testuser1")
-                .email("test1@example.com")
+        // username/email 길이 제한(50자) 내에서 고유값 생성
+        user1Username = "testuser1_" + UUID.randomUUID().toString().substring(0, 8);
+        user1Email = "test1_" + UUID.randomUUID().toString().substring(0, 8) + "@example.com";
+        user2Username = "testuser2_" + UUID.randomUUID().toString().substring(0, 8);
+        user2Email = "test2_" + UUID.randomUUID().toString().substring(0, 8) + "@example.com";
+        blockedUsername = "blocked_" + UUID.randomUUID().toString().substring(0, 8);
+        blockedEmail = "blocked_" + UUID.randomUUID().toString().substring(0, 8) + "@example.com";
+        adminUsername = "admin_" + UUID.randomUUID().toString().substring(0, 8);
+        adminEmail = "admin_" + UUID.randomUUID().toString().substring(0, 8) + "@example.com";
+
+        user1 = createTestUser("테스트 사용자1", user1Username, user1Email, false, EducationStatus.ENROLLED, "테스트 대학교", "컴퓨터공학과", "USER");
+        user2 = createTestUser("테스트 사용자2", user2Username, user2Email, false, EducationStatus.GRADUATED, "테스트 대학교", "소프트웨어공학과", "USER");
+        blockedUser = createTestUser("차단된 사용자", blockedUsername, blockedEmail, true, EducationStatus.ENROLLED, "테스트 대학교", "정보통신공학과", "USER");
+        adminUser = createTestUser("관리자", adminUsername, adminEmail, false, EducationStatus.GRADUATED, "관리자 대학교", "관리학과", "ADMIN");
+    }
+
+    /**
+     * 테스트용 사용자 생성 유틸 (username/email/차단여부/role 등 파라미터화)
+     */
+    private User createTestUser(String name, String username, String email, boolean isBlocked, EducationStatus educationStatus, String university, String major, String role) {
+        User user = User.builder()
+                .name(name)
+                .username(username)
+                .email(email)
                 .password("password123")
-                .role("USER")
-                .isBlocked(false)
-                .educationStatus(EducationStatus.ENROLLED)
-                .university("테스트 대학교")
-                .major("컴퓨터공학과")
+                .role(role)
+                .isBlocked(isBlocked)
+                .educationStatus(educationStatus)
+                .university(university)
+                .major(major)
                 .build();
-        userRepository.save(user1);
-
-        user2 = User.builder()
-                .name("테스트 사용자2")
-                .username("testuser2")
-                .email("test2@example.com")
-                .password("password456")
-                .role("USER")
-                .isBlocked(false)
-                .educationStatus(EducationStatus.GRADUATED)
-                .university("테스트 대학교")
-                .major("소프트웨어공학과")
-                .build();
-        userRepository.save(user2);
-
-        blockedUser = User.builder()
-                .name("차단된 사용자")
-                .username("blockeduser")
-                .email("blocked@example.com")
-                .password("password789")
-                .role("USER")
-                .isBlocked(true)
-                .educationStatus(EducationStatus.ENROLLED)
-                .university("테스트 대학교")
-                .major("정보통신공학과")
-                .build();
-        userRepository.save(blockedUser);
-
-        adminUser = User.builder()
-                .name("관리자")
-                .username("admin")
-                .email("admin@example.com")
-                .password("admin123")
-                .role("ADMIN")
-                .isBlocked(false)
-                .educationStatus(EducationStatus.GRADUATED)
-                .university("관리자 대학교")
-                .major("관리학과")
-                .build();
-        userRepository.save(adminUser);
+        return userRepository.save(user);
     }
 
     @Test
     @DisplayName("이메일로 사용자 조회")
     void findByEmail() {
         // when
-        Optional<User> found = userRepository.findByEmail("test1@example.com");
+        Optional<User> found = userRepository.findByEmail(user1Email);
 
         // then
         assertThat(found).isPresent();
         assertThat(found.get().getName()).isEqualTo("테스트 사용자1");
-        assertThat(found.get().getEmail()).isEqualTo("test1@example.com");
+        assertThat(found.get().getEmail()).isEqualTo(user1Email);
     }
 
     @Test
@@ -118,7 +108,7 @@ class UserRepositoryTest {
     @DisplayName("이메일 존재 여부 확인")
     void existsByEmail() {
         // when
-        boolean exists1 = userRepository.existsByEmail("test1@example.com");
+        boolean exists1 = userRepository.existsByEmail(user1Email);
         boolean exists2 = userRepository.existsByEmail("nonexistent@example.com");
 
         // then
@@ -130,13 +120,13 @@ class UserRepositoryTest {
     @DisplayName("이메일로 사용자 삭제")
     void deleteByEmail() {
         // given
-        assertThat(userRepository.findByEmail("test1@example.com")).isPresent();
+        assertThat(userRepository.findByEmail(user1Email)).isPresent();
 
         // when
-        userRepository.deleteByEmail("test1@example.com");
+        userRepository.deleteByEmail(user1Email);
 
         // then
-        assertThat(userRepository.findByEmail("test1@example.com")).isEmpty();
+        assertThat(userRepository.findByEmail(user1Email)).isEmpty();
     }
 
     @Test
@@ -153,10 +143,12 @@ class UserRepositoryTest {
     @DisplayName("사용자 저장 및 조회")
     void saveAndFind() {
         // given
+        String newUsername = "newuser_" + UUID.randomUUID().toString().substring(0, 8);
+        String newEmail = "new_" + UUID.randomUUID().toString().substring(0, 8) + "@example.com";
         User newUser = User.builder()
                 .name("새로운 사용자")
-                .username("newuser")
-                .email("new@example.com")
+                .username(newUsername)
+                .email(newEmail)
                 .password("newpassword")
                 .role("USER")
                 .isBlocked(false)
@@ -172,7 +164,7 @@ class UserRepositoryTest {
         // then
         assertThat(found).isNotNull();
         assertThat(found.getName()).isEqualTo("새로운 사용자");
-        assertThat(found.getEmail()).isEqualTo("new@example.com");
+        assertThat(found.getEmail()).isEqualTo(newEmail);
         assertThat(found.getUniversity()).isEqualTo("새로운 대학교");
         assertThat(found.getMajor()).isEqualTo("새로운 학과");
         assertThat(found.getEducationStatus()).isEqualTo(EducationStatus.ENROLLED);

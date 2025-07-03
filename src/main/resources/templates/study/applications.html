@@ -291,7 +291,7 @@
             <ul class="nav-menu">
                 <li><a href="/studies">스터디 찾기</a></li>
                 <li><a href="/community">커뮤니티</a></li>
-                <li><a href="/about">소개</a></li>
+                <li><a href="https://github.com/DLST316/StudyHub" target="_blank" rel="noopener">소개</a></li>
             </ul>
         </div>
     </nav>
@@ -352,9 +352,11 @@
                 </div>
                 <div class="application-actions" th:if="${app.status == T(dev.kang.studyhub.domain.study.model.ApplicationStatus).PENDING}">
                     <form th:action="@{'/studies/' + ${study.id} + '/applications/' + ${app.id} + '/accept'}" method="post" style="display:inline;">
+                        <input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
                         <button type="submit" class="btn btn-success">승인</button>
                     </form>
                     <form th:action="@{'/studies/' + ${study.id} + '/applications/' + ${app.id} + '/reject'}" method="post" style="display:inline;">
+                        <input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
                         <button type="submit" class="btn btn-danger">거절</button>
                     </form>
                 </div>

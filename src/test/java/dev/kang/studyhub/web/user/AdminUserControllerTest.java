@@ -21,6 +21,7 @@ import org.springframework.web.context.WebApplicationContext;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
@@ -50,6 +51,12 @@ class AdminUserControllerTest {
     private User adminUser;
     private User regularUser;
     private User blockedUser;
+    private String adminUsername;
+    private String adminEmail;
+    private String regularUsername;
+    private String regularEmail;
+    private String blockedUsername;
+    private String blockedEmail;
 
     @BeforeEach
     void setUp() {
@@ -61,10 +68,18 @@ class AdminUserControllerTest {
         // 기존 데이터 정리
         userRepository.deleteAll();
 
+        // 고유값 생성
+        adminUsername = "admin_" + UUID.randomUUID();
+        adminEmail = adminUsername + "@test.com";
+        regularUsername = "user_" + UUID.randomUUID();
+        regularEmail = regularUsername + "@test.com";
+        blockedUsername = "blocked_" + UUID.randomUUID();
+        blockedEmail = blockedUsername + "@test.com";
+
         // 테스트 데이터 준비
-        adminUser = createAdminUser();
-        regularUser = createRegularUser();
-        blockedUser = createBlockedUser();
+        adminUser = createTestUser("관리자", adminUsername, adminEmail, false, "ADMIN");
+        regularUser = createTestUser("일반 사용자", regularUsername, regularEmail, false, "USER");
+        blockedUser = createTestUser("차단된 사용자", blockedUsername, blockedEmail, true, "USER");
 
         // DB에 저장
         userRepository.save(adminUser);
@@ -112,7 +127,7 @@ class AdminUserControllerTest {
         List<User> users = userService.findAllUsers();
         assertThat(users).hasSize(3); // adminUser, regularUser, blockedUser
         assertThat(users).extracting("email")
-                .contains("admin@test.com", "user@test.com", "blocked@test.com");
+                .contains(adminEmail, regularEmail, blockedEmail);
     }
 
     @Test
@@ -138,15 +153,15 @@ class AdminUserControllerTest {
     void searchUsers_ByEmail() throws Exception {
         // when & then
         mockMvc.perform(get("/admin/users/api")
-                        .param("search", "user@test.com"))
+                        .param("search", regularEmail))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/json"));
 
         // 비즈니스 로직 검증
         Page<User> searchResult = userRepository.findByEmailContainingIgnoreCaseOrNameContainingIgnoreCase(
-                "user@test.com", "user@test.com", PageRequest.of(0, 20));
+                regularEmail, regularEmail, PageRequest.of(0, 20));
         assertThat(searchResult.getContent()).hasSize(1);
-        assertThat(searchResult.getContent().get(0).getEmail()).isEqualTo("user@test.com");
+        assertThat(searchResult.getContent().get(0).getEmail()).isEqualTo(regularEmail);
     }
 
     @Test
@@ -179,7 +194,7 @@ class AdminUserControllerTest {
         // 비즈니스 로직 검증
         Page<User> blockedUsers = userRepository.findByIsBlockedTrue(PageRequest.of(0, 20));
         assertThat(blockedUsers.getContent()).hasSize(1);
-        assertThat(blockedUsers.getContent().get(0).getEmail()).isEqualTo("blocked@test.com");
+        assertThat(blockedUsers.getContent().get(0).getEmail()).isEqualTo(blockedEmail);
     }
 
     @Test
@@ -196,7 +211,7 @@ class AdminUserControllerTest {
         Page<User> activeUsers = userRepository.findByIsBlockedFalse(PageRequest.of(0, 20));
         assertThat(activeUsers.getContent()).hasSize(2); // adminUser, regularUser
         assertThat(activeUsers.getContent()).extracting("email")
-                .contains("admin@test.com", "user@test.com");
+                .contains(adminEmail, regularEmail);
     }
 
     @Test
@@ -211,7 +226,7 @@ class AdminUserControllerTest {
         // 비즈니스 로직 검증
         User foundUser = userRepository.findById(regularUser.getId()).orElse(null);
         assertThat(foundUser).isNotNull();
-        assertThat(foundUser.getEmail()).isEqualTo("user@test.com");
+        assertThat(foundUser.getEmail()).isEqualTo(regularEmail);
     }
 
     @Test
@@ -307,53 +322,19 @@ class AdminUserControllerTest {
     }
 
     /**
-     * 테스트용 어드민 사용자 생성
+     * 테스트용 사용자 생성 유틸 (username/email/차단여부/role만 파라미터화)
      */
-    private User createAdminUser() {
+    private User createTestUser(String name, String username, String email, boolean isBlocked, String role) {
         return User.builder()
-                .name("관리자")
-                .username("admin")
-                .email("admin@test.com")
+                .name(name)
+                .username(username)
+                .email(email)
                 .password("password")
                 .university("테스트 대학교")
                 .major("컴퓨터공학과")
                 .educationStatus(dev.kang.studyhub.domain.user.model.EducationStatus.ENROLLED)
-                .role("ADMIN")
-                .isBlocked(false)
-                .build();
-    }
-
-    /**
-     * 테스트용 일반 사용자 생성
-     */
-    private User createRegularUser() {
-        return User.builder()
-                .name("일반 사용자")
-                .username("user")
-                .email("user@test.com")
-                .password("password")
-                .university("테스트 대학교")
-                .major("컴퓨터공학과")
-                .educationStatus(dev.kang.studyhub.domain.user.model.EducationStatus.ENROLLED)
-                .role("USER")
-                .isBlocked(false)
-                .build();
-    }
-
-    /**
-     * 테스트용 차단된 사용자 생성
-     */
-    private User createBlockedUser() {
-        return User.builder()
-                .name("차단된 사용자")
-                .username("blocked")
-                .email("blocked@test.com")
-                .password("password")
-                .university("테스트 대학교")
-                .major("컴퓨터공학과")
-                .educationStatus(dev.kang.studyhub.domain.user.model.EducationStatus.ENROLLED)
-                .role("USER")
-                .isBlocked(true)
+                .role(role)
+                .isBlocked(isBlocked)
                 .build();
     }
 } 

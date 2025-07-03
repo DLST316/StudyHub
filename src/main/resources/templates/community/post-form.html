@@ -126,6 +126,7 @@
         <div class="container py-4">
             <h2 th:text="${#strings.isEmpty(postForm.title) ? '글쓰기' : '글 수정'}"></h2>
             <form th:action="@{/community/write}" th:object="${postForm}" method="post" class="needs-validation" novalidate>
+                <input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
                 <div class="mb-3">
                     <label for="title" class="form-label">제목</label>
                     <input type="text" th:field="*{title}" class="form-control" id="title" required>
