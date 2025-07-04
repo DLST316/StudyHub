@@ -116,7 +116,7 @@ public class StudyHubApplication {
             // 기본 게시판 생성
             if (boardRepository.count() == 0) {
                 Board freeBoard = new Board();
-                freeBoard.setName("자유게시판");
+                freeBoard.setName("커뮤니티");
                 freeBoard.setDescription("자유롭게 이야기를 나누는 공간입니다.");
                 freeBoard.setCreatedAt(LocalDateTime.now());
                 boardRepository.save(freeBoard);
