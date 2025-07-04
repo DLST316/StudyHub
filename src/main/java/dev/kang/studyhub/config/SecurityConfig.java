@@ -10,6 +10,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.csrf.LazyCsrfTokenRepository;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -88,56 +89,66 @@ public class SecurityConfig {
     @Bean
     @Profile("prod")  // 운영 환경 프로파일
     public SecurityFilterChain productionSecurityFilterChain(HttpSecurity http) throws Exception {
+        // CSRF 토큰을 쿠키에 저장 (세션 생성 문제 없이)
+        CookieCsrfTokenRepository repo = CookieCsrfTokenRepository.withHttpOnlyFalse();
+        repo.setCookiePath("/");
+        // repo.setCookieSecure(true); // Spring Security 6.x에서는 setCookieSecure 미지원, 필요시 CookieSerializer 사용
+        // repo.setSameSite("Lax"); // 필요시 주석 해제
+
         http
-                // 운영 환경에서 CSRF 완전 비활성화
-                .csrf(AbstractHttpConfigurer::disable)
-                // 보안 헤더 설정
-                .headers(headers -> headers
-                        // Clickjacking 방지
-                        .frameOptions(HeadersConfigurer.FrameOptionsConfig::deny)
-                        // XSS 방지
-                        .xssProtection(xss -> xss.disable())
-                        // Content Type Sniffing 방지
-                        .contentTypeOptions(contentType -> contentType.disable())
-                        // HSTS 헤더 설정
-                        .httpStrictTransportSecurity(hsts -> hsts
-                                .maxAgeInSeconds(31536000)
-                        )
-                        // Content Security Policy 설정 (CDN 허용)
-                        .contentSecurityPolicy(csp -> csp
-                                .policyDirectives(
-                                    "default-src 'self'; " +
-                                    "script-src 'self' 'unsafe-inline' https://cdn.quilljs.com https://cdn.jsdelivr.net; " +
-                                    "style-src 'self' 'unsafe-inline' https://cdn.quilljs.com https://cdn.jsdelivr.net; " +
-                                    "font-src 'self' https://cdn.jsdelivr.net; " +
-                                    "img-src 'self' data: https:; " +
-                                    "connect-src 'self';"
-                                )
-                        )
-                )
-                // URL별 접근 권한 설정
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/join", "/login", "/css/**", "/js/**", "/images/**", "/h2-console/**", "/api/images/**", "/error", "/favicon.ico").permitAll()
-                        .requestMatchers("/admin/**").hasRole("ADMIN")
-                        .anyRequest().authenticated()
-                )
-                // 폼 로그인 설정
-                .formLogin(form -> form
-                        .loginPage("/login")
-                        .loginProcessingUrl("/login")
-                        .usernameParameter("username")
-                        .passwordParameter("password")
-                        .defaultSuccessUrl("/?success=login")
-                        .failureUrl("/login?error=true")
-                        .permitAll()
-                )
-                // 로그아웃 설정
-                .logout(logout -> logout
-                        .logoutUrl("/logout")
-                        .logoutSuccessUrl("/")
-                        .invalidateHttpSession(true)
-                        .deleteCookies("JSESSIONID")
-                );
+            .csrf(csrf -> csrf
+                // LazyCsrfTokenRepository로 세션/쿠키 타이밍 문제까지 방지
+                .csrfTokenRepository(new LazyCsrfTokenRepository(repo))
+                // 정말 예외가 필요한 POST만 예외 처리
+                .ignoringRequestMatchers("/api/images/upload")
+            )
+            // 보안 헤더 설정
+            .headers(headers -> headers
+                    // Clickjacking 방지
+                    .frameOptions(HeadersConfigurer.FrameOptionsConfig::deny)
+                    // XSS 방지
+                    .xssProtection(xss -> xss.disable())
+                    // Content Type Sniffing 방지
+                    .contentTypeOptions(contentType -> contentType.disable())
+                    // HSTS 헤더 설정
+                    .httpStrictTransportSecurity(hsts -> hsts
+                            .maxAgeInSeconds(31536000)
+                    )
+                    // Content Security Policy 설정 (CDN 허용)
+                    .contentSecurityPolicy(csp -> csp
+                            .policyDirectives(
+                                "default-src 'self'; " +
+                                "script-src 'self' 'unsafe-inline' https://cdn.quilljs.com https://cdn.jsdelivr.net; " +
+                                "style-src 'self' 'unsafe-inline' https://cdn.quilljs.com https://cdn.jsdelivr.net; " +
+                                "font-src 'self' https://cdn.jsdelivr.net; " +
+                                "img-src 'self' data: https:; " +
+                                "connect-src 'self';"
+                            )
+                    )
+            )
+            // URL별 접근 권한 설정
+            .authorizeHttpRequests(auth -> auth
+                    .requestMatchers("/", "/join", "/login", "/css/**", "/js/**", "/images/**", "/h2-console/**", "/api/images/**", "/error", "/favicon.ico").permitAll()
+                    .requestMatchers("/admin/**").hasRole("ADMIN")
+                    .anyRequest().authenticated()
+            )
+            // 폼 로그인 설정
+            .formLogin(form -> form
+                    .loginPage("/login")
+                    .loginProcessingUrl("/login")
+                    .usernameParameter("username")
+                    .passwordParameter("password")
+                    .defaultSuccessUrl("/?success=login")
+                    .failureUrl("/login?error=true")
+                    .permitAll()
+            )
+            // 로그아웃 설정
+            .logout(logout -> logout
+                    .logoutUrl("/logout")
+                    .logoutSuccessUrl("/")
+                    .invalidateHttpSession(true)
+                    .deleteCookies("JSESSIONID")
+            );
 
         return http.build();
     }
