@@ -89,22 +89,8 @@ public class SecurityConfig {
     @Profile("prod")  // 운영 환경 프로파일
     public SecurityFilterChain productionSecurityFilterChain(HttpSecurity http) throws Exception {
         http
-                // CSRF 토큰을 쿠키에 저장 (세션 생성 문제 해결)
-                .csrf(csrf -> csrf
-                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                        .ignoringRequestMatchers(
-                            "/", 
-                            "/login", 
-                            "/join", 
-                            "/css/**", 
-                            "/js/**", 
-                            "/images/**", 
-                            "/h2-console/**", 
-                            "/api/images/**", 
-                            "/error", 
-                            "/favicon.ico"
-                        )
-                )
+                // 운영 환경에서 CSRF 완전 비활성화
+                .csrf(AbstractHttpConfigurer::disable)
                 // 보안 헤더 설정
                 .headers(headers -> headers
                         // Clickjacking 방지
@@ -117,9 +103,16 @@ public class SecurityConfig {
                         .httpStrictTransportSecurity(hsts -> hsts
                                 .maxAgeInSeconds(31536000)
                         )
-                        // Content Security Policy 설정
+                        // Content Security Policy 설정 (CDN 허용)
                         .contentSecurityPolicy(csp -> csp
-                                .policyDirectives("default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self'; connect-src 'self'")
+                                .policyDirectives(
+                                    "default-src 'self'; " +
+                                    "script-src 'self' 'unsafe-inline' https://cdn.quilljs.com https://cdn.jsdelivr.net; " +
+                                    "style-src 'self' 'unsafe-inline' https://cdn.quilljs.com https://cdn.jsdelivr.net; " +
+                                    "font-src 'self' https://cdn.jsdelivr.net; " +
+                                    "img-src 'self' data: https:; " +
+                                    "connect-src 'self';"
+                                )
                         )
                 )
                 // URL별 접근 권한 설정
@@ -160,8 +153,8 @@ public class SecurityConfig {
     @Profile("!h2 && !prod")  // h2, prod 프로파일이 아닌 경우
     public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
         http
-                // CSRF 보호 활성화
-                .csrf(csrf -> csrf.ignoringRequestMatchers("/api/images/upload"))
+                // CSRF 완전 비활성화
+                .csrf(AbstractHttpConfigurer::disable)
                 
                 // 기본 보안 헤더 설정
                 .headers(headers -> headers
