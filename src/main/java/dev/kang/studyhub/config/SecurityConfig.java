@@ -9,6 +9,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -88,9 +89,22 @@ public class SecurityConfig {
     @Profile("prod")  // 운영 환경 프로파일
     public SecurityFilterChain productionSecurityFilterChain(HttpSecurity http) throws Exception {
         http
-                // CSRF 보호 활성화
-                .csrf(csrf -> csrf.ignoringRequestMatchers("/api/images/upload"))
-                
+                // CSRF 토큰을 쿠키에 저장 (세션 생성 문제 해결)
+                .csrf(csrf -> csrf
+                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                        .ignoringRequestMatchers(
+                            "/", 
+                            "/login", 
+                            "/join", 
+                            "/css/**", 
+                            "/js/**", 
+                            "/images/**", 
+                            "/h2-console/**", 
+                            "/api/images/**", 
+                            "/error", 
+                            "/favicon.ico"
+                        )
+                )
                 // 보안 헤더 설정
                 .headers(headers -> headers
                         // Clickjacking 방지
@@ -108,15 +122,12 @@ public class SecurityConfig {
                                 .policyDirectives("default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self'; connect-src 'self'")
                         )
                 )
-                
                 // URL별 접근 권한 설정
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/join", "/login", "/css/**", "/js/**", "/images/**").permitAll()
-                        .requestMatchers("/api/images/**").authenticated()
+                        .requestMatchers("/", "/join", "/login", "/css/**", "/js/**", "/images/**", "/h2-console/**", "/api/images/**", "/error", "/favicon.ico").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
-                
                 // 폼 로그인 설정
                 .formLogin(form -> form
                         .loginPage("/login")
@@ -127,7 +138,6 @@ public class SecurityConfig {
                         .failureUrl("/login?error=true")
                         .permitAll()
                 )
-                
                 // 로그아웃 설정
                 .logout(logout -> logout
                         .logoutUrl("/logout")
