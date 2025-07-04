@@ -232,7 +232,6 @@
 
         <!-- 폼 컨테이너 -->
         <form th:action="${studyId != null} ? @{'/studies/edit/' + ${studyId}} : @{/studies/new}" method="post" class="form-container">
-            <input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
             <div class="form-group">
                 <label for="title" class="form-label">스터디명 *</label>
                 <input type="text" id="title" name="title" th:value="${studyForm.title}" required 

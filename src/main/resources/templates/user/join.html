@@ -194,7 +194,6 @@
         <h1 class="join-title">회원가입</h1>
 
         <form th:action="@{/join}" th:object="${userJoinForm}" method="post">
-            <input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
             <div class="form-group">
                 <label for="name">이름</label>
                 <input type="text" th:field="*{name}" id="name" placeholder="이름을 입력하세요" />

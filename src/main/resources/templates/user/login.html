@@ -6,7 +6,6 @@
 <div>
     <h1>로그인</h1>
     <form th:action="@{/login}" th:object="${loginForm}" method="post">
-        <input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
         <label for="email">이메일</label>
         <input type="email" th:field="*{email}" id="email" />
         <br />

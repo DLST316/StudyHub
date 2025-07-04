@@ -523,13 +523,11 @@
             <a th:href="@{/studies}" class="btn">목록으로</a>
             <a th:if="${isLeader}" th:href="@{'/studies/edit/' + ${study.id}}" class="btn btn-primary">수정</a>
             <form th:if="${isLeader or (currentUser != null and currentUser.role == 'ADMIN')}" th:action="@{'/studies/delete/' + ${study.id}}" method="post" style="display:inline;">
-                <input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
                 <button type="submit" class="btn btn-danger" onclick="return confirm('정말 삭제하시겠습니까?')">삭제</button>
             </form>
             
             <!-- 신청하지 않은 경우 -->
             <form th:if="${!isLeader && !isApplied}" th:action="@{'/studies/' + ${study.id} + '/apply'}" method="post" style="display:inline;">
-                <input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
                 <button type="submit" class="btn btn-primary">스터디 신청</button>
             </form>
             
@@ -538,7 +536,6 @@
                 <!-- 대기중인 경우 -->
                 <form th:if="${applicationStatus == T(dev.kang.studyhub.domain.study.model.ApplicationStatus).PENDING}" 
                       th:action="@{'/studies/' + ${study.id} + '/cancel'}" method="post" style="display:inline;">
-                    <input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
                     <button type="submit" class="btn btn-danger">신청 취소</button>
                 </form>
                 
@@ -574,7 +571,6 @@
                     <div class="restricted-actions">
                         <!-- 신청하지 않은 경우 -->
                         <form th:if="${!isLeader && !isApplied}" th:action="@{'/studies/' + ${study.id} + '/apply'}" method="post" style="display:inline;">
-                            <input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
                             <button type="submit" class="btn btn-primary">스터디 신청하기</button>
                         </form>
                         
@@ -608,7 +604,6 @@
                 <!-- 댓글 작성 폼 -->
                 <div class="comment-form">
                     <form th:action="@{'/studies/' + ${study.id} + '/comments'}" method="post">
-                        <input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
                         <textarea name="content" class="comment-textarea" placeholder="댓글을 입력하세요..." required></textarea>
                         <button type="submit" class="comment-submit">댓글 작성</button>
                     </form>

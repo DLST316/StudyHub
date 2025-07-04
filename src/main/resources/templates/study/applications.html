@@ -352,11 +352,9 @@
                 </div>
                 <div class="application-actions" th:if="${app.status == T(dev.kang.studyhub.domain.study.model.ApplicationStatus).PENDING}">
                     <form th:action="@{'/studies/' + ${study.id} + '/applications/' + ${app.id} + '/accept'}" method="post" style="display:inline;">
-                        <input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
                         <button type="submit" class="btn btn-success">승인</button>
                     </form>
                     <form th:action="@{'/studies/' + ${study.id} + '/applications/' + ${app.id} + '/reject'}" method="post" style="display:inline;">
-                        <input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
                         <button type="submit" class="btn btn-danger">거절</button>
                     </form>
                 </div>

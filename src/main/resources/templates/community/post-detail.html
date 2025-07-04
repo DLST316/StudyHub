@@ -54,14 +54,12 @@
                 <nav class="like-section" aria-label="추천/비추천 및 목록 이동">
                     <div th:if="${currentUser != null}" style="display: flex; gap: 1rem; align-items: center;">
                         <form th:action="@{'/community/post/' + ${post.id} + '/like'}" method="post" style="display:inline">
-                            <input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
                             <button type="submit" th:class="${userLikeStatus == T(dev.kang.studyhub.domain.board.PostLike$LikeType).LIKE ? 'like-btn' : 'like-btn like-btn-outline'}">
                                 <i class="bi bi-hand-thumbs-up-fill"></i>
                                 추천 <span th:text="${post.likeCount}">0</span>
                             </button>
                         </form>
                         <form th:action="@{'/community/post/' + ${post.id} + '/dislike'}" method="post" style="display:inline">
-                            <input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
                             <button type="submit" th:class="${userLikeStatus == T(dev.kang.studyhub.domain.board.PostLike$LikeType).DISLIKE ? 'dislike-btn' : 'dislike-btn dislike-btn-outline'}">
                                 <i class="bi bi-hand-thumbs-down-fill"></i>
                                 비추천 <span th:text="${post.dislikeCount}">0</span>
@@ -69,7 +67,6 @@
                         </form>
                         <form th:if="${currentUser != null and (post.user != null and post.user.id == currentUser.id or currentUser.role == 'ADMIN')}"
                               th:action="@{'/community/post/' + ${post.id} + '/delete'}" method="post" style="display:inline; margin-left:1rem;">
-                            <input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
                             <button type="submit" class="btn btn-danger">
                                 <i class="bi bi-trash"></i> 게시글 삭제
                             </button>
@@ -109,7 +106,6 @@
 
                     <div class="comment-form mt-3" th:if="${currentUser != null}">
                         <form th:action="@{'/community/post/' + ${post.id} + '/comment'}" method="post">
-                            <input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
                             <textarea name="content" class="comment-textarea form-control" rows="4" placeholder="댓글을 입력하세요..." required></textarea>
                             <div class="d-flex justify-content-end mt-2">
                                 <button type="submit" class="comment-submit">
