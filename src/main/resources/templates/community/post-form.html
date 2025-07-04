@@ -129,7 +129,7 @@
                 <div class="mb-3">
                     <label for="title" class="form-label">제목</label>
                     <input type="text" th:field="*{title}" class="form-control" id="title" required>
-                    <div class="invalid-feedback" th:if="#fields.hasErrors('title')" th:errors="*{title}"></div>
+                    <div class="invalid-feedback" th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></div>
                 </div>
                 
                 <div class="mb-3">

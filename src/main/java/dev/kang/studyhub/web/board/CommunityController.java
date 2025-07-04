@@ -75,22 +75,24 @@ public class CommunityController {
 
     /** 글쓰기 처리 */
     @PostMapping("/write")
-    public String write(@Valid @ModelAttribute PostForm postForm, BindingResult result, @AuthenticationPrincipal UserDetails userDetails) {
-        if (result.hasErrors()) return "community/post-form";
-        
+    public String write(@Valid @ModelAttribute("postForm") PostForm postForm, BindingResult result, Model model, @AuthenticationPrincipal UserDetails userDetails) {
+        if (result.hasErrors()) {
+            model.addAttribute("postForm", postForm);
+            return "community/post-form";
+        }
         // 추가 검증: 내용이 비어있거나 공백만 있는 경우
         if (postForm.getContent() == null || postForm.getContent().trim().isEmpty()) {
             result.rejectValue("content", "field.required", "내용을 입력해주세요.");
+            model.addAttribute("postForm", postForm);
             return "community/post-form";
         }
-        
         // HTML 태그를 제거하고 순수 텍스트만 추출하여 검증
         String plainText = postForm.getContent().replaceAll("<[^>]*>", "").trim();
         if (plainText.isEmpty()) {
             result.rejectValue("content", "field.required", "내용을 입력해주세요.");
+            model.addAttribute("postForm", postForm);
             return "community/post-form";
         }
-        
         Board board = boardService.getCommunityBoard();
         // 인증 사용자 조회
         if (userDetails == null) return "redirect:/login";
