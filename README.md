@@ -13,6 +13,8 @@
 스터디 모집과 취업 준비생을 위한 커뮤니티 플랫폼입니다.  
 Spring Boot 기반 MVC 패턴으로 제작되었으며, 회원 관리, 스터디 기능, 게시판, 관리자 기능까지 포함합니다.
 
+[배포 사이트 바로가기](http://studyhub-env.eba-qnsmv3is.ap-northeast-2.elasticbeanstalk.com/)
+
 ---
 
 ## 🚀 프로젝트 개요
@@ -24,7 +26,7 @@ Spring Boot 기반 MVC 패턴으로 제작되었으며, 회원 관리, 스터디
 | 대상    | 백엔드 개발 취업용 포트폴리오                                                         |
 | 기술 스택 | Java 17, Spring Boot 3.5, Spring Security 6.2, JPA/Hibernate, MySQL/H2, Thymeleaf, Gradle |
 | 클라우드 서비스 | Cloudinary (이미지 업로드)                                              |
-| 배포 환경 | AWS EC2 (추후 Docker 도입 예정)                                          |
+| 배포 환경 | AWS EC2                                     |
 
 ---
 
@@ -119,7 +121,7 @@ Spring Boot 기반 MVC 패턴으로 제작되었으며, 회원 관리, 스터디
 ### 보안
 - **Spring Security**: URL별 접근 권한 설정
 - **CSRF**: 개발환경에서 비활성화 (운영환경에서 활성화 필요)
-- **세션 기반 인증**: JWT는 추후 확장 예정
+- **세션 기반 인증**: 
 - **H2 콘솔**: 개발환경에서 접근 허용
 
 ### 클라우드 서비스
@@ -143,6 +145,8 @@ Spring Boot 기반 MVC 패턴으로 제작되었으며, 회원 관리, 스터디
 - [x] 통합 테스트 및 단위 테스트
 - [x] 페이징 처리
 - [x] 검색 기능
+- [x] AWS EC2 배포
+
 
 ### 🔄 진행 중인 작업
 - [ ] API 문서화 (Swagger/OpenAPI)
@@ -150,12 +154,8 @@ Spring Boot 기반 MVC 패턴으로 제작되었으며, 회원 관리, 스터디
 - [ ] Javadoc 및 한글 주석 추가
 
 ### 📋 향후 계획
-- [ ] Docker 컨테이너화
-- [ ] AWS EC2 배포
 - [ ] CI/CD 파이프라인 구축
 - [ ] REST API 확장
-- [ ] JWT 토큰 인증
-- [ ] 실시간 알림 시스템
 
 ---
 
