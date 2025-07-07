@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="_csrf" th:content="${_csrf != null ? _csrf.token : ''}">
+    <meta name="_csrf_header" th:content="${_csrf != null ? _csrf.headerName : ''}">
     <title>스터디 상세 - StudyHub</title>
     <style>
         * {
@@ -679,14 +681,28 @@
                 alert('댓글 내용을 입력해주세요.');
                 return;
             }
+
+            // CSRF 토큰 가져오기 (메타 태그에서 우선, 없으면 쿠키에서)
+            const metaToken = document.querySelector('meta[name="_csrf"]')?.getAttribute('content');
+            const cookieToken = document.cookie.split('; ').find(row => row.startsWith('XSRF-TOKEN='))?.split('=')[1];
+            const csrfToken = metaToken || cookieToken;
+
             fetch(`/studies/[[${study.id}]]/comments/${commentId}`, {
                 method: 'PUT',
                 headers: {
+                    'X-XSRF-TOKEN': csrfToken,
                     'Content-Type': 'application/x-www-form-urlencoded',
                 },
-                body: `content=${encodeURIComponent(content)}`
+                body: `content=${encodeURIComponent(content)}`,
+                credentials: 'same-origin'
             })
-            .then(response => response.text())
+            .then(response => {
+                if (response.ok) {
+                    return response.text();
+                } else {
+                    throw new Error('댓글 수정에 실패했습니다.');
+                }
+            })
             .then(result => {
                 if (result === 'success') {
                     location.reload();
@@ -706,10 +722,26 @@
                 return;
             }
 
+            // CSRF 토큰 가져오기 (메타 태그에서 우선, 없으면 쿠키에서)
+            const metaToken = document.querySelector('meta[name="_csrf"]')?.getAttribute('content');
+            const cookieToken = document.cookie.split('; ').find(row => row.startsWith('XSRF-TOKEN='))?.split('=')[1];
+            const csrfToken = metaToken || cookieToken;
+
             fetch(`/studies/[[${study.id}]]/comments/${commentId}`, {
-                method: 'DELETE'
+                method: 'DELETE',
+                headers: {
+                    'X-XSRF-TOKEN': csrfToken,
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'same-origin'
             })
-            .then(response => response.text())
+            .then(response => {
+                if (response.ok) {
+                    return response.text();
+                } else {
+                    throw new Error('댓글 삭제에 실패했습니다.');
+                }
+            })
             .then(result => {
                 if (result === 'success') {
                     // 성공 시 페이지 새로고침

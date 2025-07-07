@@ -92,8 +92,8 @@ public class SecurityConfig {
         // CSRF 토큰을 쿠키에 저장 (세션 생성 문제 없이)
         CookieCsrfTokenRepository repo = CookieCsrfTokenRepository.withHttpOnlyFalse();
         repo.setCookiePath("/");
+        repo.setCookieName("XSRF-TOKEN"); // 쿠키 이름을 명시적으로 설정
         // repo.setCookieSecure(true); // Spring Security 6.x에서는 setCookieSecure 미지원, 필요시 CookieSerializer 사용
-        // repo.setSameSite("Lax"); // 필요시 주석 해제
 
         http
             .csrf(csrf -> csrf

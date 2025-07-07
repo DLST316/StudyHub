@@ -9,6 +9,8 @@
     <title th:text="${post.title} + ' - StudyHub'"></title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="_csrf" th:content="${_csrf != null ? _csrf.token : ''}">
+    <meta name="_csrf_header" th:content="${_csrf != null ? _csrf.headerName : ''}">
     <link rel="stylesheet" th:href="@{/css/custom.css}"/>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"/>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css"/>
@@ -158,9 +160,16 @@
                     if (confirmBtn) {
                         confirmBtn.addEventListener('click', function() {
                             if (commentIdToDelete) {
+                                // CSRF 토큰 가져오기 (쿠키에서만 추출 - 가장 안정적)
+                                const csrfToken = document.cookie.split('; ').find(row => row.startsWith('XSRF-TOKEN='))?.split('=')[1];
+
                                 fetch('/community/comment/' + commentIdToDelete + '/delete', {
                                     method: 'POST',
-                                    headers: { 'Content-Type': 'application/json' }
+                                    headers: { 
+                                        'Content-Type': 'application/json',
+                                        'X-XSRF-TOKEN': csrfToken
+                                    },
+                                    credentials: 'same-origin'
                                 })
                                 .then(response => {
                                     if (response.ok) {
