@@ -4,6 +4,7 @@ import dev.kang.studyhub.service.user.exception.AlreadyExistsEmailException;
 import dev.kang.studyhub.web.user.UserJoinForm;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.MediaType;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -11,7 +12,9 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.multipart.support.MissingServletRequestPartException;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.method.ControllerAdviceBean;
 
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -25,7 +28,6 @@ import java.util.Map;
  */
 @ControllerAdvice
 public class UserControllerAdvice {
-
     /**
      * 이메일 중복 예외 처리
      * 회원가입 폼에 에러 메시지를 표시하고 다시 폼을 보여줌
@@ -80,7 +82,17 @@ public class UserControllerAdvice {
      * 서버 에러 페이지로 리다이렉트
      */
     @ExceptionHandler(Exception.class)
-    public ModelAndView handleGenericException(Exception ex) {
+    public Object handleGenericException(Exception ex, HttpServletRequest request) {
+        // OpenAPI 요청은 JSON 반환
+        if (request.getRequestURI() != null && request.getRequestURI().startsWith("/v3/api-docs")) {
+            Map<String, Object> error = new HashMap<>();
+            error.put("message", "서버 내부 오류가 발생했습니다.");
+            error.put("error", ex.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(error);
+        }
+        // 그 외는 기존대로 HTML 반환
         ModelAndView mav = new ModelAndView("error/500");
         mav.addObject("message", "서버 내부 오류가 발생했습니다.");
         mav.addObject("error", "일시적인 문제가 발생했습니다. 잠시 후 다시 시도해주세요.");

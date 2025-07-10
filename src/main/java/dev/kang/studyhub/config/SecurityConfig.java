@@ -52,7 +52,8 @@ public class SecurityConfig {
                 
                 // URL별 접근 권한 설정
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/join", "/login", "/css/**", "/js/**", "/images/**", "/h2-console/**").permitAll()
+                        .requestMatchers("/", "/join", "/login", "/css/**", "/js/**", "/images/**", "/h2-console/**", 
+                                       "/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
                         .requestMatchers("/api/images/**").authenticated()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
@@ -96,11 +97,11 @@ public class SecurityConfig {
         // repo.setCookieSecure(true); // Spring Security 6.x에서는 setCookieSecure 미지원, 필요시 CookieSerializer 사용
 
         http
-            .csrf(csrf -> csrf
+                            .csrf(csrf -> csrf
                 // LazyCsrfTokenRepository로 세션/쿠키 타이밍 문제까지 방지
                 .csrfTokenRepository(new LazyCsrfTokenRepository(repo))
                 // 정말 예외가 필요한 POST만 예외 처리
-                .ignoringRequestMatchers("/api/images/upload")
+                .ignoringRequestMatchers("/api/images/upload", "/v3/api-docs/**")
             )
             // 보안 헤더 설정
             .headers(headers -> headers
@@ -128,7 +129,8 @@ public class SecurityConfig {
             )
             // URL별 접근 권한 설정
             .authorizeHttpRequests(auth -> auth
-                    .requestMatchers("/", "/join", "/login", "/css/**", "/js/**", "/images/**", "/h2-console/**", "/api/images/**", "/error", "/favicon.ico").permitAll()
+                    .requestMatchers("/", "/join", "/login", "/css/**", "/js/**", "/images/**", "/h2-console/**", "/api/images/**", "/error", "/favicon.ico",
+                                   "/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
                     .requestMatchers("/admin/**").hasRole("ADMIN")
                     .anyRequest().authenticated()
             )
@@ -176,7 +178,8 @@ public class SecurityConfig {
                 
                 // URL별 접근 권한 설정
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/join", "/login", "/css/**", "/js/**", "/images/**").permitAll()
+                        .requestMatchers("/", "/join", "/login", "/css/**", "/js/**", "/images/**",
+                                       "/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
                         .requestMatchers("/api/images/**").authenticated()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()

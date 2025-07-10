@@ -143,19 +143,47 @@ Spring Boot 기반 MVC 패턴으로 제작되었으며, 회원 관리, 스터디
 - [x] 이미지 업로드 (Cloudinary)
 - [x] Spring Security 설정
 - [x] 통합 테스트 및 단위 테스트
-- [x] 페이징 처리
-- [x] 검색 기능
+- [x] 스터디 검색 기능
 - [x] AWS EC2 배포
+- [x] API 문서화 (Swagger/OpenAPI)
 
 
 ### 🔄 진행 중인 작업
-- [ ] API 문서화 (Swagger/OpenAPI)
-- [ ] 코드 품질 개선 및 중복 제거
-- [ ] Javadoc 및 한글 주석 추가
+- [ ] 코드 품질 개선
+- [ ] JWT 인증 방식 추가
+- [ ] 페이징 처리
+
 
 ### 📋 향후 계획
 - [ ] CI/CD 파이프라인 구축
 - [ ] REST API 확장
+
+---
+
+## API 문서화 (Swagger/OpenAPI)
+
+StudyHub는 SpringDoc OpenAPI를 사용하여 REST API를 문서화했습니다.
+
+### Swagger UI 접속
+- **로컬 개발 환경**: http://localhost:8080/swagger-ui/index.html
+- **배포 환경**: http://studyhub-env.eba-qnsmv3is.ap-northeast-2.elasticbeanstalk.com/swagger-ui/index.html
+
+### 문서화된 API
+- 이미지 업로드 API: `/api/images/upload`
+- 관리자 대시보드 API: `/admin/dashboard/**`
+- 관리자 사용자 관리 API: `/admin/users/api/**`
+- 관리자 신고 처리 API: `/admin/reports/api/**`
+
+### 기술 스택
+- SpringDoc OpenAPI 2.5.0: API 문서화 라이브러리
+- Swagger UI: 인터랙티브 API 문서 인터페이스
+- OpenAPI 3.0: 표준 API 문서화 스펙
+
+### 사용 방법
+1. 위 URL에 접속하여 Swagger UI 페이지 열기
+2. 원하는 API 엔드포인트 클릭
+3. "Try it out" 버튼을 클릭하여 API 테스트
+4. 파라미터 입력 후 "Execute" 버튼으로 실제 API 호출
 
 ---
 

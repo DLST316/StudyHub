@@ -40,8 +40,16 @@ dependencies {
     
     // Cloudinary 의존성 추가
     implementation 'com.cloudinary:cloudinary-http44:1.36.0'
-    implementation 'com.cloudinary:cloudinary-taglib:1.36.0'
+    implementation('com.cloudinary:cloudinary-taglib:1.36.0') {
+        exclude group: 'javax.servlet', module: 'servlet-api'
+        exclude group: 'javax.servlet', module: 'jsp-api'
+    }
+    // Spring Boot 3.x 호환을 위한 jakarta.servlet-api 명시적 추가
+    implementation 'jakarta.servlet:jakarta.servlet-api:6.0.0'
     
+    // SpringDoc OpenAPI (Swagger) 의존성 추가
+    // https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-starter-webmvc-ui
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.9")
     
 
 }
