@@ -13,7 +13,7 @@
 스터디 모집과 취업 준비생을 위한 커뮤니티 플랫폼입니다.  
 Spring Boot 기반 MVC 패턴으로 제작되었으며, 회원 관리, 스터디 기능, 게시판, 관리자 기능까지 포함합니다.
 
-[배포 사이트 바로가기](http://studyhub-env.eba-qnsmv3is.ap-northeast-2.elasticbeanstalk.com/)
+[배포 사이트 바로가기](http://studyhub-env.eba-mhqi3ikj.ap-northeast-2.elasticbeanstalk.com/)
 
 ---
 
@@ -170,7 +170,7 @@ StudyHub는 SpringDoc OpenAPI를 사용하여 REST API를 문서화했습니다.
 
 ### Swagger UI 접속
 - **로컬 개발 환경**: http://localhost:8080/swagger-ui/index.html
-- **배포 환경**: http://studyhub-env.eba-qnsmv3is.ap-northeast-2.elasticbeanstalk.com/swagger-ui/index.html
+- **배포 환경**: http://studyhub-env.eba-mhqi3ikj.ap-northeast-2.elasticbeanstalk.com/swagger-ui/index.html
 
 ### 문서화된 API
 
