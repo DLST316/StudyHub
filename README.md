@@ -152,6 +152,7 @@ Spring Boot 기반 MVC 패턴으로 제작되었으며, 회원 관리, 스터디
 - [ ] 코드 품질 개선
 - [ ] JWT 인증 방식 추가
 - [ ] 페이징 처리
+- [x] 프로젝트 디렉토리 구조 리팩토링
 
 
 ### 📋 향후 계획
@@ -164,26 +165,42 @@ Spring Boot 기반 MVC 패턴으로 제작되었으며, 회원 관리, 스터디
 
 StudyHub는 SpringDoc OpenAPI를 사용하여 REST API를 문서화했습니다.
 
+### 기술 스택
+- SpringDoc OpenAPI 2.8.9: API 문서화 라이브러리
+
 ### Swagger UI 접속
 - **로컬 개발 환경**: http://localhost:8080/swagger-ui/index.html
 - **배포 환경**: http://studyhub-env.eba-qnsmv3is.ap-northeast-2.elasticbeanstalk.com/swagger-ui/index.html
 
 ### 문서화된 API
-- 이미지 업로드 API: `/api/images/upload`
-- 관리자 대시보드 API: `/admin/dashboard/**`
-- 관리자 사용자 관리 API: `/admin/users/api/**`
-- 관리자 신고 처리 API: `/admin/reports/api/**`
 
-### 기술 스택
-- SpringDoc OpenAPI 2.5.0: API 문서화 라이브러리
-- Swagger UI: 인터랙티브 API 문서 인터페이스
-- OpenAPI 3.0: 표준 API 문서화 스펙
+#### 관리자 대시보드 API
+- `GET /admin/dashboard/recent-reports` - 최근 신고 내역 조회
+- `GET /admin/dashboard/stats` - 대시보드 통계 조회
 
-### 사용 방법
-1. 위 URL에 접속하여 Swagger UI 페이지 열기
-2. 원하는 API 엔드포인트 클릭
-3. "Try it out" 버튼을 클릭하여 API 테스트
-4. 파라미터 입력 후 "Execute" 버튼으로 실제 API 호출
+#### 관리자 신고 처리 API
+- `GET /admin/reports/api` - 신고 목록 조회
+- `GET /admin/reports/api/{reportId}` - 특정 신고 상세 조회
+- `POST /admin/reports/api/{reportId}/resolve` - 신고 처리
+- `GET /admin/reports/api/stats` - 신고 통계 조회
+
+#### 관리자 사용자 관리 API
+- `GET /admin/users/api` - 사용자 목록 조회
+- `GET /admin/users/api/{id}` - 특정 사용자 상세 조회
+- `POST /admin/users/api/{id}/unblock` - 사용자 차단 해제
+- `POST /admin/users/api/{userId}/block` - 사용자 차단
+- `GET /admin/users/api/list` - 사용자 목록 (페이징)
+
+#### 커뮤니티 API
+- `POST /community/comment/{commentId}/delete` - 댓글 삭제
+
+#### 스터디 댓글 API
+- `PUT /studies/{studyId}/comments/{commentId}` - 스터디 댓글 수정
+- `DELETE /studies/{studyId}/comments/{commentId}` - 스터디 댓글 삭제
+
+#### 이미지 업로드 API
+- `POST /api/images/upload` - 이미지 파일 업로드
+
 
 ---
 
