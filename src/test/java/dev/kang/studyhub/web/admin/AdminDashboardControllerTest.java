@@ -1,11 +1,12 @@
 package dev.kang.studyhub.web.admin;
 
-import dev.kang.studyhub.domain.board.BoardRepository;
-import dev.kang.studyhub.domain.board.PostCommentRepository;
-import dev.kang.studyhub.domain.board.PostRepository;
-import dev.kang.studyhub.domain.board.ReportRepository;
-import dev.kang.studyhub.domain.study.repository.StudyRepository;
-import dev.kang.studyhub.domain.user.repository.UserRepository;
+import dev.kang.studyhub.admin.AdminDashboardController;
+import dev.kang.studyhub.board.repository.BoardRepository;
+import dev.kang.studyhub.board.repository.PostCommentRepository;
+import dev.kang.studyhub.board.repository.PostRepository;
+import dev.kang.studyhub.board.repository.ReportRepository;
+import dev.kang.studyhub.study.repository.StudyRepository;
+import dev.kang.studyhub.user.repository.UserRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

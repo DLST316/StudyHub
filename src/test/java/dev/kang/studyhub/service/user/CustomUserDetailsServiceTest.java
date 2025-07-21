@@ -1,8 +1,9 @@
 package dev.kang.studyhub.service.user;
 
-import dev.kang.studyhub.domain.user.entity.User;
-import dev.kang.studyhub.domain.user.model.EducationStatus;
-import dev.kang.studyhub.domain.user.repository.UserRepository;
+import dev.kang.studyhub.user.entity.User;
+import dev.kang.studyhub.user.model.EducationStatus;
+import dev.kang.studyhub.user.repository.UserRepository;
+import dev.kang.studyhub.user.service.CustomUserDetailsService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

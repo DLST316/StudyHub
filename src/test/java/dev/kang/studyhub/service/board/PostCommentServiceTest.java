@@ -1,9 +1,10 @@
 package dev.kang.studyhub.service.board;
 
-import dev.kang.studyhub.domain.board.Post;
-import dev.kang.studyhub.domain.board.PostComment;
-import dev.kang.studyhub.domain.board.PostCommentRepository;
-import dev.kang.studyhub.domain.user.entity.User;
+import dev.kang.studyhub.board.entity.Post;
+import dev.kang.studyhub.board.entity.PostComment;
+import dev.kang.studyhub.board.repository.PostCommentRepository;
+import dev.kang.studyhub.board.service.PostCommentService;
+import dev.kang.studyhub.user.entity.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

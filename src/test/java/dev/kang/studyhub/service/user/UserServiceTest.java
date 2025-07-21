@@ -1,11 +1,12 @@
 package dev.kang.studyhub.service.user;
 
-import dev.kang.studyhub.domain.user.entity.User;
-import dev.kang.studyhub.domain.user.model.EducationStatus;
-import dev.kang.studyhub.domain.user.repository.UserRepository;
-import dev.kang.studyhub.service.user.exception.AlreadyExistsEmailException;
-import dev.kang.studyhub.service.user.exception.AlreadyExistsUsernameException;
-import dev.kang.studyhub.web.user.UserJoinForm;
+import dev.kang.studyhub.user.entity.User;
+import dev.kang.studyhub.user.model.EducationStatus;
+import dev.kang.studyhub.user.repository.UserRepository;
+import dev.kang.studyhub.user.exception.AlreadyExistsEmailException;
+import dev.kang.studyhub.user.exception.AlreadyExistsUsernameException;
+import dev.kang.studyhub.user.service.UserService;
+import dev.kang.studyhub.user.dto.UserJoinForm;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,8 +15,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
-
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;

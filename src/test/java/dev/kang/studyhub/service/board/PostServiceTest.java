@@ -1,12 +1,16 @@
 package dev.kang.studyhub.service.board;
 
-import dev.kang.studyhub.domain.board.*;
-import dev.kang.studyhub.domain.user.entity.User;
+import dev.kang.studyhub.board.entity.Board;
+import dev.kang.studyhub.board.entity.Post;
+import dev.kang.studyhub.board.entity.PostLike;
+import dev.kang.studyhub.board.repository.PostLikeRepository;
+import dev.kang.studyhub.board.repository.PostRepository;
+import dev.kang.studyhub.board.service.PostService;
+import dev.kang.studyhub.user.entity.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;

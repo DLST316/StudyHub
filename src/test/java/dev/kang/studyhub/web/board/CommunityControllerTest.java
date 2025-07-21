@@ -1,27 +1,25 @@
 package dev.kang.studyhub.web.board;
 
-import dev.kang.studyhub.domain.board.Board;
-import dev.kang.studyhub.domain.board.Post;
-import dev.kang.studyhub.domain.board.PostComment;
-import dev.kang.studyhub.domain.board.PostLike;
-import dev.kang.studyhub.domain.board.BoardRepository;
-import dev.kang.studyhub.domain.board.PostRepository;
-import dev.kang.studyhub.domain.board.PostCommentRepository;
-import dev.kang.studyhub.domain.user.entity.User;
-import dev.kang.studyhub.domain.user.repository.UserRepository;
-import dev.kang.studyhub.service.board.BoardService;
-import dev.kang.studyhub.service.board.PostCommentService;
-import dev.kang.studyhub.service.board.PostService;
-import dev.kang.studyhub.service.user.UserService;
+import dev.kang.studyhub.board.entity.Board;
+import dev.kang.studyhub.board.entity.Post;
+import dev.kang.studyhub.board.entity.PostComment;
+import dev.kang.studyhub.board.repository.BoardRepository;
+import dev.kang.studyhub.board.repository.PostRepository;
+import dev.kang.studyhub.board.repository.PostCommentRepository;
+import dev.kang.studyhub.user.entity.User;
+import dev.kang.studyhub.user.model.EducationStatus;
+import dev.kang.studyhub.user.repository.UserRepository;
+import dev.kang.studyhub.board.service.BoardService;
+import dev.kang.studyhub.board.service.PostCommentService;
+import dev.kang.studyhub.board.service.PostService;
+import dev.kang.studyhub.user.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -30,7 +28,6 @@ import org.springframework.web.context.WebApplicationContext;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
@@ -400,7 +397,7 @@ class CommunityControllerTest {
                 .password("password")
                 .university("테스트 대학교")
                 .major("컴퓨터공학과")
-                .educationStatus(dev.kang.studyhub.domain.user.model.EducationStatus.ENROLLED)
+                .educationStatus(EducationStatus.ENROLLED)
                 .role("USER")
                 .build();
     }

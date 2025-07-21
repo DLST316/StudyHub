@@ -1,8 +1,9 @@
 package dev.kang.studyhub.web.user;
 
-import dev.kang.studyhub.domain.user.entity.User;
-import dev.kang.studyhub.domain.user.repository.UserRepository;
-import dev.kang.studyhub.service.user.UserService;
+import dev.kang.studyhub.user.entity.User;
+import dev.kang.studyhub.user.model.EducationStatus;
+import dev.kang.studyhub.user.repository.UserRepository;
+import dev.kang.studyhub.user.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -10,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
@@ -20,7 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -332,7 +331,7 @@ class AdminUserControllerTest {
                 .password("password")
                 .university("테스트 대학교")
                 .major("컴퓨터공학과")
-                .educationStatus(dev.kang.studyhub.domain.user.model.EducationStatus.ENROLLED)
+                .educationStatus(EducationStatus.ENROLLED)
                 .role(role)
                 .isBlocked(isBlocked)
                 .build();

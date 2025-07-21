@@ -152,7 +152,6 @@ Spring Boot 기반 MVC 패턴으로 제작되었으며, 회원 관리, 스터디
 - [ ] 코드 품질 개선
 - [ ] JWT 인증 방식 추가
 - [ ] 페이징 처리
-- [x] 프로젝트 디렉토리 구조 리팩토링
 
 
 ### 📋 향후 계획
@@ -172,7 +171,7 @@ StudyHub는 SpringDoc OpenAPI를 사용하여 REST API를 문서화했습니다.
 - **로컬 개발 환경**: http://localhost:8080/swagger-ui/index.html
 - **배포 환경**: http://studyhub-env.eba-mhqi3ikj.ap-northeast-2.elasticbeanstalk.com/swagger-ui/index.html
 
-### 문서화된 API
+### API
 
 #### 관리자 대시보드 API
 - `GET /admin/dashboard/recent-reports` - 최근 신고 내역 조회

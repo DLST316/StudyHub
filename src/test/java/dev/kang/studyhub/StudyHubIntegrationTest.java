@@ -1,18 +1,26 @@
 package dev.kang.studyhub;
 
-import dev.kang.studyhub.domain.user.entity.User;
-import dev.kang.studyhub.domain.user.model.EducationStatus;
-import dev.kang.studyhub.domain.user.repository.UserRepository;
-import dev.kang.studyhub.service.user.UserService;
-import dev.kang.studyhub.web.user.UserJoinForm;
-import dev.kang.studyhub.domain.study.entity.Study;
-import dev.kang.studyhub.domain.study.entity.StudyApplication;
-import dev.kang.studyhub.domain.study.entity.StudyComment;
-import dev.kang.studyhub.domain.study.model.ApplicationStatus;
-import dev.kang.studyhub.domain.study.repository.StudyApplicationRepository;
-import dev.kang.studyhub.service.study.StudyService;
-import dev.kang.studyhub.service.study.StudyApplicationService;
-import dev.kang.studyhub.service.study.StudyCommentService;
+import dev.kang.studyhub.board.entity.Board;
+import dev.kang.studyhub.board.entity.Post;
+import dev.kang.studyhub.board.entity.PostComment;
+import dev.kang.studyhub.board.repository.BoardRepository;
+import dev.kang.studyhub.board.repository.PostCommentRepository;
+import dev.kang.studyhub.board.repository.PostLikeRepository;
+import dev.kang.studyhub.board.repository.PostRepository;
+import dev.kang.studyhub.user.entity.User;
+import dev.kang.studyhub.user.exception.AlreadyExistsEmailException;
+import dev.kang.studyhub.user.model.EducationStatus;
+import dev.kang.studyhub.user.repository.UserRepository;
+import dev.kang.studyhub.user.service.UserService;
+import dev.kang.studyhub.user.dto.UserJoinForm;
+import dev.kang.studyhub.study.entity.Study;
+import dev.kang.studyhub.study.entity.StudyApplication;
+import dev.kang.studyhub.study.entity.StudyComment;
+import dev.kang.studyhub.study.model.ApplicationStatus;
+import dev.kang.studyhub.study.repository.StudyApplicationRepository;
+import dev.kang.studyhub.study.service.StudyService;
+import dev.kang.studyhub.study.service.StudyApplicationService;
+import dev.kang.studyhub.study.service.StudyCommentService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,14 +39,10 @@ import java.time.LocalDateTime;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import dev.kang.studyhub.domain.board.*;
-import dev.kang.studyhub.domain.board.PostLike.LikeType;
-import dev.kang.studyhub.domain.board.PostLikeRepository;
-import dev.kang.studyhub.domain.board.BoardRepository;
-import dev.kang.studyhub.service.board.PostService;
-import dev.kang.studyhub.service.board.PostCommentService;
-import dev.kang.studyhub.service.ImageUploadService;
-import org.mockito.Mockito;
+import dev.kang.studyhub.board.entity.PostLike.LikeType;
+import dev.kang.studyhub.board.service.PostService;
+import dev.kang.studyhub.board.service.PostCommentService;
+import dev.kang.studyhub.common.service.ImageUploadService;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.mock.web.MockMultipartFile;
 
@@ -188,7 +192,7 @@ class StudyHubIntegrationTest {
         try {
             userService.join(joinForm2);
             assertThat(false).isTrue(); // 예외가 발생해야 함
-        } catch (dev.kang.studyhub.service.user.exception.AlreadyExistsEmailException e) {
+        } catch (AlreadyExistsEmailException e) {
             assertThat(e.getMessage()).isEqualTo("이미 사용 중인 이메일입니다.");
         }
     }

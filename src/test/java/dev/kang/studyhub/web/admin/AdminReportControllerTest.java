@@ -1,10 +1,11 @@
 package dev.kang.studyhub.web.admin;
 
-import dev.kang.studyhub.domain.board.Report;
-import dev.kang.studyhub.domain.board.ReportRepository;
-import dev.kang.studyhub.domain.user.entity.User;
-import dev.kang.studyhub.domain.user.repository.UserRepository;
-import dev.kang.studyhub.web.admin.dto.ReportDto;
+import dev.kang.studyhub.admin.AdminReportController;
+import dev.kang.studyhub.board.entity.Report;
+import dev.kang.studyhub.board.repository.ReportRepository;
+import dev.kang.studyhub.user.entity.User;
+import dev.kang.studyhub.user.repository.UserRepository;
+import dev.kang.studyhub.admin.dto.ReportDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -18,7 +19,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;

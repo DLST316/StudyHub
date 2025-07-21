@@ -1,13 +1,14 @@
 package dev.kang.studyhub.web.study;
 
-import dev.kang.studyhub.domain.study.entity.Study;
-import dev.kang.studyhub.domain.study.entity.StudyApplication;
-import dev.kang.studyhub.domain.user.entity.User;
-import dev.kang.studyhub.domain.user.repository.UserRepository;
-import dev.kang.studyhub.service.study.StudyApplicationService;
-import dev.kang.studyhub.service.study.StudyService;
-import dev.kang.studyhub.service.user.UserService;
-import dev.kang.studyhub.web.user.UserJoinForm;
+import dev.kang.studyhub.study.entity.Study;
+import dev.kang.studyhub.study.entity.StudyApplication;
+import dev.kang.studyhub.user.entity.User;
+import dev.kang.studyhub.user.model.EducationStatus;
+import dev.kang.studyhub.user.repository.UserRepository;
+import dev.kang.studyhub.study.service.StudyApplicationService;
+import dev.kang.studyhub.study.service.StudyService;
+import dev.kang.studyhub.user.service.UserService;
+import dev.kang.studyhub.user.dto.UserJoinForm;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -221,7 +222,7 @@ class StudyApplicationControllerTest {
         form.setName(name);
         form.setUniversity("테스트 대학교");
         form.setMajor("컴퓨터공학과");
-        form.setEducationStatus(dev.kang.studyhub.domain.user.model.EducationStatus.ENROLLED);
+        form.setEducationStatus(EducationStatus.ENROLLED);
         
         userService.join(form);
         return userService.findByUsername(username).orElseThrow();

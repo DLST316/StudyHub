@@ -1,18 +1,17 @@
 package dev.kang.studyhub;
 
-import dev.kang.studyhub.domain.user.model.EducationStatus;
-import dev.kang.studyhub.service.user.UserService;
-import dev.kang.studyhub.web.user.UserJoinForm;
+import dev.kang.studyhub.user.model.EducationStatus;
+import dev.kang.studyhub.user.service.UserService;
+import dev.kang.studyhub.user.dto.UserJoinForm;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
-import dev.kang.studyhub.domain.board.Board;
-import dev.kang.studyhub.domain.board.BoardRepository;
+import dev.kang.studyhub.board.entity.Board;
+import dev.kang.studyhub.board.repository.BoardRepository;
 import java.time.LocalDateTime;
-import org.springframework.context.annotation.Profile;
 
 /**
  * StudyHub 애플리케이션의 메인 클래스

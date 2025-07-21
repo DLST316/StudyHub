@@ -2,6 +2,7 @@ package dev.kang.studyhub.service;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.Uploader;
+import dev.kang.studyhub.common.service.ImageUploadService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;

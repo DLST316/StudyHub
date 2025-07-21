@@ -1,7 +1,9 @@
 package dev.kang.studyhub.domain.board;
 
-import dev.kang.studyhub.domain.user.entity.User;
-import dev.kang.studyhub.domain.user.repository.UserRepository;
+import dev.kang.studyhub.board.entity.Report;
+import dev.kang.studyhub.board.repository.ReportRepository;
+import dev.kang.studyhub.user.entity.User;
+import dev.kang.studyhub.user.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

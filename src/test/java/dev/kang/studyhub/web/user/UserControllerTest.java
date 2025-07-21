@@ -1,6 +1,8 @@
 package dev.kang.studyhub.web.user;
 
-import dev.kang.studyhub.service.user.UserService;
+import dev.kang.studyhub.user.dto.UserJoinForm;
+import dev.kang.studyhub.user.service.UserService;
+import dev.kang.studyhub.user.model.EducationStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -164,7 +166,7 @@ class UserControllerTest {
         form.setPassword("password123");
         form.setUniversity("테스트 대학교");
         form.setMajor("컴퓨터공학과");
-        form.setEducationStatus(dev.kang.studyhub.domain.user.model.EducationStatus.ENROLLED);
+        form.setEducationStatus(EducationStatus.ENROLLED);
         
         userService.join(form);
     }

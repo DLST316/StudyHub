@@ -1,5 +1,6 @@
 package dev.kang.studyhub.web.board;
 
+import dev.kang.studyhub.board.dto.PostForm;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;

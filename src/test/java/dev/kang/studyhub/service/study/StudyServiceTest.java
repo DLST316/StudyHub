@@ -1,10 +1,12 @@
 package dev.kang.studyhub.service.study;
 
-import dev.kang.studyhub.domain.study.entity.Study;
-import dev.kang.studyhub.domain.study.entity.StudyComment;
-import dev.kang.studyhub.domain.study.repository.StudyRepository;
-import dev.kang.studyhub.domain.user.entity.User;
-import dev.kang.studyhub.domain.user.model.EducationStatus;
+import dev.kang.studyhub.study.entity.Study;
+import dev.kang.studyhub.study.entity.StudyComment;
+import dev.kang.studyhub.study.repository.StudyRepository;
+import dev.kang.studyhub.study.service.StudyApplicationService;
+import dev.kang.studyhub.study.service.StudyCommentService;
+import dev.kang.studyhub.study.service.StudyService;
+import dev.kang.studyhub.user.entity.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -25,7 +27,6 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
 /**

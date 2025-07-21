@@ -1,11 +1,11 @@
 package dev.kang.studyhub.web.admin;
 
-import dev.kang.studyhub.domain.board.PostRepository;
-import dev.kang.studyhub.domain.board.PostCommentRepository;
-import dev.kang.studyhub.domain.study.repository.StudyRepository;
-import dev.kang.studyhub.domain.board.Post;
-import dev.kang.studyhub.domain.board.PostComment;
-import dev.kang.studyhub.domain.study.entity.Study;
+import dev.kang.studyhub.board.repository.PostRepository;
+import dev.kang.studyhub.board.repository.PostCommentRepository;
+import dev.kang.studyhub.study.repository.StudyRepository;
+import dev.kang.studyhub.board.entity.Post;
+import dev.kang.studyhub.board.entity.PostComment;
+import dev.kang.studyhub.study.entity.Study;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
